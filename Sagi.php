@@ -115,7 +115,7 @@ class Sagi
         if ($prepared->execute($this->args)) {
             return $prepared;
         } else {
-            throw new Exception('Your query has been failed, message:', $this->pdo->errorInfo()['message']);
+            throw new Exception('Your query has been failed, message:' . $this->pdo->errorInfo()[0]);
         }
 
 
@@ -165,7 +165,7 @@ class Sagi
 
         $handled = $this->handlePattern($pattern, [
             ':from' => $this->getTable(),
-            ':update' => $setted['message'],
+            ':update' => $setted['content'],
             ':where' => $this->prepareWhereQuery()
         ]);
 
@@ -185,7 +185,7 @@ class Sagi
 
         $handled = $this->handlePattern($pattern, [
             ':from' => $this->getTable(),
-            ':insert' => $setted['message'],
+            ':insert' => $setted['content'],
         ]);
 
         return $this->returnPreparedResults($handled);
@@ -199,7 +199,7 @@ class Sagi
     private function handlePattern($pattern, $args)
     {
         foreach ($args as $key => $arg) {
-            $pattern = str_replace($key, $args, $pattern);
+            $pattern = str_replace($key, $arg, $pattern);
         }
 
         return $pattern;
@@ -377,6 +377,10 @@ class Sagi
 
         if (!empty($orWhere)) {
             $string .= $this->prepare0rWhereQuery();
+        }
+
+        if ($string !== '') {
+            $string = 'WHERE ' . $string;
         }
 
         return $string;
