@@ -65,7 +65,6 @@ class Sagi
      * @var string
      */
     private $query;
-
     /**
      * @var array
      */
