@@ -110,7 +110,6 @@ class Sagi
     private function returnPreparedResults($query)
     {
         $query = trim($query);
-
         $prepared = $this->pdo->prepare($query);
         if ($prepared->execute($this->args)) {
             return $prepared;
@@ -119,6 +118,24 @@ class Sagi
         }
 
 
+    }
+
+    /**
+     * @return mixed
+     */
+    public function fetch()
+    {
+        $get = $this->get();
+
+        return $get->fetchObject();
+    }
+
+    /**
+     * @return array
+     */
+    public function fetchAll()
+    {
+        return $this->get()->fetchAll();
     }
 
     public function get()
@@ -130,6 +147,7 @@ class Sagi
             ':from' => $this->getTable(),
             ':join' => $this->prepareJoinQuery(),
             ':group' => $this->prepareGroupQuery(),
+            ':where' => $this->prepareWhereQuery(),
             ':order' => $this->prepareOrderQuery(),
             ':limit' => $this->prepareLimitQuery()
         ]);
@@ -356,6 +374,10 @@ class Sagi
     private function prepareJoinQuery()
     {
         $join = $this->getJoin();
+
+        if (empty($join)) {
+            return '';
+        }
 
         $string = '';
         foreach ($join as $type => $value) {
