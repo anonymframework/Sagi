@@ -1,0 +1,14 @@
+{
+    "name": "sagi/sagi",
+    "description": "sagi basic database orm",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vahit",
+            "email": "vahit.serif119@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
