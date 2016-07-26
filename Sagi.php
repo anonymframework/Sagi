@@ -41,14 +41,14 @@ class Sagi
      *
      * @var array
      */
-    private $where;
+    private $where = [];
 
     /**
      * or where query
      *
      * @var array
      */
-    private $orWhere;
+    private $orWhere = [];
 
     /**
      * @var array
@@ -58,7 +58,7 @@ class Sagi
     /**
      * @var array
      */
-    private $join;
+    private $join = [];
     /**
      * full query string
      *
