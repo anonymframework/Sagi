@@ -109,7 +109,6 @@ class Sagi
 
     private function returnPreparedResults($query)
     {
-        var_dump($query);
         $query = trim($query);
         $prepared = $this->pdo->prepare($query);
         if ($prepared->execute($this->args)) {
