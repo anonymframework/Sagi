@@ -171,5 +171,23 @@ $db->relations([
 
 ```
 
+##Examples;
+
+```php
+ 
+ $db->where('username', 'admin')
+ ->relations([
+       'posts' => ['user_id', 'id', 'many']
+ ]);
+ 
+ $data = $db->first();
+ 
+ 
+ foreach($db->posts as $post)
+ {
+    echo $post->id;
+ }
+
+```
 
 
