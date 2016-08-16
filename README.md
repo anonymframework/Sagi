@@ -141,6 +141,40 @@ $db->join('targetTable', ['targetColumn' => 'ourColumn']);
 
 ```
 
+####first
+
+gets only first data
+
+```php
+
+ $data = $db->first();
+
+```
+
+#### all
+
+gets all datas with fetchAll method
+
+```php
+ 
+  $datas = $db->all();
+ 
+```
+
+```php
+
+  echo $data->username;
+
+```
+
+```php
+ 
+  foreach($datas as $data){
+    echo $data->username;
+  }
+
+```
+
 ### Relations
 
 #### one

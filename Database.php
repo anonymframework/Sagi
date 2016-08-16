@@ -25,10 +25,6 @@ class Database implements Iterator
     public $attr;
 
 
-    /**
-     * @var array
-     */
-    public $relations;
 
     /**
      * Database constructor.

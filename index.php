@@ -35,10 +35,10 @@ $query = $db->relations([
     'posts' => ['user_id', 'id', 'many']
 ]);
 
-$data = $db->first();
+$query->select('username,id');
 
-foreach ($data->posts as $item) {
-    echo 'Post:' . $item->id;
+foreach ($query->first()->posts as $post){
+    echo $post->id;
 }
 
 
