@@ -149,7 +149,7 @@ $db->join('targetTable', ['targetColumn' => 'ourColumn']);
 ```php
 
 $db->relations([
-   'posts' => ['user_id', 'id'']
+   'posts' => ['user_id', 'id']
 ]);
 
 $post = $db->posts; 
