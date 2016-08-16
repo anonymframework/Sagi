@@ -254,6 +254,15 @@ class QueryBuilder
             $select = explode(",", $select);
         }
 
+        $table = $this->getTable();
+
+        $select = array_map(function ($value) use ($table) {
+            if (strpos($value, '.') === false) {
+                return $table . '.' . $value;
+            }
+        }, $select);
+
+
         return $this->setSelect($select);
     }
 
@@ -414,7 +423,6 @@ class QueryBuilder
 
         foreach ($joins as $join) {
             $type = isset($join[0]) ? $join[0] : 'LEFT JOIN';
-            $targetTable = isset($join[1]) ? $join[1] : '';
             $targetColumn = isset($join[2]) ? $join[2] : '';
             $ourTable = $this->getTable();
             $ourColumn = isset($join[3]) ? $join[3] : '';
@@ -678,7 +686,6 @@ class QueryBuilder
 
         return $this;
     }
-
 
 
 }
