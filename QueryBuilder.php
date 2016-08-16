@@ -1,6 +1,6 @@
 <?php
 
-class Sagi
+class QueryBuilder
 {
 
     /**
@@ -11,7 +11,7 @@ class Sagi
     /**
      * @var PDO
      */
-    private $pdo;
+    public $pdo;
     /**
      * @var select query
      */
@@ -71,22 +71,38 @@ class Sagi
     private $args = [];
 
     /**
-     * Sagi constructor.
+     * @var QueryBuilder
+     */
+    public static $instance;
+
+    /**
+     * @var array
+     */
+    public $relations;
+
+    /**
+     * QueryBuilder constructor.
      * @param array $configs
      * @param string $table
      * @throws Exception
      */
-    public function __construct(array $configs = [], $table = null)
+    public function __construct($configs = [], $table = null)
     {
-        if (isset($configs['host']) && isset($configs['dbname']) && $configs['username'] && $configs['password']) {
-            $this->setConfigs($configs);
+        if ($configs instanceof PDO) {
+            $this->pdo = $configs;
         } else {
-            throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
+            if (isset($configs['host']) && isset($configs['dbname']) && $configs['username'] && $configs['password']) {
+                $this->setConfigs($configs);
+                $this->startConnection();
+            } else {
+                throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
+            }
+
         }
 
         $this->setTable($table);
 
-        $this->startConnection();
+        static::$instance = $this;
     }
 
 
@@ -110,13 +126,15 @@ class Sagi
     {
         $query = trim($query);
         $prepared = $this->pdo->prepare($query);
-        if ($prepared->execute($this->args)) {
-            return $prepared;
-        } else {
-            throw new Exception('Your query has been failed, message:' . $this->pdo->errorInfo()[0]);
-        }
+        $this->args = array_slice($this->args, 0, count($this->where));
+        $prepared->execute($this->args);
+        return $prepared;
 
+    }
 
+    public function newInstance($table)
+    {
+        return new static($this->configs, $table);
     }
 
     /**
@@ -126,7 +144,7 @@ class Sagi
     {
         $get = $this->get();
 
-        return $get->fetchObject();
+        return $get->fetchObject('Results', ['table' => $this->getTable(), 'database' => $this]);
     }
 
     /**
@@ -134,9 +152,12 @@ class Sagi
      */
     public function fetchAll()
     {
-        return $this->get()->fetchAll();
+        return $this->get()->fetchAll(PDO::FETCH_CLASS, 'Results', ['table' => $this->getTable(), 'database' => $this]);
     }
 
+    /**
+     * @return PDOStatement
+     */
     public function get()
     {
         $pattern = 'SELECT :select FROM :from :join :group :where :order :limit';
@@ -205,6 +226,7 @@ class Sagi
             ':insert' => $setted['content'],
         ]);
 
+
         return $this->returnPreparedResults($handled);
     }
 
@@ -224,7 +246,7 @@ class Sagi
 
     /**
      * @param array $select
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function select($select = [])
     {
@@ -238,7 +260,7 @@ class Sagi
     /**
      * @param $column
      * @param string $type
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function order($column, $type = 'DESC')
     {
@@ -262,7 +284,7 @@ class Sagi
 
     /**
      * @param $group
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function group($group)
     {
@@ -271,22 +293,25 @@ class Sagi
 
     /**
      * @param $join
-     * @return Sagi
+     * @return QueryBuilder
      */
-    public function join($join)
+    public function join($table, array $columns = [], $type = 'INNER JOIN')
     {
-        $this->join[] = $join;
+        $indexs = array_keys($columns);
+        $values = array_values($columns);
+        $this->join[] = [$type, $table, $values[0], $indexs[0]];
         return $this;
     }
 
     public function where($a, $b = null, $c = null)
     {
         if (is_null($b) && is_null($c)) {
+            $a[] = 'AND';
             $this->where[] = $a;
         } elseif (is_null($c)) {
-            $this->where[] = [$a, '=', $b];
+            $this->where[] = [$a, '=', $b, 'AND'];
         } else {
-            $this->where[] = [$a, $b, $c];
+            $this->where[] = [$a, $b, $c, 'AND'];
         }
 
         return $this;
@@ -301,11 +326,12 @@ class Sagi
     public function orWhere($a, $b = null, $c = null)
     {
         if (is_null($b) && is_null($c)) {
-            $this->orWhere[] = $a;
+            $a[] = 'OR';
+            $this->where[] = $a;
         } elseif (is_null($c)) {
-            $this->orWhere[] = [$a, '=', $b];
+            $this->where[] = [$a, '=', $b, 'OR'];
         } else {
-            $this->orWhere[] = [$a, $b, $c];
+            $this->where[] = [$a, $b, $c, 'OR'];
         }
 
         return $this;
@@ -322,7 +348,13 @@ class Sagi
             return "";
         }
 
-        return "LIMIT " . join(",", $limit);
+        $s = "LIMIT $limit[0] ";
+
+        if (isset($limit[1])) {
+            $s .= 'OFFSET ' . $limit[1];
+        }
+
+        return $s;
     }
 
     private function prepareOrderQuery()
@@ -372,33 +404,34 @@ class Sagi
      */
     private function prepareJoinQuery()
     {
-        $join = $this->getJoin();
+        $joins = $this->getJoin();
 
-        if (empty($join)) {
+        if (empty($joins)) {
             return '';
         }
 
         $string = '';
-        foreach ($join as $type => $value) {
-            $string .= sprintf("%s %s ON %s.%s = %s.%s", $type, $value[0], $value[0], $value[1], $this->getTable(), $value[2]);
-        }
 
+        foreach ($joins as $join) {
+            $type = isset($join[0]) ? $join[0] : 'LEFT JOIN';
+            $targetTable = isset($join[1]) ? $join[1] : '';
+            $targetColumn = isset($join[2]) ? $join[2] : '';
+            $ourTable = $this->getTable();
+            $ourColumn = isset($join[3]) ? $join[3] : '';
+            $string .= "$type $targetTable ON $ourTable.$ourColumn = $targetTable.$targetColumn";
+        }
         return $string;
     }
 
     private function prepareWhereQuery()
     {
         $where = $this->getWhere();
-        $orWhere = $this->getOrWhere();
 
         $string = '';
         if (!empty($where)) {
-            $string .= $this->prepareAndWhereQuery();
+            $string .= $this->prepareAllWhereQueries();
         }
 
-        if (!empty($orWhere)) {
-            $string .= $this->prepare0rWhereQuery();
-        }
 
         if ($string !== '') {
             $string = 'WHERE ' . $string;
@@ -410,32 +443,29 @@ class Sagi
     /**
      * @return string
      */
-    private function prepareAndWhereQuery()
+    private function prepareAllWhereQueries()
     {
         $where = $this->getWhere();
 
-        $prepared = $this->databaseStringBuilderWithStart($where, "AND");
+        $args = [];
+        $s = '';
+        foreach ($where as $item) {
+            if ($s !== '') {
+                $s .= "$item[3] {$item[0]} {$item[1]} ? ";
+            } else {
+                $s .= "{$item[0]} {$item[1]} ?  ";
+            }
+            $args[] = $item[2];
+        }
 
-        $this->args = array_merge($this->args, $prepared['args']);
 
-        return $prepared['content'];
+        $s = rtrim($s, $item[3]);
+
+        $this->args = array_merge($this->args, $args);
+
+        return $s;
     }
 
-
-    /**
-     * @return string
-     */
-    private function prepare0rWhereQuery()
-    {
-        $where = $this->getOrWhere();
-
-
-        $prepared = $this->databaseStringBuilderWithStart($where, "Or");
-
-        $this->args = array_merge($this->args, $prepared['args']);
-
-        return $prepared['content'];
-    }
 
     /**
      * Set verisi oluşturur
@@ -458,30 +488,6 @@ class Sagi
     }
 
     /**
-     *
-     * @param array $args
-     * @param string $start
-     * @return mixed
-     */
-    private function databaseStringBuilderWithStart(array $args, $start)
-    {
-        $s = '';
-        $arr = [];
-        foreach ($args as $arg) {
-            $s .= " {$arg[0]} {$arg[1]} ? $start";
-            $arr[] = $arg[2];
-        }
-        if (!count($args) === 1) {
-            $s = $start . $s;
-        }
-        $s = rtrim($s, $start);
-        return [
-            'content' => $s,
-            'args' => $arr,
-        ];
-    }
-
-    /**
      * @return array
      */
     public function getConfigs()
@@ -491,7 +497,7 @@ class Sagi
 
     /**
      * @param array $configs
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setConfigs($configs)
     {
@@ -510,7 +516,7 @@ class Sagi
 
     /**
      * @param select $select
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setSelect($select)
     {
@@ -528,7 +534,7 @@ class Sagi
 
     /**
      * @param string $table
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setTable($table)
     {
@@ -546,7 +552,7 @@ class Sagi
 
     /**
      * @param array $limit
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setLimit($limit)
     {
@@ -564,7 +570,7 @@ class Sagi
 
     /**
      * @param string $groupBy
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setGroupBy($groupBy)
     {
@@ -582,7 +588,7 @@ class Sagi
 
     /**
      * @param array $where
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setWhere($where)
     {
@@ -600,7 +606,7 @@ class Sagi
 
     /**
      * @param string $query
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setQuery($query)
     {
@@ -618,7 +624,7 @@ class Sagi
 
     /**
      * @param array $order
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setOrder($order)
     {
@@ -636,7 +642,7 @@ class Sagi
 
     /**
      * @param array $join
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setJoin($join)
     {
@@ -654,13 +660,25 @@ class Sagi
 
     /**
      * @param array $orWhere
-     * @return Sagi
+     * @return QueryBuilder
      */
     public function setOrWhere($orWhere)
     {
         $this->orWhere = $orWhere;
         return $this;
     }
+
+    /**
+     * @param $relations
+     * @return $this
+     */
+    public function relations($relations)
+    {
+        RelationBag::setRelations($relations);
+
+        return $this;
+    }
+
 
 
 }
