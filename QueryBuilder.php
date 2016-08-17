@@ -179,6 +179,7 @@ class QueryBuilder
             ':limit' => $this->prepareLimitQuery()
         ]);
 
+
         return $this->returnPreparedResults($handled);
     }
 
@@ -248,7 +249,11 @@ class QueryBuilder
             $pattern = str_replace($key, $arg, $pattern);
         }
 
-        return $pattern;
+        $exploded = array_filter(explode(' ', $pattern), function ($value) {
+            return !empty($value);
+        });
+
+        return join(" ", $exploded);
     }
 
     /**
@@ -305,6 +310,56 @@ class QueryBuilder
     public function group($group)
     {
         return $this->setGroupBy($group);
+    }
+
+    /**
+     * @param $column
+     * @param $datas
+     * @param bool $not
+     */
+    public function like($column, $datas, $not = false)
+    {
+        if (is_array($datas)) {
+            $type = isset($datas[1]) ? $datas[1] : $datas[0];
+            $data = isset($datas[0]) ? $datas[0] : '';
+        } else {
+            $type = $data = $datas;
+        }
+
+        $type = str_replace('?', $data, $type);
+
+        $like = ' LIKE ';
+
+        if($not){
+            $like = ' NOT'.$like;
+        }
+
+        $this->where([$column, $like, $type]);
+    }
+
+    /**
+     * @param $column
+     * @param $datas
+     * @param bool $not
+     */
+    public function orLike($column, $datas, $not = false)
+    {
+        if (is_array($datas)) {
+            $type = isset($datas[1]) ? $datas[1] : $datas[0];
+            $data = isset($datas[0]) ? $datas[0] : '';
+        } else {
+            $type = $data = $datas;
+        }
+
+        $type = str_replace('?', $data, $type);
+
+        $like = ' LIKE ';
+
+        if($not){
+            $like = ' NOT'.$like;
+        }
+
+        $this->orWhere([$column, $like, $type]);
     }
 
     /**

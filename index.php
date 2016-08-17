@@ -31,9 +31,6 @@ $db = new Database([
 
 $db->select('username,id');
 
-$db->relation(['post' ,'posts'], ['user_id', 'id']);
+$db->where(['username', 'LIKE', '%a%']);
 
-$db->relation(['posts.category', 'categories'], ['id', 'category_id']);;
-
-
-var_dump($db->post->category->id);
+$db->one();
