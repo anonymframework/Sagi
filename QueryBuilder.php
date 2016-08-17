@@ -101,6 +101,11 @@ class QueryBuilder implements Iterator
     public $attr;
 
     /**
+     * @var string
+     */
+    private $as;
+
+    /**
      * QueryBuilder constructor.
      * @param array $configs
      * @param string $table
@@ -346,9 +351,11 @@ class QueryBuilder implements Iterator
         $table = $this->getTable();
 
         $select = array_map(function ($value) use ($table) {
-            if (strpos($value, '.') === false) {
+            if (is_string($value) && strpos($value, '.') === false) {
                 return $table . '.' . $value;
             }
+
+            return $value;
         }, $select);
 
 
@@ -379,6 +386,7 @@ class QueryBuilder implements Iterator
 
         return $this;
     }
+
 
     /**
      * @param $group
@@ -442,6 +450,28 @@ class QueryBuilder implements Iterator
     }
 
     /**
+     * @param $callback
+     * @return string
+     */
+    private function prepareSubQuery($callback)
+    {
+        /**
+         * @var $builder QueryBuilder
+         */
+        $builder = call_user_func_array($callback, [$this->newInstance($this->table)]);
+
+        $query = '(' . $builder->prepareGetQuery() . ')';
+
+        if ($builder->hasAs()) {
+            $query .= ' AS ' . $builder->getAs();
+        }
+
+        $this->setArgs(array_merge($this->getArgs(), $builder->getArgs()));
+
+        return $query;
+    }
+
+    /**
      * @return mixeds|string
      */
     private function prepareInQuery($datas)
@@ -450,14 +480,7 @@ class QueryBuilder implements Iterator
         if (is_array($datas)) {
             $inQuery = implode(',', $datas);
         } elseif (is_callable($datas)) {
-            /**
-             * @var $builder QueryBuilder
-             */
-            $builder = call_user_func_array($datas, [$this->newInstance($this->table)]);
-
-            $inQuery = '(' . $builder->prepareGetQuery() . ')';
-
-            $this->setArgs(array_merge($this->getArgs(), $builder->getArgs()));
+            $inQuery = $this->prepareSubQuery($datas);
         } else {
             $inQuery = $datas;
         }
@@ -622,6 +645,16 @@ class QueryBuilder implements Iterator
         if (empty($select)) {
             $select = ["*"];
         }
+
+        $app = $this;
+
+        $select = array_map(function ($value) use ($app) {
+            if (is_callable($value)) {
+                $value = $app->prepareSubQuery($value);
+            }
+
+            return $value;
+        }, $select);
 
         return (join(",", $select));
     }
@@ -1035,5 +1068,26 @@ class QueryBuilder implements Iterator
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getAs()
+    {
+        return $this->as;
+    }
+
+    /**
+     * @param string $as
+     * @return QueryBuilder
+     */
+    public function setAs($as)
+    {
+        $this->as = $as;
+        return $this;
+    }
+
+    public function hasAs(){
+        return !empty($this->as);
+    }
 
 }

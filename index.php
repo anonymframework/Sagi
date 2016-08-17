@@ -28,9 +28,4 @@ $db = new QueryBuilder([
  */
 
 
-$db->select('username,id');
-
-$db->in('id', function(QueryBuilder $builder){
-    return $builder->where('username', 'admin');
-});
 
