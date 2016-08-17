@@ -2,7 +2,6 @@
 
 include 'QueryBuilder.php';
 include 'Results.php';
-include 'Database.php';
 include 'RelationBag.php';
 
 /*
@@ -16,7 +15,7 @@ include 'RelationBag.php';
 
 ini_set('display_errors', 'On');
 
-$db = new Database([
+$db = new QueryBuilder([
     'host' => 'localhost',
     'username' => 'root',
     'password' => 'sanane123',
@@ -31,6 +30,7 @@ $db = new Database([
 
 $db->select('username,id');
 
-$db->where(['username', 'LIKE', '%a%']);
+$db->in('id', function(QueryBuilder $builder){
+    return $builder->where('username', 'admin');
+});
 
-$db->one();

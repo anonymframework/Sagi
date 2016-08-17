@@ -1,6 +1,9 @@
 <?php
 
-class QueryBuilder
+/**
+ * Class QueryBuilder
+ */
+class QueryBuilder implements Iterator
 {
 
     /**
@@ -87,6 +90,17 @@ class QueryBuilder
     public $relations;
 
     /**
+     * @var bool
+     */
+    private $prepareValues = true;
+
+
+    /**
+     * @var array
+     */
+    public $attr;
+
+    /**
      * QueryBuilder constructor.
      * @param array $configs
      * @param string $table
@@ -128,6 +142,10 @@ class QueryBuilder
     }
 
 
+    /**
+     * @param $query
+     * @return PDOStatement
+     */
     private function returnPreparedResults($query)
     {
         $query = trim($query);
@@ -138,9 +156,58 @@ class QueryBuilder
 
     }
 
+    /**
+     * @return $this
+     */
+    public function one()
+    {
+        $attrs = $this->fetch();
+
+        $this->attr[0] = $attrs;
+        return $this;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function all()
+    {
+        if (empty($this->attr)) {
+            $this->fetchAll();
+        }
+
+        return $this->attr;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function first()
+    {
+        if (isset($this->attr[0]) === false) {
+            $this->one();
+        }
+
+        return $this->attr[0];
+    }
+
+    /**
+     * @return array
+     */
+    public function attrs()
+    {
+        return $this->attr;
+    }
+
+
+    /**
+     * @param $table
+     * @return static
+     */
     public function newInstance($table)
     {
-        return new static($this->configs, $table);
+        return new static($this->pdo, $table);
     }
 
     /**
@@ -162,9 +229,9 @@ class QueryBuilder
     }
 
     /**
-     * @return PDOStatement
+     * @return mixeds
      */
-    public function get()
+    public function prepareGetQuery()
     {
         $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
 
@@ -178,6 +245,16 @@ class QueryBuilder
             ':order' => $this->prepareOrderQuery(),
             ':limit' => $this->prepareLimitQuery()
         ]);
+
+        return $handled;
+    }
+
+    /**
+     * @return PDOStatement
+     */
+    public function get()
+    {
+        $handled = $this->prepareGetQuery();
 
 
         return $this->returnPreparedResults($handled);
@@ -316,6 +393,7 @@ class QueryBuilder
      * @param $column
      * @param $datas
      * @param bool $not
+     * @return QueryBuilder
      */
     public function like($column, $datas, $not = false)
     {
@@ -330,17 +408,18 @@ class QueryBuilder
 
         $like = ' LIKE ';
 
-        if($not){
-            $like = ' NOT'.$like;
+        if ($not) {
+            $like = ' NOT' . $like;
         }
 
-        $this->where([$column, $like, $type]);
+        return $this->where([$column, $like, $type]);
     }
 
     /**
-     * @param $column
-     * @param $datas
+     * @param string $column
+     * @param mized $datas
      * @param bool $not
+     * @return QueryBuilder
      */
     public function orLike($column, $datas, $not = false)
     {
@@ -355,12 +434,85 @@ class QueryBuilder
 
         $like = ' LIKE ';
 
-        if($not){
-            $like = ' NOT'.$like;
+        if ($not) {
+            $like = ' NOT' . $like;
         }
 
-        $this->orWhere([$column, $like, $type]);
+        return $this->orWhere([$column, $like, $type]);
     }
+
+    /**
+     * @return mixeds|string
+     */
+    private function prepareInQuery($datas)
+    {
+        $inQuery = '';
+        if (is_array($datas)) {
+            $inQuery = implode(',', $datas);
+        } elseif (is_callable($datas)) {
+            /**
+             * @var $builder QueryBuilder
+             */
+            $builder = call_user_func_array($datas, [$this->newInstance($this->table)]);
+
+            $inQuery = '(' . $builder->prepareGetQuery() . ')';
+
+            $this->setArgs(array_merge($this->getArgs(), $builder->getArgs()));
+        } else {
+            $inQuery = $datas;
+        }
+
+        return $inQuery;
+    }
+
+    /**
+     * @param $bool
+     * @return $this
+     */
+    public function prepareValues($bool)
+    {
+        $this->prepareValues = $bool;
+        return $this;
+    }
+
+    /**
+     * @param string $table
+     * @param array|callable|string $datas
+     * @param bool $not
+     * @return QueryBuilder
+     */
+    public function in($table, $datas, $not = false)
+    {
+        $query = $this->prepareInQuery($datas);
+
+        $in = ' IN ';
+
+        if ($not) {
+            $in = ' NOT' . $in;
+        }
+
+        return $this->where([$table, $in, $query], null, null, true);
+    }
+
+    /**
+     * @param string $table
+     * @param array|callable|string $datas
+     * @param bool $not
+     * @return QueryBuilder
+     */
+    public function orIn($table, $datas, $not = false)
+    {
+        $query = $this->prepareInQuery($datas);
+
+        $in = ' IN ';
+
+        if ($not) {
+            $in = ' NOT' . $in;
+        }
+
+        return $this->orWhere([$table, $in, $query], null, null, true);
+    }
+
 
     /**
      * @param $join
@@ -374,10 +526,22 @@ class QueryBuilder
         return $this;
     }
 
-    public function where($a, $b = null, $c = null)
+    /**
+     * @param $a
+     * @param null $b
+     * @param null $c
+     * @param bool $prepare
+     * @return $this
+     */
+    public function where($a, $b = null, $c = null, $prepare = false)
     {
         if (is_null($b) && is_null($c)) {
             $a[] = 'AND';
+
+            if ($prepare) {
+                $a[] = true;
+            }
+
             $this->where[] = $a;
         } elseif (is_null($c)) {
             $this->where[] = [$a, '=', $b, 'AND'];
@@ -394,10 +558,16 @@ class QueryBuilder
      * @param null $c
      * @return $this
      */
-    public function orWhere($a, $b = null, $c = null)
+    public function orWhere($a, $b = null, $c = null, $prepare = false)
     {
         if (is_null($b) && is_null($c)) {
             $a[] = 'OR';
+
+            if ($prepare) {
+                $a[] = true;
+            }
+
+
             $this->where[] = $a;
         } elseif (is_null($c)) {
             $this->where[] = [$a, '=', $b, 'OR'];
@@ -528,12 +698,19 @@ class QueryBuilder
         $args = [];
         $s = '';
         foreach ($where as $item) {
-            if ($s !== '') {
-                $s .= "$item[3] {$item[0]} {$item[1]} ? ";
+
+            if (isset($item[4]) && $item[4] === true || $this->prepareValues === false) {
+                $query = $item[2];
             } else {
-                $s .= "{$item[0]} {$item[1]} ?  ";
+                $query = '?';
+                $args[] = $item[2];
             }
-            $args[] = $item[2];
+
+            if ($s !== '') {
+                $s .= "$item[3] {$item[0]} {$item[1]} $query ";
+            } else {
+                $s .= "{$item[0]} {$item[1]} $query ";
+            }
         }
 
 
@@ -782,6 +959,79 @@ class QueryBuilder
         RelationBag::$relations[$alias] = [
             'propeties' => $columns];
 
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->first()->$name;
+    }
+
+    public function __set($name, $value)
+    {
+        $this->first()->$name = $value;
+    }
+
+    public function rewind()
+    {
+        reset($this->attr);
+    }
+
+    public function current()
+    {
+        $var = current($this->attr);
+        return $var;
+    }
+
+    public function key()
+    {
+        $var = key($this->attr);
+        echo "key: $var\n";
+        return $var;
+    }
+
+    public function next()
+    {
+        $var = next($this->attr);
+        return $var;
+    }
+
+    public function valid()
+    {
+        $key = key($this->attr);
+        $var = ($key !== NULL && $key !== FALSE);
+        return $var;
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        return call_user_func_array([static::$instance, $name], $arguments);
+    }
+
+    /**
+     * @return array
+     */
+    public function getArgs()
+    {
+        return $this->args;
+    }
+
+    /**
+     * @param array $args
+     * @return QueryBuilder
+     */
+    public function setArgs($args)
+    {
+        $this->args = $args;
         return $this;
     }
 

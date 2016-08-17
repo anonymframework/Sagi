@@ -125,6 +125,55 @@ $db->orLike('username', [$username, '%?%'], true); // username NOT LIKE %$userna
 
 ```
 
+####in
+
+```php
+
+$db->in('id', [1,2,3,4,5,6,7,8,9,10]);
+
+// or 
+
+$db->in('id', '1,2,3,4,5');
+
+//or you can use callbacks
+
+$db->in('username', function(QueryBuilder $builder){
+   return $builder->select('username')->where('id', 1); 
+});
+
+// you may want to use not in query
+
+// you can, just add a third parameter and set it true
+
+$db->in('id', [1,2,3,4,5], true);
+
+```
+
+####or in
+
+```php
+
+$db->OrIn('id', [1,2,3,4,5,6,7,8,9,10]);
+
+// or 
+
+$db->OrIn('id', '1,2,3,4,5');
+
+//or you can use callbacks
+
+$db->OrIn('username', function(QueryBuilder $builder){
+   return $builder->select('username')->where('id', 1); 
+});
+
+// you may want to use not in query
+
+
+// you can, just add a third parameter and set it true
+
+$db->OrIn('id', [1,2,3,4,5], true);
+
+```
+
 #### Limit
 
 ```php
