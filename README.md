@@ -25,13 +25,14 @@ Sagi Database Class
  
  $db = new QueryBuilder($configs);
  
+ $db->setTable('users');
+ 
  // you may want to set your own PDO instance, you can!
  
  $pdo = new PDO('...whatever.');
  
  $db = new QueryBuilder($pdo);
  
- $db->setTable('users');
 ```
 ---------------------------
 #### <i class="icon-file"></i> Create
