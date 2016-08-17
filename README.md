@@ -75,6 +75,14 @@ Sagi Database Class
   
 ```
 
+####find
+
+```php
+
+  $db->find(1); // equal to id = 1
+
+```
+
 #### Where
 
 ```php

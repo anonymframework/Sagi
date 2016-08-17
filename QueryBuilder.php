@@ -172,6 +172,14 @@ class QueryBuilder implements Iterator
         return $this;
     }
 
+    /**
+     * @param int $id
+     * @return QueryBuilder
+     */
+    public function find($id)
+    {
+        return $this->where(['id' => $id])->one();
+    }
 
     /**
      * @return array
@@ -1086,8 +1094,10 @@ class QueryBuilder implements Iterator
         return $this;
     }
 
-    public function hasAs(){
+    public function hasAs()
+    {
         return !empty($this->as);
     }
+
 
 }
