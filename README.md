@@ -99,6 +99,32 @@ Sagi Database Class
  
 ```
 
+####Like
+
+```php
+
+$db->like('username', [$username, '%?%']); // username LIKE %$username%
+
+// make a or like query
+
+$db->like('username', [$username, '%?%'], true); // username NOT LIKE %$username%
+
+
+```
+
+####Orlike
+
+```php
+
+$db->orLike('username', [$username, '%?%']); // username LIKE %$username%
+
+// make a or like query
+
+$db->orLike('username', [$username, '%?%'], true); // username NOT LIKE %$username%
+
+
+```
+
 #### Limit
 
 ```php
