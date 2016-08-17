@@ -32,13 +32,15 @@ $db = new Database([
  * @var $query Database
  */
 $query = $db->relations([
-    'posts' => ['user_id', 'id', 'many']
+    'posts' => ['user_id', 'id']
 ]);
 
 $query->select('username,id');
 
-foreach ($query->first()->posts as $post){
-    echo $post->id;
-}
 
+$data = $db->first();
+
+$posts = $data->posts;
+
+$posts->relation('categories', ['id', 'category_id']);
 

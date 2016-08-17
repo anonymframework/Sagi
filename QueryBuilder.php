@@ -695,7 +695,7 @@ class QueryBuilder
      */
     public function relation($name, array $columns = [])
     {
-        RelationBag::$relations[] = [$name, $columns];
+        RelationBag::$relations[$name] = $columns;
 
         return $this;
     }
