@@ -677,25 +677,23 @@ class QueryBuilder
         return $this;
     }
 
-    /**
-     * @param $relations
-     * @return $this
-     */
-    public function relations($relations)
-    {
-        RelationBag::setRelations($relations);
-
-        return $this;
-    }
 
     /**
      * @param $name
      * @param array $columns
      * @return $this
      */
-    public function relation($name, array $columns = [])
+    public function relation($prop, array $columns = [])
     {
-        RelationBag::$relations[$name] = $columns;
+        if (is_array($prop)) {
+            $alias = $prop[0];
+            $name = $prop[1];
+        } else {
+             $alias = $name = $prop;
+        }
+        $columns['table'] = $name;
+        RelationBag::$relations[$alias] = [
+            'propeties' => $columns];
 
         return $this;
     }

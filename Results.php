@@ -9,7 +9,7 @@
 class Results
 {
     /**
-     * @var static
+     * @var string
      */
     public $table;
 
@@ -45,7 +45,7 @@ class Results
      */
     public function __get($name)
     {
-        if (isset(RelationBag::$relations[$name])) {
+        if ($this->findRelative($name)) {
             return call_user_func_array([$this, $name], []);
         }
 
@@ -61,6 +61,66 @@ class Results
         $this->attr[$name] = $value;
     }
 
+
+    /**
+     * @param $name
+     * @param array $columns
+     * @return $this
+     */
+    public function relation($prop, array $columns = [])
+    {
+        if (is_array($prop)) {
+            $alias = $this->table . '.' . $prop[0];
+            $name = $prop[1];
+        } else {
+            $alias = $this->table . '.' . $prop;
+            $name = $prop;
+        }
+        $columns['table'] = $name;
+        RelationBag::$relations[$alias] = [
+            'propeties' => $columns];
+
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @return bool|mixed
+     */
+    public function findPreparedRelative($name)
+    {
+        $subname = $this->table . '.' . $name;
+
+        if (isset($this->preparedRelatives[$name])) {
+            return $this->preparedRelatives[$name];
+        } elseif (isset($this->preparedRelatives[$subname])) {
+            return $this->preparedRelatives[$subname];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $name
+     * @return array|bool
+     */
+    public function findRelative($name)
+    {
+        $subName = $this->table . '.' . $name;
+
+        if (isset(RelationBag::$relations[$name])) {
+            return
+                ['name' => $name, 'relation' => RelationBag::$relations[$name]];
+
+        } elseif (isset(RelationBag::$relations[$subName])) {
+            return
+                ['name' => $subName, 'relation' => RelationBag::$relations[$subName]];
+        } else {
+            return false;
+        }
+
+    }
+
     /**
      * @param $name
      * @param $arguments
@@ -68,38 +128,34 @@ class Results
      */
     public function __call($name, $arguments)
     {
-        if (isset(RelationBag::$relations[$name])) {
-            return $this->prepareRelation($name);
+        if ($relation = $this->findPreparedRelative($name)) {
+            return $relation;
+        } elseif ($relation = $this->findRelative($name)) {
+            return $this->prepareRelation($relation['name'], $relation['relation']['propeties']);
         } else {
             return call_user_func_array([$this->database, $name], $arguments);
         }
     }
 
-    public function prepareRelation($name)
+    public function prepareRelation($name, $relation)
     {
-        if (!$this->preparedRelatives[$name]) {
-            $relation = RelationBag::$relations[$name];
+        $targetTable = $relation['table'];
+        $targetColumn = $relation[0];
+        $ourColumn = $relation[1];
+        $type = isset($relation[2]) ? $relation[2] : 'one';
 
-            $targetTable = $name;
-            $targetColumn = $relation[0];
-            $ourColumn = $relation[1];
-            $type = isset($relation[2]) ? $relation[2] : 'one';
+        $query = $this->database->newInstance($this->table)->setTable($targetTable);
 
-            $query = $this->database->newInstance($this->table)->setTable($targetTable);
+        $relation = $query->where($targetColumn, $this->{$ourColumn});
 
-            $relation = $query->where($targetColumn, $this->{$ourColumn});
-
-            if ($type == 'one') {
-                $relation = $relation->limit(1)->fetch();
-            } else {
-                $relation = $relation->fetchAll();
-            }
-
-            $this->preparedRelatives[$name] = $relation;
-
+        if ($type == 'one') {
+            $relation = $relation->limit(1)->fetch();
         } else {
-            $relation = $this->preparedRelatives[$name];
+            $relation = $relation->fetchAll();
         }
+
+        $this->preparedRelatives[$name] = $relation;
+
         return $relation;
     }
 }

@@ -28,19 +28,12 @@ $db = new Database([
  *
  */
 
-/**
- * @var $query Database
- */
-$query = $db->relations([
-    'posts' => ['user_id', 'id']
-]);
 
-$query->select('username,id');
+$db->select('username,id');
+
+$db->relation(['post' ,'posts'], ['user_id', 'id']);
+
+$db->relation(['posts.category', 'categories'], ['id', 'category_id']);;
 
 
-$data = $db->first();
-
-$posts = $data->posts;
-
-$posts->relation('categories', ['id', 'category_id']);
-
+var_dump($db->post->category->id);

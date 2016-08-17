@@ -182,9 +182,7 @@ gets all datas with fetchAll method
 
 ```php
 
-$db->relations([
-   'posts' => ['user_id', 'id']
-]);
+$db->relation('posts', ['user_id', 'id']);
 
 $post = $db->posts; 
 
@@ -192,10 +190,14 @@ $post = $db->posts;
 
 $post = $db->posts();
 
-// be carryful this will add a new relation but don't clean old ones.
-$db->relation('categories', ['category_id', 'id']);
+// you may want to set alias
 
-echo $post->categories->id;
+$db->relation(['aliasName', 'tableName'], ['user_id', 'id']);
+
+$post = $db->aliasName;
+
+// or 
+$post = $db->aliasName();
 
 ```
 
@@ -203,9 +205,8 @@ echo $post->categories->id;
 
 ```php
 
-$db->relations([
-    'posts' => ['user_id', 'id', 'many']
-]);
+$db->relation('posts', ['user_id', 'id', 'many']);
+
 
 
 
@@ -215,10 +216,8 @@ $db->relations([
 
 ```php
  
- $db->where('username', 'admin')
- ->relations([
-       'posts' => ['user_id', 'id', 'many']
- ]);
+ $db->where('username', 'admin')->relation('posts', ['user_id', 'id', 'many']);
+
  
  $data = $db->first();
  
@@ -230,4 +229,30 @@ $db->relations([
 
 ```
 
+
+###SubRelatives
+
+You can set subrelatives
+
+
+```php
+
+$db->relation(['post', 'posts'], ['user_id', 'id']);
+
+$post = $db->post;
+
+$post->relation(['category', 'categories'], ['id', 'category_id']);
+
+// or  
+
+$db->relation(['posts.category', 'categories']); // ['firstTableName.'secondTableName.aliasName', 'tableName']
+
+// be careful, you set on $db not on $post;
+
+echo $post->category->category_name; 
+
+
+
+
+```
 
