@@ -1,6 +1,11 @@
 # Sagi
 Sagi Database Class
 
+#Setup
+
+```
+ $ composer require sagi/sagi:dev-master
+```
 
 #Initialize
 
