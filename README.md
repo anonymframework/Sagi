@@ -121,7 +121,7 @@ Sagi Database Class
 
 $db->like('username', [$username, '%?%']); // username LIKE %$username%
 
-// make a or like query
+// make a not like query
 
 $db->like('username', [$username, '%?%'], true); // username NOT LIKE %$username%
 
@@ -134,7 +134,7 @@ $db->like('username', [$username, '%?%'], true); // username NOT LIKE %$username
 
 $db->orLike('username', [$username, '%?%']); // username LIKE %$username%
 
-// make a or like query
+// make a not like query
 
 $db->orLike('username', [$username, '%?%'], true); // username NOT LIKE %$username%
 
