@@ -15,7 +15,8 @@ Sagi Database Class
     'host'  => 'localhost',
     'username' => 'root',
     'password' => '',
-    'dbname' => 'test'
+    'dbname' => 'test',
+    // 'driver' => 'mysql' // Default=mysql.
     ];
 
  $db = new QueryBuilder($configs , $table);
