@@ -342,7 +342,7 @@ $post->relation(['category', 'categories'], ['id', 'category_id']);
 
 // or  
 
-$db->relation(['posts.category', 'categories']); // ['firstTableName.secondTableName.aliasName', 'tableName']
+$db->relation(['posts.category', 'categories'], ['id', 'category_id']); // ['firstTableName.secondTableName.aliasName', 'tableName']
 
 // be careful, you set on $db not on $post;
 
