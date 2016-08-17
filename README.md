@@ -80,7 +80,7 @@ Sagi Database Class
  
  // or you can use subqueries
  
- $db->select(['title', 'id', function(QueryBuilder $builder{
+ $db->select(['title', 'id', function(QueryBuilder $builder){
         return $builder->setTable('categories')->select('category_name')->where('id', 'posts.category_id')->setAs('category_name');
  })]);
  
