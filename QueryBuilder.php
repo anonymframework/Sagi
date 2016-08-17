@@ -423,6 +423,7 @@ class QueryBuilder
 
         foreach ($joins as $join) {
             $type = isset($join[0]) ? $join[0] : 'LEFT JOIN';
+            $targetTable = isset($join[1]) ? $join[1] : '';
             $targetColumn = isset($join[2]) ? $join[2] : '';
             $ourTable = $this->getTable();
             $ourColumn = isset($join[3]) ? $join[3] : '';
@@ -683,6 +684,18 @@ class QueryBuilder
     public function relations($relations)
     {
         RelationBag::setRelations($relations);
+
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @param array $columns
+     * @return $this
+     */
+    public function relation($name, array $columns = [])
+    {
+        RelationBag::$relations[] = [$name, $columns];
 
         return $this;
     }

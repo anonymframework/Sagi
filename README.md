@@ -192,6 +192,11 @@ $post = $db->posts;
 
 $post = $db->posts();
 
+
+$db->relation('categories', ['category_id', 'id']);
+
+echo $post->categories->id;
+
 ```
 
 ####many
@@ -201,6 +206,7 @@ $post = $db->posts();
 $db->relations([
     'posts' => ['user_id', 'id', 'many']
 ]);
+
 
 
 ```
