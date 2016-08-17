@@ -192,7 +192,7 @@ $post = $db->posts;
 
 $post = $db->posts();
 
-
+// be carryful this will add a new relation but don't clean old ones.
 $db->relation('categories', ['category_id', 'id']);
 
 echo $post->categories->id;
