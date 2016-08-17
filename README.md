@@ -258,11 +258,6 @@ gets all datas with fetchAll method
  
 ```
 
-```php
-
-  echo $data->username;
-
-```
 
 ```php
  
@@ -279,7 +274,7 @@ gets all datas with fetchAll method
 
 ```php
 
-$db->relation('posts', ['user_id', 'id']);
+$db->relation('posts', ['user_id', 'id'] /*['targetTableColumn', 'yourColumn'] */);
 
 $post = $db->posts; 
 
