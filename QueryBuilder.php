@@ -59,6 +59,12 @@ class QueryBuilder
      * @var array
      */
     private $join = [];
+
+    /**
+     * @var string
+     */
+    private $having = '';
+
     /**
      * full query string
      *
@@ -160,13 +166,14 @@ class QueryBuilder
      */
     public function get()
     {
-        $pattern = 'SELECT :select FROM :from :join :group :where :order :limit';
+        $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
 
         $handled = $this->handlePattern($pattern, [
             ':select' => $this->prepareSelectQuery(),
             ':from' => $this->getTable(),
             ':join' => $this->prepareJoinQuery(),
             ':group' => $this->prepareGroupQuery(),
+            ':having' => $this->prepareHavingQuery(),
             ':where' => $this->prepareWhereQuery(),
             ':order' => $this->prepareOrderQuery(),
             ':limit' => $this->prepareLimitQuery()
@@ -408,6 +415,13 @@ class QueryBuilder
         return "GROUP BY $group";
     }
 
+    private function prepareHavingQuery()
+    {
+        $having = $this->getHaving();
+
+        return $having;
+    }
+
     /**
      * @return string
      */
@@ -608,6 +622,24 @@ class QueryBuilder
     /**
      * @return string
      */
+    public function getHaving()
+    {
+        return $this->having;
+    }
+
+    /**
+     * @param string $having
+     */
+    public function setHaving($having)
+    {
+        $this->having = $having;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
     public function getQuery()
     {
         return $this->query;
@@ -689,7 +721,7 @@ class QueryBuilder
             $alias = $prop[0];
             $name = $prop[1];
         } else {
-             $alias = $name = $prop;
+            $alias = $name = $prop;
         }
         $columns['table'] = $name;
         RelationBag::$relations[$alias] = [

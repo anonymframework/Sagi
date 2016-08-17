@@ -132,6 +132,12 @@ $db->order('id', 'DESC');
  
 ```
 
+####having
+
+```php
+  $db->group('id')->having('COUNT(id) > 10');
+```
+
 #### Join
 
 
