@@ -164,7 +164,7 @@ $db->in('id', [1,2,3,4,5,6,7,8,9,10]);
 
 $db->in('id', '1,2,3,4,5');
 
-//or you can use callbacks
+//or you can use subqueries
 
 $db->in('username', function(QueryBuilder $builder){
    return $builder->select('username')->where('id', 1); 
@@ -188,7 +188,7 @@ $db->OrIn('id', [1,2,3,4,5,6,7,8,9,10]);
 
 $db->OrIn('id', '1,2,3,4,5');
 
-//or you can use callbacks
+//or you can use subqueries
 
 $db->OrIn('username', function(QueryBuilder $builder){
    return $builder->select('username')->where('id', 1); 
