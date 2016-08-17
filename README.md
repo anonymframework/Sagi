@@ -13,11 +13,11 @@ Sagi Database Class
     'dbname' => 'test'
     ];
 
- $db = new Database($configs , $table);
+ $db = new QueryBuilder($configs , $table);
  
  // you may want to set table after initialize, 
  
- $db = new Database($configs);
+ $db = new QueryBuilder($configs);
  
  $db->setTable('users');
 ```
