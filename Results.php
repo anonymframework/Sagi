@@ -70,11 +70,10 @@ class Results
     public function relation($prop, array $columns = [])
     {
         if (is_array($prop)) {
-            $alias = $this->table . '.' . $prop[0];
+            $alias = $prop[0];
             $name = $prop[1];
         } else {
-            $alias = $this->table . '.' . $prop;
-            $name = $prop;
+            $alias = $name = $prop;
         }
         $columns['table'] = $name;
         RelationBag::$relations[$alias] = [
