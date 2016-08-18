@@ -179,12 +179,6 @@ $db->in('username', function(QueryBuilder $builder){
    return $builder->select('username')->where('id', 1); 
 });
 
-// you may want to use not in query
-
-// you can, just add a third parameter and set it true
-
-$db->in('id', [1,2,3,4,5], true);
-
 ```
 
 ####or in
@@ -202,13 +196,17 @@ $db->OrIn('id', '1,2,3,4,5');
 $db->OrIn('username', function(QueryBuilder $builder){
    return $builder->select('username')->where('id', 1); 
 });
+```
 
-// you may want to use not in query
+####NotIn
 
+```php
 
-// you can, just add a third parameter and set it true
+$db->notIn('id', [1,2,3,4,5]);
 
-$db->OrIn('id', [1,2,3,4,5], true);
+// or not query
+
+$db->orNotIn('id', [1,2,3,4,5]);
 
 ```
 
