@@ -150,7 +150,7 @@ $db->orLike('username', [$username, '%?%'], true); // username NOT LIKE %$userna
 
 ```
 
- ####NotLike
+ #### NotLike
 
 ```php
 
@@ -198,7 +198,7 @@ $db->OrIn('username', function(QueryBuilder $builder){
 });
 ```
 
-####NotIn
+#### WNotIn
 
 ```php
 
