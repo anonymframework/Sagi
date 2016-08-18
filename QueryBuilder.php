@@ -431,12 +431,14 @@ class QueryBuilder implements Iterator
 
         return $this->where([$column, $like, $type]);
     }
+
     /**
      * @param $column
      * @param $datas
      * @return QueryBuilder
      */
-    public function notLike($column, $datas){
+    public function notLike($column, $datas)
+    {
         return $this->like($column, $datas, true);
     }
 
@@ -445,9 +447,11 @@ class QueryBuilder implements Iterator
      * @param $datas
      * @return QueryBuilder
      */
-    public function orNotLike($column, $datas){
+    public function orNotLike($column, $datas)
+    {
         return $this->orLike($column, $datas, true);
     }
+
     /**
      * @param string $column
      * @param mized $datas
@@ -503,11 +507,11 @@ class QueryBuilder implements Iterator
     {
         $inQuery = '';
         if (is_array($datas)) {
-            $inQuery = implode(',', $datas);
+            $inQuery = '[' . implode(',', $datas) . ']';
         } elseif (is_callable($datas)) {
             $inQuery = $this->prepareSubQuery($datas);
         } else {
-            $inQuery = $datas;
+            $inQuery = '['.$datas.']';
         }
 
         return $inQuery;
