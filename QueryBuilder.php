@@ -410,7 +410,6 @@ class QueryBuilder implements Iterator
     /**
      * @param $column
      * @param $datas
-     * @param bool $not
      * @return QueryBuilder
      */
     public function like($column, $datas, $not = false)
@@ -435,7 +434,6 @@ class QueryBuilder implements Iterator
     /**
      * @param $column
      * @param $datas
-     * @param bool $not
      * @return QueryBuilder
      */
     public function notLike($column, $datas){
@@ -445,7 +443,6 @@ class QueryBuilder implements Iterator
     /**
      * @param $column
      * @param $datas
-     * @param bool $not
      * @return QueryBuilder
      */
     public function orNotLike($column, $datas){
@@ -527,12 +524,11 @@ class QueryBuilder implements Iterator
     }
 
     /**
-     * @param string $table
+     * @param string $column
      * @param array|callable|string $datas
-     * @param bool $not
      * @return QueryBuilder
      */
-    public function in($table, $datas, $not = false)
+    public function in($column, $datas, $not = false)
     {
         $query = $this->prepareInQuery($datas);
 
@@ -546,12 +542,32 @@ class QueryBuilder implements Iterator
     }
 
     /**
-     * @param string $table
+     * @param string $column
      * @param array|callable|string $datas
-     * @param bool $not
      * @return QueryBuilder
      */
-    public function orIn($table, $datas, $not = false)
+    public function notIn($column, $datas)
+    {
+        return $this->in($column, $datas, true);
+    }
+
+    /**
+     * @param string $column
+     * @param array|callable|string $datas
+     * @return QueryBuilder
+     */
+    public function orNotIn($column, $datas)
+    {
+        return $this->orIn($column, $datas, true);
+    }
+
+
+    /**
+     * @param string $column
+     * @param array|callable|string $datas
+     * @return QueryBuilder
+     */
+    public function orIn($column, $datas, $not = false)
     {
         $query = $this->prepareInQuery($datas);
 
