@@ -432,7 +432,25 @@ class QueryBuilder implements Iterator
 
         return $this->where([$column, $like, $type]);
     }
+    /**
+     * @param $column
+     * @param $datas
+     * @param bool $not
+     * @return QueryBuilder
+     */
+    public function notLike($column, $datas){
+        return $this->like($column, $datas, true);
+    }
 
+    /**
+     * @param $column
+     * @param $datas
+     * @param bool $not
+     * @return QueryBuilder
+     */
+    public function orNotLike($column, $datas){
+        return $this->orLike($column, $datas, true);
+    }
     /**
      * @param string $column
      * @param mized $datas
