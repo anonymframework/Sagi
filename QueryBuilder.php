@@ -538,7 +538,7 @@ class QueryBuilder implements Iterator
             $in = ' NOT' . $in;
         }
 
-        return $this->where([$table, $in, $query], null, null, true);
+        return $this->where([$column, $in, $query], null, null, true);
     }
 
     /**
@@ -577,7 +577,7 @@ class QueryBuilder implements Iterator
             $in = ' NOT' . $in;
         }
 
-        return $this->orWhere([$table, $in, $query], null, null, true);
+        return $this->orWhere([$column, $in, $query], null, null, true);
     }
 
 
