@@ -1022,6 +1022,22 @@ class QueryBuilder implements Iterator
         return $this;
     }
 
+    /**
+     * @return int
+     */
+    public function count(){
+        $handled = $this->returnPreparedResults($this->prepareGetQuery())->rowCount();
+
+        return  $handled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function exists(){
+        return ($this->count() > 0);
+    }
+
 
     /**
      * @param $name
