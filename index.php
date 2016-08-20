@@ -28,3 +28,6 @@ $db = new QueryBuilder([
  */
 
 
+$find = QueryBuilder::find(1);
+
+var_dump($find);

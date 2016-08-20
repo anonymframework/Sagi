@@ -178,9 +178,17 @@ class QueryBuilder implements Iterator
      * @param int $id
      * @return QueryBuilder
      */
-    public function find($id)
+    public static function find($id)
     {
-        return $this->where(['id' => $id])->one();
+        return static::$instance->where(['id' => $id]);
+    }
+
+    /**
+     * @param int $id
+     * @return QueryBuilder
+     */
+    public static function findOne($id){
+        return static::$instance->where(['id' => $id])->one();
     }
 
     /**
@@ -1104,15 +1112,6 @@ class QueryBuilder implements Iterator
         return $var;
     }
 
-    /**
-     * @param $name
-     * @param $arguments
-     * @return mixed
-     */
-    public static function __callStatic($name, $arguments)
-    {
-        return call_user_func_array([static::$instance, $name], $arguments);
-    }
 
     /**
      * @return array

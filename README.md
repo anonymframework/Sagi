@@ -92,9 +92,19 @@ Sagi Database Class
 
 ```php
 
-  $db->find(1); // equal to id = 1
+  $find = QueryBuilder::find(1); // equal to id = 1
 
 ```
+
+####findOne
+
+```php
+
+  QueryBuilder::findOne(1); // equal to $find->one(); 
+
+```
+
+
 
 #### Where
 
