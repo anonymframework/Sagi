@@ -287,6 +287,22 @@ gets all datas with fetchAll method
 
 ```
 
+####count
+
+```php
+
+ $count = $db->count(); // returns int.
+
+```
+
+####exists
+
+```php
+
+$exists = $db->exists(); // returns true or false
+
+```
+
 ### Relations
 
 #### one
