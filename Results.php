@@ -149,8 +149,6 @@ class Results
 
         if ($type == 'one') {
             $relation = $relation->limit(1)->fetch();
-        } else {
-            $relation = $relation->fetchAll();
         }
 
         $this->preparedRelatives[$name] = $relation;
