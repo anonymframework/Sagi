@@ -3,7 +3,6 @@
 include 'QueryBuilder.php';
 include 'Results.php';
 include 'RelationBag.php';
-
 /*
  *  or you can use composer for autoloading
  *
@@ -20,19 +19,6 @@ $db = new QueryBuilder([
     'username' => 'root',
     'password' => 'sanane123',
     'dbname' => 'test'
-], 'users');
+]);
 
-/*
- *  or $db->setTable('users');
- *
- */
-
-
-$db->relation('posts', ['user_id', 'id']);
-
-/**
- * @var QueryBuilder $posts
- */
-$posts = $db->posts;
-
-$posts->order('id');
+$user = new User();
