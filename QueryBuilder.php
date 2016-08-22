@@ -106,6 +106,11 @@ class QueryBuilder implements Iterator
     private $as;
 
     /**
+     * @var array
+     */
+    private $cAttr = [];
+
+    /**
      * QueryBuilder constructor.
      * @param array $configs
      * @param string $table
@@ -150,16 +155,31 @@ class QueryBuilder implements Iterator
 
 
     /**
+     * @return array
+     */
+    public function error()
+    {
+        return $this->pdo->errorInfo();
+    }
+
+    /**
      * @param $query
+     * @param bool $ex
      * @return PDOStatement
      */
-    private function returnPreparedResults($query)
+    private function returnPreparedResults($query, $ex = false)
     {
         $query = trim($query);
         $prepared = $this->pdo->prepare($query);
-        $this->args = array_slice($this->args, 0, count($this->where));
-        $prepared->execute($this->args);
-        return $prepared;
+        $this->args = array_slice($this->args, 0, count($this->args));
+
+        $result = $prepared->execute($this->args);
+        if ($ex) {
+            return $result;
+        } else {
+            return $prepared;
+        }
+
 
     }
 
@@ -296,7 +316,7 @@ class QueryBuilder implements Iterator
             ':where' => $this->prepareWhereQuery()
         ));
 
-        return $this->returnPreparedResults($handled);
+        return $this->returnPreparedResults($handled, true);
     }
 
     /**
@@ -308,7 +328,7 @@ class QueryBuilder implements Iterator
         $pattern = 'UPDATE :from SET :update :where';
 
         if (empty($sets)) {
-            $sets = $this->attr[0];
+            $sets = $this->cAttr;
         }
 
         $setted = $this->databaseSetBuilder($sets);
@@ -320,7 +340,7 @@ class QueryBuilder implements Iterator
             ':where' => $this->prepareWhereQuery()
         ]);
 
-        return $this->returnPreparedResults($handled);
+        return $this->returnPreparedResults($handled, true);
     }
 
     /**
@@ -332,7 +352,7 @@ class QueryBuilder implements Iterator
         $pattern = 'INSERT INTO :from SET :insert';
 
         if (empty($sets)) {
-            $sets = $this->attr[0];
+            $sets = $this->cAttr;
         }
 
         $setted = $this->databaseSetBuilder($sets);
@@ -344,7 +364,7 @@ class QueryBuilder implements Iterator
         ]);
 
 
-        return $this->returnPreparedResults($handled);
+        return $this->returnPreparedResults($handled, true);
     }
 
     /**
@@ -1163,11 +1183,7 @@ class QueryBuilder implements Iterator
 
     public function __set($name, $value)
     {
-        if (!$this->attr[0]) {
-            $this->attr[0] = [];
-        }
-
-        $this->attr[0]->$name = $value;
+        $this->cAttr[$name] = $value;
     }
 
 }

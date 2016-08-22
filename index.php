@@ -19,6 +19,11 @@ $db = new QueryBuilder([
     'username' => 'root',
     'password' => 'sanane123',
     'dbname' => 'test'
-]);
+],'users');
 
-$user = new User();
+$db->password = 'aaa';
+$db->username = 'aa';
+
+
+$create = $db->create();
+var_dump($create);
