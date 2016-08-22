@@ -389,8 +389,20 @@ $db->relation(['posts.category', 'categories'], ['id', 'category_id']); // ['fir
 
 echo $post->category->category_name; 
 
-
-
-
 ```
 
+####Relatives Queries
+
+You can use every method of QueryBuilder in Relatives;
+
+Examples;
+
+```php
+
+$db->relation('posts', ['user_id', 'id', 'many']);
+
+$posts = $db->posts;
+
+$posts->order('id');
+
+```

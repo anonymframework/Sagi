@@ -1067,19 +1067,7 @@ class QueryBuilder implements Iterator
         return $this;
     }
 
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        return $this->first()->$name;
-    }
 
-    public function __set($name, $value)
-    {
-        $this->first()->$name = $value;
-    }
 
     public function rewind()
     {
@@ -1153,6 +1141,18 @@ class QueryBuilder implements Iterator
     {
         return !empty($this->as);
     }
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->first()->$name;
+    }
 
+    public function __set($name, $value)
+    {
+        $this->first()->$name = $value;
+    }
 
 }

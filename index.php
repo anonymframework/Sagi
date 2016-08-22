@@ -28,6 +28,11 @@ $db = new QueryBuilder([
  */
 
 
-$find = QueryBuilder::find(1);
+$db->relation('posts', ['user_id', 'id']);
 
-var_dump($find);
+/**
+ * @var QueryBuilder $posts
+ */
+$posts = $db->posts;
+
+$posts->order('id');

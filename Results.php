@@ -148,7 +148,7 @@ class Results
         $relation = $query->where($targetColumn, $this->{$ourColumn});
 
         if ($type == 'one') {
-            $relation = $relation->limit(1)->fetch();
+            $relation = $relation->limit(1);
         }
 
         $this->preparedRelatives[$name] = $relation;
