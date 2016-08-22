@@ -421,4 +421,10 @@ $posts = $db->posts;
 
 $posts->order('id');
 
+foreach($posts as $post){
+
+echo $post->id; 
+
+}
+
 ```
