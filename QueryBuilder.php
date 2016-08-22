@@ -1085,7 +1085,7 @@ class QueryBuilder implements Iterator
      */
     public function relation($table, array $columns = [])
     {
-        if (is_array($prop)) {
+        if (is_array($table)) {
             $alias = $table[0];
             $name = $table[1];
         } else {
