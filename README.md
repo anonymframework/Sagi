@@ -43,6 +43,14 @@ Sagi Database Class
        'username' => 'admin',
        'password' => 123456
     ]);
+    
+    // or 
+    
+    
+    $db->username = 'admin';
+    $db->password = 123456;
+    
+    $db->create();
   
 ```
 
@@ -58,9 +66,17 @@ Sagi Database Class
 
 ```php
 
-  $db->where('username', 'admin')->update([
+  $db->where('username', 'admin');
+  
+     $db->update([
       'username' => 'newAdmin'
       ]);
+      
+      //or 
+      
+      $db->username = 'newAdmin';
+      
+      $db->update();
 
 ```
 
