@@ -187,7 +187,8 @@ class QueryBuilder implements Iterator
      * @param int $id
      * @return QueryBuilder
      */
-    public static function findOne($id){
+    public static function findOne($id)
+    {
         return static::$instance->where(['id' => $id])->one();
     }
 
@@ -306,6 +307,10 @@ class QueryBuilder implements Iterator
     {
         $pattern = 'UPDATE :from SET :update :where';
 
+        if (empty($sets)) {
+            $sets = $this->attr[0];
+        }
+
         $setted = $this->databaseSetBuilder($sets);
         $this->args = array_merge($this->args, $setted['args']);
 
@@ -319,12 +324,16 @@ class QueryBuilder implements Iterator
     }
 
     /**
-     * @param $sets
+     * @param array $sets
      * @return PDOStatement
      */
-    public function create($sets)
+    public function create($sets = [])
     {
         $pattern = 'INSERT INTO :from SET :insert';
+
+        if (empty($sets)) {
+            $sets = $this->attr[0];
+        }
 
         $setted = $this->databaseSetBuilder($sets);
         $this->args = array_merge($this->args, $setted['args']);
@@ -519,7 +528,7 @@ class QueryBuilder implements Iterator
         } elseif (is_callable($datas)) {
             $inQuery = $this->prepareSubQuery($datas);
         } else {
-            $inQuery = '['.$datas.']';
+            $inQuery = '[' . $datas . ']';
         }
 
         return $inQuery;
@@ -1033,16 +1042,18 @@ class QueryBuilder implements Iterator
     /**
      * @return int
      */
-    public function count(){
+    public function count()
+    {
         $handled = $this->returnPreparedResults($this->prepareGetQuery())->rowCount();
 
-        return  $handled;
+        return $handled;
     }
 
     /**
      * @return bool
      */
-    public function exists(){
+    public function exists()
+    {
         return ($this->count() > 0);
     }
 
@@ -1066,7 +1077,6 @@ class QueryBuilder implements Iterator
 
         return $this;
     }
-
 
 
     public function rewind()
@@ -1141,6 +1151,7 @@ class QueryBuilder implements Iterator
     {
         return !empty($this->as);
     }
+
     /**
      * @param $name
      * @return mixed
@@ -1152,7 +1163,11 @@ class QueryBuilder implements Iterator
 
     public function __set($name, $value)
     {
-        $this->first()->$name = $value;
+        if (!$this->attr[0]) {
+            $this->attr[0] = [];
+        }
+
+        $this->attr[0]->$name = $value;
     }
 
 }
