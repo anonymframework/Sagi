@@ -1086,10 +1086,10 @@ class QueryBuilder implements Iterator
     public function relation($table, array $columns = [])
     {
         if (is_array($prop)) {
-            $alias = $prop[0];
-            $name = $prop[1];
+            $alias = $table[0];
+            $name = $table[1];
         } else {
-            $alias = $name = $prop;
+            $alias = $name = $table;
         }
         $columns['table'] = $name;
         RelationBag::$relations[$alias] = [
