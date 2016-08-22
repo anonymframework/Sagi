@@ -19,11 +19,14 @@ $db = new QueryBuilder([
     'username' => 'root',
     'password' => 'sanane123',
     'dbname' => 'test'
-],'users');
+], 'users');
 
-$db->password = 'aaa';
-$db->username = 'aa';
+$db->where('id', 1);
 
+$db->relation('posts', ['user_id', 'id', 'many']);
 
-$create = $db->create();
-var_dump($create);
+$posts = $db->posts->order('id');
+
+foreach ($posts as $post){
+    echo  $post->id;
+}

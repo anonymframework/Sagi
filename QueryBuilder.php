@@ -218,10 +218,10 @@ class QueryBuilder implements Iterator
     public function all()
     {
         if (empty($this->attr)) {
-            $this->fetchAll();
+            $this->attr = $this->fetchAll();
         }
 
-        return $this->attr;
+        return $this;
     }
 
     /**
@@ -1101,6 +1101,14 @@ class QueryBuilder implements Iterator
 
     public function rewind()
     {
+        if (is_null($this->attr)) {
+            if (is_null($this->limit)) {
+                $this->all();
+            } elseif ($this->limit[0] === 1) {
+                $this->one();
+            }
+
+        }
         reset($this->attr);
     }
 
@@ -1112,6 +1120,7 @@ class QueryBuilder implements Iterator
 
     public function key()
     {
+
         $var = key($this->attr);
         return $var;
     }
