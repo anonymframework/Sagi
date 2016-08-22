@@ -1079,11 +1079,11 @@ class QueryBuilder implements Iterator
 
 
     /**
-     * @param $name
+     * @param string|array $table
      * @param array $columns
      * @return $this
      */
-    public function relation($prop, array $columns = [])
+    public function relation($table, array $columns = [])
     {
         if (is_array($prop)) {
             $alias = $prop[0];
@@ -1113,7 +1113,6 @@ class QueryBuilder implements Iterator
     public function key()
     {
         $var = key($this->attr);
-        echo "key: $var\n";
         return $var;
     }
 
