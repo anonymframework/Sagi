@@ -494,7 +494,7 @@ class User extends Model{
  
  ```
  
-  ###Relations
+ ##Relations
 
 ```php
   
