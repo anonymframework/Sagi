@@ -1202,6 +1202,23 @@ class QueryBuilder implements Iterator
         return $this->first()->$name;
     }
 
+    /**
+     * @return array
+     */
+    public function getAttr()
+    {
+        return $this->attr;
+    }
+
+    /**
+     * @param array $attr
+     * @return QueryBuilder
+     */
+    public function setAttr($attr)
+    {
+        $this->attr = $attr;
+        return $this;
+    }
 
 
 }

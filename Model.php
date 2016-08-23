@@ -144,7 +144,8 @@ class Model extends QueryBuilder
             }
         } else {
             $this->create($datas);
-            $this->attr[0] = $datas;
+
+            return $this->newInstance($this->table)->setAttr($datas);
         }
 
         return $this;
