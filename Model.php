@@ -30,18 +30,9 @@ class Model extends QueryBuilder
      */
     public function hasMany($class, $link)
     {
-        if ($class::hasAliasName()) {
-            $class = [$class::getAliasName(), $class::getTableName()];
-            $name = $class::getAliasName();
-        } else {
-            $name = $class::getTableName();
-        }
-
         $link[] = 'many';
 
-        $this->relation($name, $link);
-
-        return $this->$name;
+        return $this->hasOne($class, $link);
     }
 
     /**
@@ -52,14 +43,19 @@ class Model extends QueryBuilder
     public function hasOne($class, $link)
     {
 
-        if ($class::hasAliasName()) {
-            $class = [$class::getAliasName(), $class::getTableName()];
 
-            $name = $class::getAliasName();
-        } else {
-            $name = $class::getTableName();
+        $table = $class::getTableName();
+
+        if (is_array($table)) {
+            $name = $table[0];
+        } elseif (is_string($table)) {
+            $name = $table;
         }
-        $this->relation($name, $link);
+
+
+        if (!parent::findRelative($name)) {
+            $this->relation($table, $link);
+        }
 
         return $this->$name;
     }
@@ -79,22 +75,15 @@ class Model extends QueryBuilder
 
     public static function getTableName()
     {
-        return static::$instance->getTable();
+        return '';
     }
 
-    /**
-     * @return bool
-     */
-    public static function hasAliasName()
-    {
-        return isset(static::$instance->alias);
-    }
 
     /**
      * @return bool
      */
     public static function getAliasName()
     {
-        return static::$instance->alias;
+        return '';
     }
 }

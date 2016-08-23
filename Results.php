@@ -45,7 +45,7 @@ class Results
      */
     public function __get($name)
     {
-        if ($this->findRelative($name)) {
+        if (QueryBuilder::findRelative($name)) {
             return call_user_func_array([$this, $name], []);
         }
 
@@ -99,26 +99,7 @@ class Results
         return false;
     }
 
-    /**
-     * @param $name
-     * @return array|bool
-     */
-    public function findRelative($name)
-    {
-        $subName = $this->table . '.' . $name;
 
-        if (isset(RelationBag::$relations[$name])) {
-            return
-                ['name' => $name, 'relation' => RelationBag::$relations[$name]];
-
-        } elseif (isset(RelationBag::$relations[$subName])) {
-            return
-                ['name' => $subName, 'relation' => RelationBag::$relations[$subName]];
-        } else {
-            return false;
-        }
-
-    }
 
     /**
      * @param $name
