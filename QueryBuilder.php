@@ -110,6 +110,8 @@ class QueryBuilder implements Iterator
      */
     private $cAttr = [];
 
+    public static $jsonFile = "config.json";
+
     /**
      * QueryBuilder constructor.
      * @param array $configs
@@ -121,12 +123,18 @@ class QueryBuilder implements Iterator
         if ($configs instanceof PDO) {
             $this->pdo = $configs;
         } else {
-            if (isset($configs['host']) && isset($configs['dbname']) && $configs['username'] && $configs['password']) {
-                $this->setConfigs($configs);
-                $this->startConnection();
+            if (is_array($configs)) {
+                if (isset($configs['host']) && isset($configs['dbname']) && $configs['username'] && $configs['password']) {
+                    // do nothing
+                } else {
+                    throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
+                }
             } else {
-                throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
+                $configs = json_decode(file_get_contents(static::$jsonFile));
             }
+
+            $this->setConfigs($configs);
+            $this->startConnection();
 
         }
 
