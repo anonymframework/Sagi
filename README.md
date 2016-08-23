@@ -404,7 +404,6 @@ echo $post->id;
 
 #Working With Models
 
-###Create A Model Class
 
 ```php 
 
