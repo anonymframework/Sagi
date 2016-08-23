@@ -11,6 +11,10 @@ class Model extends QueryBuilder
 
     public function __construct($configs = null, $table = null)
     {
+        if (!$table) {
+            $table = static::getTableName();
+        }
+
         parent::__construct($configs, $table);
     }
 
@@ -30,9 +34,21 @@ class Model extends QueryBuilder
      */
     public function hasMany($class, $link)
     {
+        $table = $class::getTableName();
+
+        if (is_array($table)) {
+            $name = $table[0];
+        } elseif (is_string($table)) {
+            $name = $table;
+        }
+
         $link[] = 'many';
 
-        return $this->hasOne($class, $link);
+        if (!parent::findRelative($name)) {
+            $this->relation($table, $link);
+        }
+
+        return $this;
     }
 
     /**
@@ -42,8 +58,6 @@ class Model extends QueryBuilder
      */
     public function hasOne($class, $link)
     {
-
-
         $table = $class::getTableName();
 
         if (is_array($table)) {
@@ -57,7 +71,7 @@ class Model extends QueryBuilder
             $this->relation($table, $link);
         }
 
-        return $this->$name;
+        return $this->first();
     }
 
     /**
@@ -73,17 +87,39 @@ class Model extends QueryBuilder
         }
     }
 
+    /**
+     * @param int $id
+     * @return QueryBuilder
+     */
+    public static function find($id)
+    {
+        return static::getInstance()->where('id',  $id);
+    }
+
+    /**
+     * @param int $id
+     * @return QueryBuilder
+     */
+    public static function findOne($id)
+    {
+        return static::getInstance()->where(['id' => $id])->one();
+    }
+
+    public static function getInstance()
+    {
+        if (!static::$instance) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+    /**
+     * @return string|array
+     */
     public static function getTableName()
     {
         return '';
     }
 
 
-    /**
-     * @return bool
-     */
-    public static function getAliasName()
-    {
-        return '';
-    }
 }

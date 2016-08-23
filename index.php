@@ -12,6 +12,8 @@ include "vendor/autoload.php";
 
 ini_set('display_errors', 'On');
 
-$users = new User();
+$users = User::find(1);
 
-var_dump($users->posts);
+$post = $users->post;
+
+var_dump($post);

@@ -85,11 +85,6 @@ class QueryBuilder implements Iterator
     public static $instance;
 
     /**
-     * @var array
-     */
-    public $relations;
-
-    /**
      * @var bool
      */
     private $prepareValues = true;
@@ -204,23 +199,6 @@ class QueryBuilder implements Iterator
         return $this;
     }
 
-    /**
-     * @param int $id
-     * @return QueryBuilder
-     */
-    public static function find($id)
-    {
-        return static::$instance->where(['id' => $id]);
-    }
-
-    /**
-     * @param int $id
-     * @return QueryBuilder
-     */
-    public static function findOne($id)
-    {
-        return static::$instance->where(['id' => $id])->one();
-    }
 
     /**
      * @return array
@@ -1211,6 +1189,7 @@ class QueryBuilder implements Iterator
     {
         return !empty($this->as);
     }
+
 
     /**
      * @param $name
