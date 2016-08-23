@@ -1101,6 +1101,7 @@ class QueryBuilder implements Iterator
         } else {
             $alias = $name = $table;
         }
+
         $columns['table'] = $name;
         RelationBag::$relations[$alias] = [
             'propeties' => $columns];
