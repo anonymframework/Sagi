@@ -45,11 +45,17 @@ class Results
      */
     public function __get($name)
     {
-        if (QueryBuilder::findRelative($name)) {
-            return call_user_func_array([$this, $name], []);
+        if ($relation = QueryBuilder::findRelative($name)) {
+
+            if ($prepared = $this->findPreparedRelative($relation['name'])) {
+                return $prepared;
+            } else {
+                return $this->prepareRelation($relation['name'], $relation['relation']['propeties']);
+            }
+        } else {
+            return $this->attr[$name];
         }
 
-        return $this->attr[$name];
     }
 
     /**
@@ -69,15 +75,7 @@ class Results
      */
     public function relation($prop, array $columns = [])
     {
-        if (is_array($prop)) {
-            $alias = $prop[0];
-            $name = $prop[1];
-        } else {
-            $alias = $name = $prop;
-        }
-        $columns['table'] = $name;
-        RelationBag::$relations[$alias] = [
-            'propeties' => $columns];
+        $this->database->relation($prop, $columns);
 
         return $this;
     }
@@ -100,7 +98,6 @@ class Results
     }
 
 
-
     /**
      * @param $name
      * @param $arguments
@@ -108,13 +105,7 @@ class Results
      */
     public function __call($name, $arguments)
     {
-        if ($relation = $this->findPreparedRelative($name)) {
-            return $relation;
-        } elseif ($relation = $this->findRelative($name)) {
-            return $this->prepareRelation($relation['name'], $relation['relation']['propeties']);
-        } else {
-            return call_user_func_array([$this->database, $name], $arguments);
-        }
+        return call_user_func_array([$this->database, $name], $arguments);
     }
 
     public function prepareRelation($name, $relation)
@@ -122,6 +113,7 @@ class Results
         $targetTable = $relation['table'];
         $targetColumn = $relation[0];
         $ourColumn = $relation[1];
+
         $type = isset($relation[2]) ? $relation[2] : 'one';
 
         $query = $this->database->newInstance($this->table)->setTable($targetTable);

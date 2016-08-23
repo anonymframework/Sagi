@@ -1122,12 +1122,18 @@ class QueryBuilder implements Iterator
         reset($this->attr);
     }
 
+    /**
+     * @return mixed
+     */
     public function current()
     {
         $var = current($this->attr);
         return $var;
     }
 
+    /**
+     * @return mixed
+     */
     public function key()
     {
 
@@ -1135,12 +1141,18 @@ class QueryBuilder implements Iterator
         return $var;
     }
 
+    /**
+     * @return mixed
+     */
     public function next()
     {
         $var = next($this->attr);
         return $var;
     }
 
+    /**
+     * @return bool
+     */
     public function valid()
     {
         $key = key($this->attr);

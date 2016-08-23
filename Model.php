@@ -8,6 +8,10 @@
  */
 class Model extends QueryBuilder
 {
+    /**
+     * @var array
+     */
+    protected $relations;
 
     public function __construct($configs = null, $table = null)
     {
@@ -16,6 +20,20 @@ class Model extends QueryBuilder
         }
 
         parent::__construct($configs, $table);
+
+        if (isset($this->relations)) {
+            $this->prepareRelations();
+        }
+    }
+
+    /**
+     *  prepares relations
+     */
+    private function prepareRelations()
+    {
+        foreach ($this->relations as $relation) {
+            $this->relation($relation[0], $relation[1]);
+        }
     }
 
     /**
@@ -28,72 +46,12 @@ class Model extends QueryBuilder
 
 
     /**
-     * @param string|Model $class
-     * @param array $link
-     * @return Model
-     */
-    public function hasMany($class, $link)
-    {
-        $table = $class::getTableName();
-
-        if (is_array($table)) {
-            $name = $table[0];
-        } elseif (is_string($table)) {
-            $name = $table;
-        }
-
-        $link[] = 'many';
-
-        if (!parent::findRelative($name)) {
-            $this->relation($table, $link);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string|Model $class
-     * @param array $link
-     * @return Model
-     */
-    public function hasOne($class, $link)
-    {
-        $table = $class::getTableName();
-
-        if (is_array($table)) {
-            $name = $table[0];
-        } elseif (is_string($table)) {
-            $name = $table;
-        }
-
-
-        if (!parent::findRelative($name)) {
-            $this->relation($table, $link);
-        }
-
-        return $this->first();
-    }
-
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        if (method_exists($this, $name = "get" . ucfirst($name))) {
-            return call_user_func_array([$this, $name], []);
-        } else {
-            parent::__get($name);
-        }
-    }
-
-    /**
      * @param int $id
      * @return QueryBuilder
      */
     public static function find($id)
     {
-        return static::getInstance()->where('id',  $id);
+        return static::getInstance()->where('id', $id);
     }
 
     /**
@@ -105,6 +63,13 @@ class Model extends QueryBuilder
         return static::getInstance()->where(['id' => $id])->one();
     }
 
+
+    public function hasOne(){
+
+    }
+    /**
+     * @return QueryBuilder
+     */
     public static function getInstance()
     {
         if (!static::$instance) {
@@ -113,6 +78,7 @@ class Model extends QueryBuilder
 
         return static::$instance;
     }
+
     /**
      * @return string|array
      */

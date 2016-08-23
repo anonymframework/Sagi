@@ -12,8 +12,8 @@ include "vendor/autoload.php";
 
 ini_set('display_errors', 'On');
 
-$users = User::find(1);
+$user = User::find(1);
 
-$post = $users->post;
-
-var_dump($post);
+foreach ($user->posts as $post){
+    echo $post->id;
+}
