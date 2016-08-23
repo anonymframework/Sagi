@@ -75,6 +75,23 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @param null $conditions
+     * @return array
+     */
+    public static function findAll($conditions = null)
+    {
+        $instance = static::getInstance();
+
+        if (is_array($conditions)) {
+            foreach ($conditions as $key => $value) {
+                $instance->where($key, $value);
+            }
+        }
+
+        return $instance->all();
+    }
+
+    /**
      * @param string|Model $class
      * @param array $link
      * @return Model

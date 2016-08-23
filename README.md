@@ -422,7 +422,6 @@ class User extends Model{
  
  ```
  
- ###Relations
  
  
  ####create
@@ -481,6 +480,22 @@ class User extends Model{
  ```
 
  
+
+ 
+ ####findAll
+
+ ```php
+ 
+   User::findAll();
+   
+   // or 
+   
+   User::findAll(['auth' => 1]);
+ 
+ ```
+ 
+  ###Relations
+
 ```php
   
     public $relations = [
@@ -488,7 +503,6 @@ class User extends Model{
     ]
 
 ```
- 
 
  ###one
  
