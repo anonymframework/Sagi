@@ -130,6 +130,27 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @param array $datas
+     * @return $this
+     */
+    public function save($datas = [])
+    {
+        $datas = array_merge($this->cAttr, $datas);
+
+        if (isset($this->attr[0])) {
+            foreach ($this->attr[0] as $key => $value) {
+                $this->where($key, $value);
+                $this->update($datas);
+            }
+        } else {
+            $this->create($datas);
+            $this->attr[0] = $datas;
+        }
+
+        return $this;
+    }
+
+    /**
      * @return QueryBuilder
      */
     public static function getInstance()

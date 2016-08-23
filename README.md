@@ -44,13 +44,6 @@ Sagi Database Class
        'password' => 123456
     ]);
     
-    // or 
-    
-    
-    $db->username = 'admin';
-    $db->password = 123456;
-    
-    $db->create();
   
 ```
 
@@ -71,12 +64,6 @@ Sagi Database Class
      $db->update([
       'username' => 'newAdmin'
       ]);
-      
-      //or 
-      
-      $db->username = 'newAdmin';
-      
-      $db->update();
 
 ```
 
@@ -436,6 +423,46 @@ class User extends Model{
  ```
  
  ###Relations
+ 
+ 
+ ####create
+ 
+ 
+ >You shouldn't call any where query before `save` method for create
+ >new data otherwise save method will update your datas.
+ 
+ >You can also use QueryBuilder `create` method for this process.
+ 
+ ```php
+ 
+ $user->username = 'admin';
+ $user->password = 'password';
+ 
+ 
+  $user->save();
+ 
+  // or
+  
+  $user->save([
+     'username' => 'admin',
+     'password' => 'password'
+  ]);
+ ```
+####update
+
+
+  >You can also use QueryBuilder `update` method for this process.
+
+ ```php 
+  
+  $user->where('username', 'admin');
+ 
+  $user->username = 'newAdmin';
+  $user->password = 'newPassword';
+  
+  
+   $user->save();
+ ```
  
  ####find
  
