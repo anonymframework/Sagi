@@ -104,21 +104,6 @@ Sagi Database Class
   
 ```
 
-####find
-
-```php
-
-  $find = QueryBuilder::find(1); // equal to id = 1
-
-```
-
-####findOne
-
-```php
-
-  QueryBuilder::findOne(1); // equal to $find->one(); 
-
-```
 
 
 
@@ -428,3 +413,101 @@ echo $post->id;
 }
 
 ```
+
+
+#Working With Models
+
+###Create A Model Class
+
+```php 
+
+class User extends Model{
+
+     public static function tableName(){
+         return "users";  
+         
+         // you can set alias for relations like that;
+         
+         // return ["aliasName", "tableName"];
+      }
+
+ }
+ 
+ ```
+ 
+ ###Relations
+ 
+ ####find
+ 
+ ```php
+ 
+   $find = User::find(1); // equal to id = 1
+ 
+ ```
+ 
+ ####findOne
+ 
+ ```php
+ 
+   User::findOne(1); // equal to $find->one(); 
+ 
+ ```
+
+ 
+```php
+  
+    public $relations = [
+       ["posts", ["user_id", "id"]] // ["posts", ["user_id", "id", "many"]]
+    ]
+
+```
+ 
+
+ ###one
+ 
+ 
+ ```php 
+ 
+ class Post extends Model{
+ 
+      public static function tableName(){
+          return ["post", "posts"];  
+         
+       }
+ 
+  }
+  ```
+ 
+ ```php
+ 
+ public function getPost(){
+       $this->hasOne(Post::className(), ["user_id", "id"]);
+ }
+ 
+ ```
+ 
+ 
+ ###many
+ 
+  ```php 
+  
+  class Post extends Model{
+  
+       public static function tableName(){
+           return "posts"; 
+          
+        }
+  
+   }
+   ```
+  
+  ```php
+  
+  public function getPosts(){
+        $this->hasMany(Post::className(), ["user_id", "id"]);
+  }
+  
+  ```
+ 
+ 
+ 

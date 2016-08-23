@@ -82,7 +82,6 @@ class Model extends QueryBuilder
 
         if (!static::findRelative($name)) {
             $this->relation($table, $link);
-
         }
     }
 
@@ -103,7 +102,6 @@ class Model extends QueryBuilder
 
         if (!static::findRelative($name)) {
             $this->relation($table, $link);
-
         }
     }
 
