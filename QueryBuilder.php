@@ -1,4 +1,7 @@
 <?php
+namespace Sagi\Database;
+
+use Iterator;
 
 /**
  * Class QueryBuilder
@@ -99,7 +102,6 @@ class QueryBuilder implements Iterator
      * @var string
      */
     private $as;
-
 
 
     public static $jsonFile = "config.json";

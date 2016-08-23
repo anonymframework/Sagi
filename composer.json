@@ -14,8 +14,8 @@
   },
   "minimum-stability": "dev",
   "autoload": {
-    "classmap": [
-      "."
-    ]
+    "psr-4": {
+      "Sagi\\Database": "."
+    }
   }
 }
