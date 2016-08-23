@@ -26,7 +26,7 @@ class QueryBuilder implements Iterator
      * @var string
      *
      */
-    private $table;
+    protected $table;
 
     /**
      *
@@ -118,7 +118,7 @@ class QueryBuilder implements Iterator
      * @param string $table
      * @throws Exception
      */
-    public function __construct($configs = [], $table = null)
+    public function __construct($configs = null, $table = null)
     {
         if ($configs instanceof PDO) {
             $this->pdo = $configs;
@@ -130,7 +130,7 @@ class QueryBuilder implements Iterator
                     throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
                 }
             } else {
-                $configs = json_decode(file_get_contents(static::$jsonFile));
+                $configs = json_decode(file_get_contents(static::$jsonFile), true);
             }
 
             $this->setConfigs($configs);
@@ -138,7 +138,9 @@ class QueryBuilder implements Iterator
 
         }
 
-        $this->setTable($table);
+        if ($table !== null) {
+            $this->setTable($table);
+        }
 
         static::$instance = $this;
     }

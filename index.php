@@ -1,8 +1,6 @@
 <?php
 
-include 'QueryBuilder.php';
-include 'Results.php';
-include 'RelationBag.php';
+include "vendor/autoload.php";
 /*
  *  or you can use composer for autoloading
  *
@@ -14,20 +12,6 @@ include 'RelationBag.php';
 
 ini_set('display_errors', 'On');
 
-$db = new QueryBuilder([
-    'host' => 'localhost',
-    'username' => 'root',
-    'password' => 'sanane123',
-    'dbname' => 'test'
-], 'users');
+$users = new User();
 
-$db->where('id', 1);
-
-$db->relation('posts', ['user_id', 'id', 'many']);
-
-$posts = $db->posts->order('id');
-
-foreach ($posts as $post){
-    echo  $post->id;
-}
-
+var_dump($users->posts);
