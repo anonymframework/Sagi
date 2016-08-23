@@ -100,10 +100,7 @@ class QueryBuilder implements Iterator
      */
     private $as;
 
-    /**
-     * @var array
-     */
-    private $cAttr = [];
+
 
     public static $jsonFile = "config.json";
 
@@ -315,9 +312,6 @@ class QueryBuilder implements Iterator
     {
         $pattern = 'UPDATE :from SET :update :where';
 
-        if (empty($sets)) {
-            $sets = $this->cAttr;
-        }
 
         $setted = $this->databaseSetBuilder($sets);
         $this->args = array_merge($this->args, $setted['args']);
@@ -338,10 +332,6 @@ class QueryBuilder implements Iterator
     public function create($sets = [])
     {
         $pattern = 'INSERT INTO :from SET :insert';
-
-        if (empty($sets)) {
-            $sets = $this->cAttr;
-        }
 
         $setted = $this->databaseSetBuilder($sets);
         $this->args = array_merge($this->args, $setted['args']);
@@ -1212,9 +1202,6 @@ class QueryBuilder implements Iterator
         return $this->first()->$name;
     }
 
-    public function __set($name, $value)
-    {
-        $this->cAttr[$name] = $value;
-    }
+
 
 }

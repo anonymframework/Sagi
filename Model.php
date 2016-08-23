@@ -13,6 +13,17 @@ class Model extends QueryBuilder
      */
     protected $relations;
 
+
+    /**
+     * @var array
+     */
+    protected $timestamps;
+
+    /**
+     * @var array
+     */
+    private $cAttr = [];
+
     public function __construct($configs = null, $table = null)
     {
         if (!$table) {
@@ -138,5 +149,13 @@ class Model extends QueryBuilder
         return '';
     }
 
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function __set($name, $value)
+    {
+        $this->cAttr[$name] = $value;
+    }
 
 }
