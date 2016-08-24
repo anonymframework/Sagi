@@ -22,6 +22,8 @@ $schema->createTable('users', function (\Sagi\Database\Row $row) {
 
 */
 
-$user = \Sagi\Database\User::findOne(1);
-$posts = $user->posts;
-var_dump($posts);
+$user = \Sagi\Database\User::findAll();
+
+var_dump($user);
+
+

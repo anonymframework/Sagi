@@ -11,7 +11,6 @@ class QueryBuilder extends Engine implements Iterator
 {
 
 
-
     /**
      * @var array
      */
@@ -58,41 +57,13 @@ class QueryBuilder extends Engine implements Iterator
 
     }
 
-    /**
-     * @return $this
-     */
-    public function one()
-    {
-        $attrs = $this->fetch();
-
-        $this->attributes[0] = $attrs;
-        return $this;
-    }
-
-
-    /**
-     * @return $this
-     */
-    public function all()
-    {
-        if (empty($this->attributes)) {
-            $this->setAttributes($this->fetchAll());
-        }
-
-        return $this;
-    }
 
     /**
      * @return mixed
      */
     public function first()
     {
-        if (isset($this->attributes[0]) === false) {
-            $this->one();
-        }
-
-
-        return $this->attributes[0];
+        return $this->attributes;
     }
 
 
@@ -121,7 +92,7 @@ class QueryBuilder extends Engine implements Iterator
     /**
      * @return mixed
      */
-    public function fetch()
+    public function one()
     {
         $get = $this->get();
 
@@ -131,7 +102,7 @@ class QueryBuilder extends Engine implements Iterator
     /**
      * @return array
      */
-    public function fetchAll()
+    public function all()
     {
         return $this->get()->fetchAll(PDO::FETCH_CLASS, 'Sagi\Database\Results', ['table' => $this->getTable(), 'database' => static::createNewInstance()]);
     }
@@ -240,7 +211,7 @@ class QueryBuilder extends Engine implements Iterator
 
     public function rewind()
     {
-        if (is_null($this->attr)) {
+        if (is_null($this->attributes)) {
             if (is_null($this->getLimit())) {
                 $this->all();
             } elseif ($this->getLimit()[0] === 1) {
@@ -248,7 +219,7 @@ class QueryBuilder extends Engine implements Iterator
             }
 
         }
-        reset($this->attr);
+        reset($this->attributes);
     }
 
     /**
@@ -256,7 +227,7 @@ class QueryBuilder extends Engine implements Iterator
      */
     public function current()
     {
-        $var = current($this->attr);
+        $var = current($this->attributes);
         return $var;
     }
 
@@ -266,7 +237,7 @@ class QueryBuilder extends Engine implements Iterator
     public function key()
     {
 
-        $var = key($this->attr);
+        $var = key($this->attributes);
         return $var;
     }
 
@@ -275,7 +246,7 @@ class QueryBuilder extends Engine implements Iterator
      */
     public function next()
     {
-        $var = next($this->attr);
+        $var = next($this->attributes);
         return $var;
     }
 
@@ -284,7 +255,7 @@ class QueryBuilder extends Engine implements Iterator
      */
     public function valid()
     {
-        $key = key($this->attr);
+        $key = key($this->attributes);
         $var = ($key !== NULL && $key !== FALSE);
         return $var;
     }

@@ -120,14 +120,9 @@ class Results
 
 
         $database = $this->database;
-        if ($className) {
-            $instance = $className::createNewInstance();
-        } else {
-            $instance = $database::createNewInstance()->setTable($targetTable);
-        }
 
+        $relation = $database->where($targetColumn, $this->{$ourColumn});
 
-        $relation = $instance->where($targetColumn, $this->{$ourColumn});
 
         if ($type == 'one') {
             $relation = $relation->limit(1);

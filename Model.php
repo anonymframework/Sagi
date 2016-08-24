@@ -1,6 +1,9 @@
 <?php
 
 namespace Sagi\Database;
+
+use PDO;
+
 /**
  * Created by PhpStorm.
  * User: sagi
@@ -44,6 +47,25 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @return mixed
+     */
+    public function all()
+    {
+        return $this->get()->fetchAll(PDO::FETCH_CLASS, get_called_class());
+    }
+
+    /**
+     * @return mixed
+     */
+    public function one()
+    {
+        $get = $this->get();
+
+        return $get->fetchObject(get_called_class());
+    }
+
+
+    /**
      *  prepares relations
      */
     private function prepareRelations()
@@ -73,7 +95,7 @@ class Model extends QueryBuilder
 
     /**
      * @param int $id
-     * @return QueryBuilder
+     * @return mixed
      */
     public static function findOne($id)
     {
@@ -113,7 +135,7 @@ class Model extends QueryBuilder
         }
 
         $link[] = 'many';
-        $link['class'] = get_called_class();
+        $link['class'] = $class;
 
         if (!static::findRelative($name)) {
             $this->relation($table, $link);
@@ -135,7 +157,7 @@ class Model extends QueryBuilder
             $name = $table;
         }
 
-        $link['class'] = get_called_class();
+        $link['class'] = $class;
 
         if (!static::findRelative($name)) {
             $this->relation($table, $link);
@@ -187,12 +209,11 @@ class Model extends QueryBuilder
     }
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * @param $name
+     * @param $value
      */
-    public function __set($name, $value)
-    {
-        $this->cAttr[$name] = $value;
-    }
-
+   public function __set($name, $value)
+   {
+       $this->attributes[$name] = $value;
+   }
 }
