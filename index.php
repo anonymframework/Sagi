@@ -2,7 +2,6 @@
 
 include "vendor/autoload.php";
 /*
- *  or you can use composer for autoloading
  *
  *  $ composer dump-autoload
  *
