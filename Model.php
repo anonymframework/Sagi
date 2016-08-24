@@ -134,12 +134,9 @@ class Model extends QueryBuilder
             $name = $table;
         }
 
-        $link[] = 'many';
-        $link['class'] = $class;
+        $class = $class::createNewInstance();
 
-        if (!static::findRelative($name)) {
-            $this->relation($table, $link);
-        }
+
     }
 
     /**
@@ -212,8 +209,8 @@ class Model extends QueryBuilder
      * @param $name
      * @param $value
      */
-   public function __set($name, $value)
-   {
-       $this->attributes[$name] = $value;
-   }
+    public function __set($name, $value)
+    {
+        $this->attributes[$name] = $value;
+    }
 }

@@ -12,7 +12,10 @@ class RelationBag
     /**
      * @var array
      */
-    public static $relations;
+    public static $relations = [
+        'one' => [],
+        'many' => []
+    ];
 
     /**
      * @var array
@@ -35,7 +38,16 @@ class RelationBag
         self::$relations = $relations;
     }
 
-    public static function prepareRelatives()
+    /**
+     * @param string $name
+     * @param Model $model
+     */
+    public static function addRelative($name, Model $model)
+    {
+        static::$relations[$name] = $model;
+    }
+
+    public static function prepareRelation()
     {
 
     }
