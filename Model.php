@@ -25,6 +25,11 @@ class Model extends QueryBuilder
      */
     private $cAttr = [];
 
+    /**
+     * Model constructor.
+     * @param null $configs
+     * @param null $table
+     */
     public function __construct($configs = null, $table = null)
     {
         if (!$table) {
@@ -72,7 +77,7 @@ class Model extends QueryBuilder
      */
     public static function findOne($id)
     {
-        return static::getInstance()->where(['id' => $id])->one();
+        return static::getInstance()->where('id', $id)->one();
     }
 
     /**

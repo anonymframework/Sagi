@@ -22,8 +22,6 @@ $schema->createTable('users', function (\Sagi\Database\Row $row) {
 
 */
 
-$builder = new \Sagi\Database\QueryBuilder();
-$builder->setTable('users');
-$builder->where('id', 1);
-
-var_dump($builder->username);
+$user = \Sagi\Database\User::findOne(1);
+$posts = $user->posts;
+var_dump($posts);

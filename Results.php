@@ -20,7 +20,7 @@ class Results
     public $attr;
 
     /**
-     * @var Database
+     * @var QueryBuilder
      */
     public $database;
 
@@ -114,12 +114,20 @@ class Results
         $targetTable = $relation['table'];
         $targetColumn = $relation[0];
         $ourColumn = $relation[1];
+        $className = isset($relation['class']) ? $relation['class'] : false;
 
         $type = isset($relation[2]) ? $relation[2] : 'one';
 
-        $query = $this->database->newInstance($this->table)->setTable($targetTable);
 
-        $relation = $query->where($targetColumn, $this->{$ourColumn});
+        $database = $this->database;
+        if ($className) {
+            $instance = $className::createNewInstance();
+        } else {
+            $instance = $database::createNewInstance()->setTable($targetTable);
+        }
+
+
+        $relation = $instance->where($targetColumn, $this->{$ourColumn});
 
         if ($type == 'one') {
             $relation = $relation->limit(1);
