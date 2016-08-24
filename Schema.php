@@ -66,7 +66,13 @@ class Schema
 
         $this->addCommand('end', [$this->charset]);
 
-        return Connector::getConnection()->query($this->prepareSchema());
+        $prepare = Connector::getConnection()->query($this->prepareSchema());
+
+        if ($prepare) {
+            return true;
+        } else {
+            throw new SchemaException(sprintf('%s could not created', $table));
+        }
     }
 
     /**

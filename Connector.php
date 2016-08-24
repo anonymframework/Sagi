@@ -11,6 +11,9 @@ class Connector
      */
     public static $connection;
 
+    /**
+     * @param $configs
+     */
     public static function madeConnection($configs)
     {
         try {
