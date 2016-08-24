@@ -42,9 +42,44 @@ class RelationBag
      * @param string $name
      * @param Model $model
      */
-    public static function addRelative($name, Model $model)
+    public static function addRelative($name, Model $model, $type = 'one')
     {
-        static::$relations[$name] = $model;
+        static::$relations[$type][$name] = $model;
+    }
+
+    /**
+     * @param $name
+     * @param $type
+     * @return Model
+     */
+    public static function getRelation($name, $type)
+    {
+        if (!static::isPreparedBefore($name)) {
+            static::prepareRelation($name, $type);
+        }
+
+        return static::$preparedRelatives[static::getPreparedName($name, $type)];
+
+    }
+
+    /**
+     * @param $name
+     * @param $type
+     * @return string
+     */
+    public static function getPreparedName($name, $type)
+    {
+        return $name . "::" . $type;
+    }
+
+    /**
+     * @param $name
+     * @param string $type
+     * @return bool
+     */
+    public static function isPreparedBefore($name, $type = 'one')
+    {
+        return isset(static::$preparedRelatives[static::getPreparedName($name, $type)]);
     }
 
     public static function prepareRelation()

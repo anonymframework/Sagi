@@ -134,9 +134,13 @@ class Model extends QueryBuilder
             $name = $table;
         }
 
-        $class = $class::createNewInstance();
+        if (!RelationBag::isPreparedBefore($name, 'many')) {
+            $class = $class::createNewInstance();
 
+            RelationBag::addRelative($name, $class, 'many');
+        }
 
+        return RelationBag::getRelation($name, 'many');
     }
 
     /**
