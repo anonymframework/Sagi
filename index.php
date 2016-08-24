@@ -12,10 +12,11 @@ include "vendor/autoload.php";
 ini_set('display_errors', 'On');
 
 
-$row = new \Sagi\Database\Row();
+$schema = new \Sagi\Database\Schema();
 
-$row->pk('id');
-$row->varchar('username')->notNull();
-$row->int('type')->defaultValue('id');
+$schema->createTable('users', function (\Sagi\Database\Row $row) {
 
-var_dump($row->prepareRow());
+    $row->int('id');
+});
+
+var_dump($schema->prepareSchema());

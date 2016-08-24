@@ -2,6 +2,7 @@
 namespace Sagi\Database;
 
 use Iterator;
+use PDO;
 
 /**
  * Class QueryBuilder
@@ -248,7 +249,7 @@ class QueryBuilder implements Iterator
     {
         $get = $this->get();
 
-        return $get->fetchObject('Results', ['table' => $this->getTable(), 'database' => $this]);
+        return $get->fetchObject('Sagi\Database\Results', ['table' => $this->getTable(), 'database' => $this]);
     }
 
     /**
@@ -256,7 +257,7 @@ class QueryBuilder implements Iterator
      */
     public function fetchAll()
     {
-        return $this->get()->fetchAll(PDO::FETCH_CLASS, 'Results', ['table' => $this->getTable(), 'database' => $this]);
+        return $this->get()->fetchAll(PDO::FETCH_CLASS, 'Sagi\Database\Results', ['table' => $this->getTable(), 'database' => $this]);
     }
 
     /**

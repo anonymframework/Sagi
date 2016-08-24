@@ -106,6 +106,8 @@ class Command
      */
     public function prepareCommand()
     {
-        return join(' ', $this->queires) . ',';
+        $query = join(' ', $this->queires) . ',';
+
+        return rtrim($query, ',');
     }
 }
