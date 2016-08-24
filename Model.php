@@ -155,31 +155,20 @@ class Model extends QueryBuilder
     {
         $datas = array_merge($this->cAttr, $datas);
 
-        if (isset($this->attr[0])) {
-            foreach ($this->attr[0] as $key => $value) {
+        if (isset($this->attributes[0])) {
+            foreach ($this->attributes[0] as $key => $value) {
                 $this->where($key, $value);
                 $this->update($datas);
             }
         } else {
             $this->create($datas);
 
-            return $this->newInstance($this->table)->setAttr($datas);
+            return static::createNewInstance()->setAttributes($datas);
         }
 
         return $this;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public static function getInstance()
-    {
-        if (!static::$instance) {
-            static::$instance = new static();
-        }
-
-        return static::$instance;
-    }
 
     /**
      * @return string|array
