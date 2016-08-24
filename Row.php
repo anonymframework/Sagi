@@ -50,7 +50,7 @@ class Row
      * @param int $limit
      * @return Command
      */
-    public function varchar($name, $limit = 255)
+    public function string($name, $limit = 255)
     {
         return $this->addCommand('varchar', $this->madeArray($name, $limit));
     }

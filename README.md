@@ -540,6 +540,16 @@ class User extends Model{
  #Table Schema
  
  ```php
+  use Sagi\Database\Schema;
+ 
+  $schema = new Schema();
  
  
+  $schema->createTable('users', function(Row $row){
+      $row->pk('id');
+      
+      $row->int('role')->defaultValue(1);
+      $row->string('username')->notNull();
+      $row->string('password')->notNull();
+  });
  ```
