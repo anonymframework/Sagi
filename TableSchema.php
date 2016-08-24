@@ -14,10 +14,6 @@ class TableSchema
     protected $commands = [
         'create' => 'CREATE TABLE :table(',
         'end' => ');',
-        'pk' => 'PRIMARY KEY (:pk)',
-        'inc' => 'AUTOINCREMENT',
-        'notnull' => 'NOT NULL',
-        'null' => 'NULL'
     ];
 
     public function __construct()
