@@ -82,7 +82,7 @@ class RelationBag
         return isset(static::$preparedRelatives[static::getPreparedName($name, $type)]);
     }
 
-    public static function prepareRelation()
+    public static function prepareRelation($name, $type)
     {
 
     }
