@@ -63,15 +63,22 @@ class Schema
         call_user_func_array($closure, [$this->row]);
 
         $this->commands[] = $this->row->prepareRow();
-
         $this->addCommand('end', [$this->charset]);
-
         $prepare = Connector::getConnection()->query($this->prepareSchema());
+        $this->checkResult($prepare);
+    }
 
+    /**
+     * @param $prepare
+     * @return bool
+     * @throws SchemaException
+     */
+    private function checkResult($prepare)
+    {
         if ($prepare) {
             return true;
         } else {
-            throw new SchemaException(sprintf('%s could not created', $table));
+            throw new SchemaException(sprintf('%s bir hata oluştu'));
         }
     }
 
