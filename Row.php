@@ -147,6 +147,11 @@ class Row
         return $this->addCommand('auto_increment', $this->madeArray($name, $limit));
     }
 
+    public function timestamps()
+    {
+
+    }
+
     /**
      * add a new time stamp with CURRENT_TIMESTAMP
      *
