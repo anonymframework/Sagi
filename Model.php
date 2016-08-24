@@ -113,6 +113,7 @@ class Model extends QueryBuilder
         }
 
         $link[] = 'many';
+        $link['class'] = get_called_class();
 
         if (!static::findRelative($name)) {
             $this->relation($table, $link);
@@ -133,6 +134,8 @@ class Model extends QueryBuilder
         } else {
             $name = $table;
         }
+
+        $link['class'] = get_called_class();
 
         if (!static::findRelative($name)) {
             $this->relation($table, $link);
