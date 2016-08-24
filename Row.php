@@ -23,19 +23,18 @@ class Row
         'time' => '`%s` TIME',
         'datetime' => '`%s` DATETIME',
         'text' => '`%s` TEXT',
-        'default' => 'DEFAULT %s'
     ];
 
     /**
      * @var array
      */
-    protected $sqlCommands;
+    protected static $sqlCommands;
 
     /**
      * add a text string to value
      *
      * @param string $name
-     * @return Chield
+     * @return Command
      */
     public function text($name)
     {
@@ -47,7 +46,7 @@ class Row
      *
      * @param string $name
      * @param int $limit
-     * @return Chield
+     * @return Command
      */
     public function varchar($name, $limit = 255)
     {
@@ -58,7 +57,7 @@ class Row
      * add a new date command
      *
      * @param  string $name
-     * @return Chield
+     * @return Command
      */
     public function date($name)
     {
@@ -70,7 +69,7 @@ class Row
      *
      * @param string $name
      * @param int $limit
-     * @return Chield
+     * @return Command
      */
     public function int($name, $limit = 255)
     {
@@ -81,7 +80,7 @@ class Row
      * add a new time string
      *
      * @param string $name
-     * @return Chield
+     * @return Command
      */
     public function time($name)
     {
@@ -92,7 +91,7 @@ class Row
      * add a new timestamp column to mysql
      *
      * @param string $name
-     * @return Chield
+     * @return Command
      */
     public function timestamp($name)
     {
@@ -103,7 +102,7 @@ class Row
      * add a new year year column to mysql
      *
      * @param string $name
-     * @return Chield
+     * @return Command
      */
     public function year($name)
     {
@@ -115,7 +114,7 @@ class Row
      *
      * @param string $name
      * @param int $limit
-     * @return mixed
+     * @return Command
      */
     public function pk($name, $limit = 255)
     {
@@ -126,12 +125,13 @@ class Row
      * add a new time stamp with CURRENT_TIMESTAMP
      *
      * @param string $name
-     * @return Chield
+     * @return Command
      */
     public function current($name)
     {
         return $this->addCommand('current', $this->madeArray($name));
     }
+
 
     /**
      * get all args
@@ -149,12 +149,41 @@ class Row
      *
      * @param string $type
      * @param array $variables
-     * @return Chield
+     * @return Command
      */
     private function addCommand($type, $variables)
     {
-        array_unshift($variables, $this->patterns[$type]);
+        if (!empty($variables)) {
+            array_unshift($variables, $this->patterns[$type]);
 
-        $this->sqlCommands[] = call_user_func_array('sprintf', $variables);
+            $command = call_user_func_array('sprintf', $variables);
+        } else {
+            $command = $this->patterns[$type];
+        }
+
+        static::$sqlCommands[] = $command = new Command($command);
+
+        return $command;
+    }
+
+    /**
+     * @return string
+     */
+    public function prepareRow()
+    {
+        $query = '';
+
+        if (is_array(static::$sqlCommands)) {
+            foreach (static::$sqlCommands as $command) {
+                if ($command instanceof Command) {
+                    $query .= $command->prepareCommand();
+                }
+            }
+        }
+
+        static::$sqlCommands = [];
+
+        return $query;
+
     }
 }
