@@ -537,4 +537,9 @@ class User extends Model{
   ```
  
  
+ #Table Schema
  
+ ```php
+ 
+ 
+ ```

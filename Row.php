@@ -15,6 +15,8 @@ class Row
     protected $patterns = [
         'auto_increment' => '`%s` INT(%d) UNSIGNED AUTO_INCREMENT PRIMARY KEY',
         'int' => '`%s` INT(%d)',
+        'bigint' => '`%s` BIGINT(%d)',
+        'tinyint' => '`%s` TINYINT(%d)',
         'varchar' => '`%s` VARCHAR(%d)',
         'timestamp' => '`%s` TIMESTAMP',
         'current' => '`%s` TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
@@ -74,6 +76,30 @@ class Row
     public function int($name, $limit = 255)
     {
         return $this->addCommand('int', $this->madeArray($name, $limit));
+    }
+
+    /**
+     * add a new integer command
+     *
+     * @param string $name
+     * @param int $limit
+     * @return Command
+     */
+    public function tinyInt($name, $limit = 255)
+    {
+        return $this->addCommand('tinyint', $this->madeArray($name, $limit));
+    }
+
+    /**
+     * add a new integer command
+     *
+     * @param string $name
+     * @param int $limit
+     * @return Command
+     */
+    public function bigInt($name, $limit = 255)
+    {
+        return $this->addCommand('bigint', $this->madeArray($name, $limit));
     }
 
     /**
