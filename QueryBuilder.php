@@ -166,26 +166,6 @@ class QueryBuilder extends Engine implements Iterator
     }
 
 
-    /**
-     * @param string|array $table
-     * @param array $columns
-     * @return $this
-     */
-    public function relation($table, array $columns = [])
-    {
-        if (is_array($table)) {
-            $alias = $table[0];
-            $name = $table[1];
-        } else {
-            $alias = $name = $table;
-        }
-
-        $columns['table'] = $name;
-        RelationBag::$relations[$alias] = [
-            'propeties' => $columns];
-
-        return $this;
-    }
 
     /**
      * @param $name

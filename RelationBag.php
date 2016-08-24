@@ -15,6 +15,11 @@ class RelationBag
     public static $relations;
 
     /**
+     * @var array
+     */
+    private static $preparedRelatives;
+
+    /**
      * @return array
      */
     public static function getRelations()
@@ -28,6 +33,11 @@ class RelationBag
     public static function setRelations($relations)
     {
         self::$relations = $relations;
+    }
+
+    public static function prepareRelatives()
+    {
+
     }
 
 }
