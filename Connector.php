@@ -9,7 +9,7 @@ class Connector
     /**
      * @var PDO
      */
-    public $connection;
+    public static $connection;
 
     public static function madeConnection($configs)
     {
@@ -22,23 +22,24 @@ class Connector
             throw new PDOException("Something went wrong, message: " . $p->getMessage());
 
         }
-        return $pdo;
+
+        static::$connection = $pdo;
     }
 
     /**
      * @return PDO
      */
-    public function getConnection()
+    public static function getConnection()
     {
-        return $this->connection;
+        return static::$connection;
     }
 
     /**
      * @param PDO $connection
      */
-    public function setConnection($connection)
+    public static function setConnection($connection)
     {
-        $this->connection = $connection;
+        static::$connection = $connection;
     }
 
 

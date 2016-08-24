@@ -123,7 +123,9 @@ class Engine
 
             $this->setConfigs($configs);
 
-            $this->pdo = Connector::madeConnection($configs);
+            Connector::madeConnection($configs);
+
+            $this->pdo = Connector::getConnection();
 
         }
 

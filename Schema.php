@@ -66,7 +66,18 @@ class Schema
 
         $this->addCommand('end', [$this->charset]);
 
-        return $this;
+        return Connector::getConnection()->query($this->prepareSchema());
+    }
+
+    /**
+     * @param string $table
+     * @return $this
+     */
+    public function dropTable($table)
+    {
+        $this->addCommand('drop', [$table]);
+
+        return Connector::getConnection()->query($this->prepareSchema());
     }
 
     /**
@@ -92,7 +103,8 @@ class Schema
     /**
      * @return string
      */
-    public function prepareSchema(){
+    public function prepareSchema()
+    {
         return join('', $this->commands);
     }
 }
