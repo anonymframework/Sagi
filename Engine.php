@@ -122,7 +122,8 @@ class Engine
             }
 
             $this->setConfigs($configs);
-            $this->startConnection();
+
+            $this->pdo = Connector::madeConnection($configs);
 
         }
 
@@ -133,22 +134,6 @@ class Engine
         static::$instance = $this;
     }
 
-    /**
-     * start the mysql connection
-     */
-    public function startConnection()
-    {
-        $configs = $this->getConfigs();
-
-        try {
-            $driver = isset($configs['driver']) ? $configs['driver'] : 'mysql';
-
-            $this->pdo = new PDO("$driver:host={$configs['host']};dbname={$configs['dbname']}", $configs['username'], $configs['password']);
-            $this->pdo->query(sprintf("SET CHARACTER SET %s", isset($configs['charset']) ? $configs['charset'] : 'utf-8'));
-        } catch (PDOException $p) {
-            throw new PDOException("Something went wrong, message: " . $p->getMessage());
-        }
-    }
 
     /**
      * @return PDOStatement
