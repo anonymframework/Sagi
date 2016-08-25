@@ -1,0 +1,14 @@
+<?php
+
+require 'vendor/autoload.php';
+
+use Sagi\Database\Console\MigrationCreateFormat;
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+
+$application->addCommands([
+    new MigrationCreateFormat()
+]);
+
+$application->run();

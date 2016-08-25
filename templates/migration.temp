@@ -1,0 +1,32 @@
+<?php
+
+/**
+ *  Created by Sagi Database Console
+ *
+ */
+
+use Sagi\Database\Schema;
+
+/**
+ * @class {{name}}
+ */
+class {{name}} extends Schema{
+
+    /**
+     * includes createTable functions
+     *
+     */
+    public function up(){
+
+
+    }
+
+    /**
+     * includes dropTable function
+     *
+     */
+    public function down(){
+
+
+    }
+}
