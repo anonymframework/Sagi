@@ -24,6 +24,8 @@ class MigrationCreateFormat extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $file = $input->getArgument('file');
+
 
     }
 }
