@@ -96,7 +96,7 @@ class QueryBuilder extends Engine implements Iterator
     {
         $get = $this->get();
 
-        return $get->fetchObject('Sagi\Database\Results', ['table' => $this->getTable(), 'database' => static::createNewInstance()]);
+        return $get->fetchObject('Sagi\Database\Results', ['table' => $this->getTable()]);
     }
 
     /**
@@ -104,7 +104,7 @@ class QueryBuilder extends Engine implements Iterator
      */
     public function all()
     {
-        return $this->get()->fetchAll(PDO::FETCH_CLASS, 'Sagi\Database\Results', ['table' => $this->getTable(), 'database' => static::createNewInstance()]);
+        return $this->get()->fetchAll(PDO::FETCH_CLASS, 'Sagi\Database\Results', ['table' => $this->getTable()]);
     }
 
 

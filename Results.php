@@ -19,10 +19,6 @@ class Results
      */
     public $attr;
 
-    /**
-     * @var QueryBuilder
-     */
-    public $database;
 
     /**
      * @var array
@@ -32,12 +28,10 @@ class Results
     /**
      * Results constructor.
      * @param $table
-     * @param Database $database
      */
-    public function __construct($table, $database)
+    public function __construct($table)
     {
         $this->table = $table;
-        $this->database = $database;
     }
 
     /**
@@ -57,16 +51,4 @@ class Results
     {
         $this->attr[$name] = $value;
     }
-
-
-    /**
-     * @param $name
-     * @param $arguments
-     * @return mixed
-     */
-    public function __call($name, $arguments)
-    {
-        return call_user_func_array([$this->database, $name], $arguments);
-    }
-
 }
