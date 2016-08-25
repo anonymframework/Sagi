@@ -23,7 +23,6 @@ class Model extends QueryBuilder
      */
     protected $updateKey = 'id';
 
-
     /**
      * Model constructor.
      * @param null $configs
@@ -170,13 +169,14 @@ class Model extends QueryBuilder
     public function save($datas = [])
     {
 
+
         if (!empty($this->attributes)) {
             $updateKey = $this->updateKey;
 
             $this->where($updateKey, $this->attribute($updateKey));
-            $this->update($this->getAttributes());
+            $this->setUpdatedAt()->update($this->getAttributes());
         } else {
-            $this->create($this->attributes);
+            $this->setCreatedAt()->create($this->attributes);
 
             return static::createNewInstance()->setAttributes($this->attributes);
         }
@@ -184,6 +184,46 @@ class Model extends QueryBuilder
         return $this;
     }
 
+    /**
+     * @return Model
+     */
+    private function setUpdatedAt()
+    {
+        if ($this->hasTimestamp($updated = 'created_at')) {
+            $this->attributes[$updated] = $this->getCurrentTime();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    private function setCreatedAt()
+    {
+        if ($this->hasTimestamp($created = 'created_at')) {
+            $this->attributes[$created] = $this->getCurrentTime();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentTime()
+    {
+        return time();
+    }
+
+    /**
+     * @param $value
+     * @return bool|mixed
+     */
+    private function hasTimestamp($value)
+    {
+        return (is_array($this->timestamps)) ? array_search($value, $this->timestamps) : false;
+    }
 
     /**
      * @return string|array
