@@ -458,8 +458,8 @@ class User extends Model{
   });
  ```
  
+ -------------
  #Migrations
- 
  ----------------
  
  ```
