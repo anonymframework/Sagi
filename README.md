@@ -380,13 +380,7 @@ class User extends Model{
  ```
  ##Relations
 
-```php
-  
-    public $relations = [
-       ["posts", ["user_id", "id"]] // ["posts", ["user_id", "id", "many"]]
-    ]
 
-```
 ####one
  
  ```php

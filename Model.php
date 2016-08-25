@@ -12,11 +12,6 @@ use PDO;
  */
 class Model extends QueryBuilder
 {
-    /**
-     * @var array
-     */
-    protected $relations;
-
 
     /**
      * @var array
@@ -24,9 +19,10 @@ class Model extends QueryBuilder
     protected $timestamps;
 
     /**
-     * @var array
+     * @var string
      */
-    private $cAttr = [];
+    protected $updateKey = 'id';
+
 
     /**
      * Model constructor.
@@ -41,9 +37,6 @@ class Model extends QueryBuilder
 
         parent::__construct($configs, $table);
 
-        if (isset($this->relations)) {
-            $this->prepareRelations();
-        }
     }
 
     /**
@@ -64,16 +57,6 @@ class Model extends QueryBuilder
         return $get->fetchObject(get_called_class());
     }
 
-
-    /**
-     *  prepares relations
-     */
-    private function prepareRelations()
-    {
-        foreach ($this->relations as $relation) {
-            $this->relation($relation[0], $relation[1]);
-        }
-    }
 
     /**
      * @return string
@@ -186,17 +169,16 @@ class Model extends QueryBuilder
      */
     public function save($datas = [])
     {
-        $datas = array_merge($this->cAttr, $datas);
 
-        if (isset($this->attributes[0])) {
-            foreach ($this->attributes[0] as $key => $value) {
-                $this->where($key, $value);
-                $this->update($datas);
-            }
+        if (!empty($this->attributes)) {
+            $updateKey = $this->updateKey;
+
+            $this->where($updateKey, $this->attribute($updateKey));
+            $this->update($this->getAttributes());
         } else {
-            $this->create($datas);
+            $this->create($this->attributes);
 
-            return static::createNewInstance()->setAttributes($datas);
+            return static::createNewInstance()->setAttributes($this->attributes);
         }
 
         return $this;

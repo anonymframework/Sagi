@@ -158,6 +158,15 @@ class QueryBuilder extends Engine implements Iterator
     }
 
     /**
+     * @param string $name
+     * @return mixed
+     */
+    public function attribute($name)
+    {
+        return $this->attributes[$name];
+    }
+
+    /**
      * @return bool
      */
     public function exists()
