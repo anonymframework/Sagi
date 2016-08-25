@@ -167,28 +167,6 @@ class QueryBuilder extends Engine implements Iterator
 
 
 
-    /**
-     * @param $name
-     * @return array|bool
-     */
-    public static function findRelative($name)
-    {
-        $subName = static::$instance->table . '.' . $name;
-
-        if (isset(RelationBag::$relations[$name])) {
-            return
-                ['name' => $name, 'relation' => RelationBag::$relations[$name]];
-
-        } elseif (isset(RelationBag::$relations[$subName])) {
-            return
-                ['name' => $subName, 'relation' => RelationBag::$relations[$subName]];
-        } else {
-            return false;
-        }
-
-    }
-
-
     public function rewind()
     {
         if (is_null($this->attributes)) {

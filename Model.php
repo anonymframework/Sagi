@@ -174,7 +174,7 @@ class Model extends QueryBuilder
     public function __get($name)
     {
         if (method_exists($this, $n = "get" . ucfirst($name))) {
-            call_user_func_array([$this, $n], []);
+            return call_user_func_array([$this, $n], []);
         }
 
         return parent::__get($name);

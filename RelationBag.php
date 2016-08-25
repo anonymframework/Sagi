@@ -59,9 +59,11 @@ class RelationBag
      */
     public static function getRelation($name, Model $our, $type)
     {
+
         if (!static::isPreparedBefore($name)) {
             static::prepareRelation($name, $our, $type);
         }
+
 
         return static::$preparedRelatives[static::getPreparedName($name, $type)];
 
@@ -95,7 +97,7 @@ class RelationBag
      */
     public static function prepareRelation($name, Model $our, $type)
     {
-        $relation = static::$relations[$name];
+        $relation = static::$relations[$type][$name];
 
         /**
          * @var Model $model
