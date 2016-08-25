@@ -381,6 +381,8 @@ class User extends Model{
       'whatever' => 'you wish'
    ]);
  ```
+  -----------------
+
   ####find
  
  ```php
@@ -388,6 +390,8 @@ class User extends Model{
    $find = User::find(1); // equal to id = 1
  
  ```
+  -----------------
+
  ####findOne
  
  ```php
@@ -395,6 +399,8 @@ class User extends Model{
    User::findOne(1); // equal to $find->one(); 
  
  ```
+  -----------------
+
  ####findAll
 
  ```php
@@ -406,8 +412,11 @@ class User extends Model{
    User::findAll(['auth' => 1]);
  
  ```
+  -----------------
+
  ##Relations
 
+ -----------------
 
 ####one
  
@@ -418,6 +427,8 @@ class User extends Model{
  }
  
  ```
+  -----------------
+
  ####many
  
   ```php
@@ -428,7 +439,8 @@ class User extends Model{
   
   ```
  
- 
+  -----------------
+
  #Table Schema
  
  ```php
