@@ -90,8 +90,6 @@ class Engine
     private $as;
 
 
-
-
     /**
      * @var QueryBuilder
      */
@@ -114,13 +112,9 @@ class Engine
                 } else {
                     throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
                 }
-            } else {
-                $configs = json_decode(file_get_contents(static::$jsonFile), true);
             }
 
-            $this->setConfigs($configs);
-
-            Connector::madeConnection($configs);
+            Connector::madeConnection(ConfigManager::getConfigs());
 
             $this->pdo = Connector::getConnection();
 
