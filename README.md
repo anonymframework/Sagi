@@ -333,7 +333,7 @@ class User extends Model{
  
   // or
   
-  $user->save([
+  $user->create([
      'username' => 'admin',
      'password' => 'password'
   ]);
@@ -355,6 +355,12 @@ class User extends Model{
   
   
    $user->save();
+   
+   // or 
+   
+   $user->update([
+      'whatever' => 'you wish'
+   ]);
  ```
   ####find
  
