@@ -166,17 +166,8 @@ class QueryBuilder extends Engine implements Iterator
     }
 
 
-
     public function rewind()
     {
-        if (is_null($this->attributes)) {
-            if (is_null($this->getLimit())) {
-                $this->all();
-            } elseif ($this->getLimit()[0] === 1) {
-                $this->one();
-            }
-
-        }
         reset($this->attributes);
     }
 
@@ -225,7 +216,7 @@ class QueryBuilder extends Engine implements Iterator
      */
     public function __get($name)
     {
-        return $this->first()->$name;
+        return $this->attributes[$name];
     }
 
     /**

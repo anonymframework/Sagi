@@ -93,7 +93,6 @@ class RelationBag
      * @param string $name
      * @param Model $our
      * @param string $type
-     * @return Model
      */
     public static function prepareRelation($name, Model $our, $type)
     {
@@ -116,7 +115,7 @@ class RelationBag
             $model->limit(1);
         }
 
-        return $model;
+        static::$preparedRelatives[static::getPreparedName($name, $type)] = $model;
     }
 
 }
