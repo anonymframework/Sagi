@@ -3,6 +3,8 @@
 namespace Sagi\Database\Console;
 
 
+use Sagi\Database\Schema;
+use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,6 +28,23 @@ class MigrationCreateFormat extends Command
     {
         $file = $input->getArgument('file');
 
+        $fileName = 'migrations/migration_file' . date('y_m_d_h_m') . '__' . $file . '.php';
+
+        if (touch($fileName)) {
+            $put = file_put_contents($fileName, TemplateManager::prepareContent('migration', ['name' => Schema::prepareClassName($file)]));
+
+            if ($put) {
+                $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');
+            } else {
+                $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
+
+            }
+        } else {
+            $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
+        }
+
 
     }
+
+
 }
