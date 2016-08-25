@@ -137,10 +137,10 @@ class Model extends QueryBuilder
         if (!RelationBag::isPreparedBefore($name, 'many')) {
             $class = $class::createNewInstance();
 
-            RelationBag::addRelative($name, $class, 'many');
+            RelationBag::addRelative($name, $class, $link, 'many');
         }
 
-        return RelationBag::getRelation($name, 'many');
+        return RelationBag::getRelation($name, $this, 'many');
     }
 
     /**
@@ -158,11 +158,13 @@ class Model extends QueryBuilder
             $name = $table;
         }
 
-        $link['class'] = $class;
+        if (!RelationBag::isPreparedBefore($name, 'one')) {
+            $class = $class::createNewInstance();
 
-        if (!static::findRelative($name)) {
-            $this->relation($table, $link);
+            RelationBag::addRelative($name, $class, $link, 'one');
         }
+
+        return RelationBag::getRelation($name, $this, 'one');
     }
 
     /**

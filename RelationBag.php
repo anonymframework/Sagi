@@ -41,21 +41,26 @@ class RelationBag
     /**
      * @param string $name
      * @param Model $model
+     * @param array $propeties
      */
-    public static function addRelative($name, Model $model, $type = 'one')
+    public static function addRelative($name, Model $model, $propeties, $type = 'one')
     {
-        static::$relations[$type][$name] = $model;
+        static::$relations[$type][$name] = [
+            'instance' => $model,
+            'propeties' => $propeties
+        ];
     }
 
     /**
-     * @param $name
+     * @param string $name
+     * @param Model $our
      * @param $type
      * @return Model
      */
-    public static function getRelation($name, $type)
+    public static function getRelation($name, Model $our, $type)
     {
         if (!static::isPreparedBefore($name)) {
-            static::prepareRelation($name, $type);
+            static::prepareRelation($name, $our, $type);
         }
 
         return static::$preparedRelatives[static::getPreparedName($name, $type)];
@@ -82,9 +87,34 @@ class RelationBag
         return isset(static::$preparedRelatives[static::getPreparedName($name, $type)]);
     }
 
-    public static function prepareRelation($name, $type)
+    /**
+     * @param string $name
+     * @param Model $our
+     * @param string $type
+     * @return Model
+     */
+    public static function prepareRelation($name, Model $our, $type)
     {
+        $relation = static::$relations[$name];
 
+        /**
+         * @var Model $model
+         *
+         *  Model instance
+         */
+        $model = $relation['instance'];
+
+        $propeties = $relation['propeties'];
+
+        $col = $propeties[1];
+
+        $model->where($propeties[0], $our->$col);
+
+        if ($type === 'one') {
+            $model->limit(1);
+        }
+
+        return $model;
     }
 
 }
