@@ -34,6 +34,10 @@ class Connector
      */
     public static function getConnection()
     {
+        if (!static::$connection) {
+            static::madeConnection();
+        }
+
         return static::$connection;
     }
 

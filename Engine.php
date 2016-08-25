@@ -89,10 +89,7 @@ class Engine
      */
     private $as;
 
-    /**
-     * @var string
-     */
-    public static $jsonFile = "config.json";
+
 
 
     /**

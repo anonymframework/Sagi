@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MigrationCreateFormat extends Command
 {
+
     protected function configure()
     {
         $this->setName('migration:create')
@@ -24,6 +25,10 @@ class MigrationCreateFormat extends Command
 
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $file = $input->getArgument('file');
