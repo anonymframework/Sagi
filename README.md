@@ -343,7 +343,10 @@ class User extends Model{
 
   >You can also use QueryBuilder `update` method for this process.
 
+  >you may want to add `updateKey` variable on your class,  default is `id`
  ```php 
+ 
+ 
   
   $user->where('username', 'admin');
  
