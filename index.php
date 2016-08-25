@@ -24,6 +24,8 @@ $schema->createTable('users', function (\Sagi\Database\Row $row) {
 
 $user = \Sagi\Database\User::findOne(1);
 
-var_dump($user->posts);
+foreach ($user->posts as $post){
+    echo $post->id;
+}
 
 

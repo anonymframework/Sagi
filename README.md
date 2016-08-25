@@ -301,107 +301,6 @@ $exists = $db->exists(); // returns true or false
 
 ```
 
-### Relations
-
-#### one
-
-
-```php
-
-$db->relation('posts', ['user_id', 'id'] /*['targetTableColumn', 'yourColumn'] */);
-
-$post = $db->posts; 
-
-// or
-
-$post = $db->posts();
-
-// you may want to set alias
-
-$db->relation(['aliasName', 'tableName'], ['user_id', 'id']);
-
-$post = $db->aliasName;
-
-// or 
-$post = $db->aliasName();
-
-```
-
-####many
-
-```php
-
-$db->relation('posts', ['user_id', 'id', 'many']);
-
-
-
-
-```
-
-##Examples;
-
-```php
- 
- $db->where('username', 'admin')->relation('posts', ['user_id', 'id', 'many']);
-
- 
- $data = $db->first();
- 
- 
- foreach($db->posts as $post)
- {
-    echo $post->id;
- }
-
-```
-
-
-###SubRelatives
-
-You can set subrelatives
-
-
-```php
-
-$db->relation(['post', 'posts'], ['user_id', 'id']);
-
-$post = $db->post;
-
-$post->relation(['category', 'categories'], ['id', 'category_id']);
-
-// or  
-
-$db->relation(['posts.category', 'categories'], ['id', 'category_id']); // ['firstTableName.secondTableName.aliasName', 'tableName']
-
-// be careful, you set on $db not on $post;
-
-echo $post->category->category_name; 
-
-```
-
-####Relatives Queries
-
-You can use every method of QueryBuilder in Relatives;
-
-Examples;
-
-```php
-
-$db->relation('posts', ['user_id', 'id', 'many']);
-
-$posts = $db->posts;
-
-$posts->order('id');
-
-foreach($posts as $post){
-
-echo $post->id; 
-
-}
-
-```
-
-
 #Working With Models
 
 
@@ -411,10 +310,6 @@ class User extends Model{
 
      public static function tableName(){
          return "users";  
-         
-         // you can set alias for relations like that;
-         
-         // return ["aliasName", "tableName"];
       }
 
  }
@@ -494,19 +389,6 @@ class User extends Model{
 ```
 ####one
  
- 
- ```php 
- 
- class Post extends Model{
- 
-      public static function tableName(){
-          return ["post", "posts"];  
-         
-       }
- 
-  }
-  ```
- 
  ```php
  
  public function getPost(){
@@ -516,22 +398,10 @@ class User extends Model{
  ```
  ####many
  
-  ```php 
-  
-  class Post extends Model{
-  
-       public static function tableName(){
-           return "posts"; 
-          
-        }
-  
-   }
-   ```
-  
   ```php
   
   public function getPosts(){
-        $this->hasMany(Post::className(), ["user_id", "id"]);
+       return $this->hasMany(Post::className(), ["user_id", "id"]);
   }
   
   ```

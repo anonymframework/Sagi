@@ -112,7 +112,9 @@ class RelationBag
         $model->where($propeties[0], $our->$col);
 
         if ($type === 'one') {
-            $model->limit(1);
+            $model = $model->limit(1)->one();
+        } else {
+            $model = $model->all();
         }
 
         static::$preparedRelatives[static::getPreparedName($name, $type)] = $model;
