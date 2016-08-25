@@ -30,17 +30,23 @@ class MigrationCreateFormat extends Command
 
         $fileName = 'migrations/migration_file' . date('y_m_d_h_m') . '__' . $file . '.php';
 
-        if (touch($fileName)) {
-            $put = file_put_contents($fileName, TemplateManager::prepareContent('migration', ['name' => Schema::prepareClassName($file)]));
+        if (!file_exists($fileName)) {
 
-            if ($put) {
-                $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');
+            if (touch($fileName)) {
+                $put = file_put_contents($fileName, TemplateManager::prepareContent('migration', ['name' => Schema::prepareClassName($file)]));
+
+                if ($put) {
+                    $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');
+                } else {
+                    $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
+
+                }
             } else {
                 $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
-
             }
-        } else {
-            $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
+        }else{
+            $output->writeln('<error>' . $fileName . ' : already exists</error>');
+
         }
 
 
