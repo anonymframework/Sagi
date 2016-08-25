@@ -46,17 +46,7 @@ class Results
      */
     public function __get($name)
     {
-        if ($relation = QueryBuilder::findRelative($name)) {
-
-            if ($prepared = $this->findPreparedRelative($relation['name'])) {
-                return $prepared;
-            } else {
-                return $this->prepareRelation($relation['name'], $relation['relation']['propeties']);
-            }
-        } else {
-            return $this->attr[$name];
-        }
-
+        return $this->attr[$name];
     }
 
     /**
@@ -71,36 +61,6 @@ class Results
 
     /**
      * @param $name
-     * @param array $columns
-     * @return $this
-     */
-    public function relation($prop, array $columns = [])
-    {
-        $this->database->relation($prop, $columns);
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     * @return bool|mixed
-     */
-    public function findPreparedRelative($name)
-    {
-        $subname = $this->table . '.' . $name;
-
-        if (isset($this->preparedRelatives[$name])) {
-            return $this->preparedRelatives[$name];
-        } elseif (isset($this->preparedRelatives[$subname])) {
-            return $this->preparedRelatives[$subname];
-        }
-
-        return false;
-    }
-
-
-    /**
-     * @param $name
      * @param $arguments
      * @return mixed
      */
@@ -109,27 +69,4 @@ class Results
         return call_user_func_array([$this->database, $name], $arguments);
     }
 
-    public function prepareRelation($name, $relation)
-    {
-        $targetTable = $relation['table'];
-        $targetColumn = $relation[0];
-        $ourColumn = $relation[1];
-        $className = isset($relation['class']) ? $relation['class'] : false;
-
-        $type = isset($relation[2]) ? $relation[2] : 'one';
-
-
-        $database = $this->database;
-
-        $relation = $database->where($targetColumn, $this->{$ourColumn});
-
-
-        if ($type == 'one') {
-            $relation = $relation->limit(1);
-        }
-
-        $this->preparedRelatives[$name] = $relation;
-
-        return $relation;
-    }
 }
