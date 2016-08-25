@@ -4,6 +4,7 @@ namespace Sagi\Database;
 
 use Exception;
 use PDO;
+use Sagi\Database\Drivers\MysqlDriver;
 
 /**
  * Class Engine
@@ -94,6 +95,13 @@ class Engine
      * @var QueryBuilder
      */
     public static $instance;
+
+    /**
+     * @var array
+     */
+    private $drivers = [
+        'mysql' => 'Sagi\Database\Drivers\MysqlDriver'
+    ];
 
     /**
      * Engine constructor.

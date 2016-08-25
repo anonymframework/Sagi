@@ -22,6 +22,8 @@ class MigrationManager extends Schema
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->connection = Connector::getConnection();
     }
 
@@ -30,7 +32,8 @@ class MigrationManager extends Schema
 
     }
 
-    public function checkMigrationTable(){
+    public function checkMigrationTable()
+    {
 
     }
 
