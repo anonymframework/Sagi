@@ -14,9 +14,14 @@ class Model extends QueryBuilder
 {
 
     /**
+     * @var string
+     */
+    public $primaryKey = 'id';
+
+    /**
      * @var array
      */
-    protected $timestamps;
+    protected $timestamps = ['created_at', 'updated_at'];
 
     /**
      * @var string
@@ -72,7 +77,9 @@ class Model extends QueryBuilder
      */
     public static function find($id)
     {
-        return static::getInstance()->where('id', $id);
+        $instance = static::createNewInstance();
+
+        return $instance->where($instance->primaryKey, $id);
     }
 
     /**
@@ -81,7 +88,9 @@ class Model extends QueryBuilder
      */
     public static function findOne($id)
     {
-        return static::getInstance()->where('id', $id)->one();
+        $instance = static::createNewInstance();
+
+        return $instance->where($instance->primaryKey, $id)->one();
     }
 
     /**
@@ -90,7 +99,7 @@ class Model extends QueryBuilder
      */
     public static function findAll($conditions = null)
     {
-        $instance = static::getInstance();
+        $instance = static::createNewInstance();
 
         if (is_array($conditions)) {
             foreach ($conditions as $key => $value) {
@@ -163,13 +172,10 @@ class Model extends QueryBuilder
     }
 
     /**
-     * @param array $datas
-     * @return $this
+     * @return Model
      */
-    public function save($datas = [])
+    public function save()
     {
-
-
         if (!empty($this->attributes)) {
             $updateKey = $this->updateKey;
 

@@ -313,8 +313,26 @@ class User extends Model{
       }
 
  }
+
  
  ```
+ 
+ ####timestamps
+ ```php
+  
+   protected $timestamps = false; // default is ['created_at', 'updated_at'];
+ 
+ ```
+ 
+####primaryKey
+
+```php
+ 
+  public $primaryKey = 'id'; // using for find and findOne methods,  default is 'id'
+  
+```
+ 
+ 
  ####create
  
  
