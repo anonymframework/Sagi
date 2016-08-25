@@ -457,3 +457,51 @@ class User extends Model{
       $row->string('password')->notNull();
   });
  ```
+ 
+ #Migrations
+ 
+ ----------------
+ 
+ ```
+  php sagi migration:create create_user_table
+  
+ ```
+ 
+ output;
+ 
+ `migrations/migration_file16_08_25_06_08__create_user_table.php : migration created successfully`
+ 
+```php
+
+
+/**
+ *  Created by Sagi Database Console
+ *
+ */
+
+use Sagi\Database\Schema;
+
+/**
+ * @class CreateUserTable
+ */
+class CreateUserTable extends Schema{
+
+    /**
+     * includes createTable functions
+     *
+     */
+    public function up(){
+
+
+    }
+
+    /**
+     * includes dropTable function
+     *
+     */
+    public function down(){
+
+
+    }
+}
+```
