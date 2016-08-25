@@ -45,14 +45,16 @@ class ConfigManager
     /**
      * Fetch a flattened array of a nested array element.
      *
-     * @param  array $array
      * @param  string $key
      * @return array
      *
      */
-    public static function get($array, $key)
+    public static function get($key)
     {
         $results = [];
+
+        $array = static::getConfigs();
+
         foreach (explode('.', $key) as $segment) {
             foreach ($array as $value) {
                 if (array_key_exists($segment, $value = (array)$value)) {
