@@ -30,7 +30,7 @@ class Schema
     /**
      * @var string
      */
-    protected $charset = 'utf-8';
+    protected $charset = 'utf8';
 
     /**
      * Schema constructor.

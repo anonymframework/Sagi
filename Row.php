@@ -213,14 +213,14 @@ class Row
         if (is_array(static::$sqlCommands)) {
             foreach (static::$sqlCommands as $command) {
                 if ($command instanceof Command) {
-                    $query .= $command->prepareCommand();
+                    $query .= $command->prepareCommand().",";
                 }
             }
         }
 
         static::$sqlCommands = [];
 
-        return $query;
+        return rtrim($query, ",");
 
     }
 }
