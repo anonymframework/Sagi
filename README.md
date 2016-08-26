@@ -11,28 +11,12 @@ Sagi Database Class
 
 ```php
 
- $configs = [
-    'host'  => 'localhost',
-    'username' => 'root',
-    'password' => '',
-    'dbname' => 'test',
-    // 'driver' => 'mysql' // Default=mysql.
-    ];
+ $db = QueryBuilder::createNewInstance('users');
+ 
+ // or 
+ 
+ $db = QueryBuilder::createNewInstance()->setTable('users');
 
- $db = new QueryBuilder($configs , $table);
- 
- // you may want to set table after initialize, 
- 
- $db = new QueryBuilder($configs);
- 
- $db->setTable('users');
- 
- // you may want to set your own PDO instance, you can!
- 
- $pdo = new PDO('...whatever.');
- 
- $db = new QueryBuilder($pdo);
- 
 ```
 ---------------------------
 #### <i class="icon-file"></i> Create
