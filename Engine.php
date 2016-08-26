@@ -93,11 +93,6 @@ class Engine
 
 
     /**
-     * @var QueryBuilder
-     */
-    public static $instance;
-
-    /**
      * @var array
      */
     private $drivers = [
@@ -116,37 +111,29 @@ class Engine
      * @param string $table
      * @throws Exception
      */
-    public function __construct($configs = null, $table = null)
+    public function __construct()
     {
-        if ($configs instanceof PDO) {
-            $this->pdo = $configs;
-        } else {
-            if (is_array($configs)) {
-                if (isset($configs['driver'])) {
-                    $driver = $configs['driver'];
-                    if (isset($this->drivers[$driver])) {
-                        $driver = $this->drivers[$driver];
+        $configs = ConfigManager::getConfigs();
 
-                        $this->driver = new $driver;
-                    } else {
-                        throw new Exception(sprintf('%s driver not found', $driver));
-                    }
+        if (isset($configs['driver'])) {
+            $driver = $configs['driver'];
+            if (isset($this->drivers[$driver])) {
+                $driver = $this->drivers[$driver];
 
-                } else {
-                    throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
-                }
+                $this->driver = new $driver;
+            } else {
+                throw new Exception(sprintf('%s driver not found', $driver));
             }
 
-            Connector::madeConnection(ConfigManager::getConfigs());
-
-            $this->pdo = Connector::getConnection();
-
-        }
-        if ($table !== null) {
-            $this->setTable($table);
+        } else {
+            throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
         }
 
-        static::$instance = $this;
+
+        Connector::madeConnection($configs);
+        $this->pdo = Connector::getConnection();
+
+
     }
 
 
