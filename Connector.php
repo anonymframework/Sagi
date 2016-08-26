@@ -17,9 +17,10 @@ class Connector
     public static function madeConnection($configs)
     {
         try {
-            $driver = isset($configs['driver']) ? $configs['driver'] : 'mysql';
+            $username = isset($configs['username']) ? $configs['username'] : null;
+            $password = isset($configs['password']) ? $configs['password'] : null;
 
-            $pdo = new PDO("$driver:host={$configs['host']};dbname={$configs['dbname']}", $configs['username'], $configs['password']);
+            $pdo = new PDO($configs['dsn'], $username, $password);
             $pdo->query(sprintf("SET CHARACTER SET %s", isset($configs['charset']) ? $configs['charset'] : 'utf-8'));
         } catch (PDOException $p) {
             throw new PDOException("Something went wrong, message: " . $p->getMessage());

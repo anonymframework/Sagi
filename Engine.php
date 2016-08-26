@@ -121,8 +121,7 @@ class Engine
             $this->pdo = $configs;
         } else {
             if (is_array($configs)) {
-                if (isset($configs['host']) && isset($configs['dbname']) && $configs['username'] && $configs['password'] && isset($configs['driver'])) {
-
+                if (isset($configs['driver'])) {
                     $driver = $configs['driver'];
                     if (isset($this->drivers[$driver])) {
                         $driver = $this->drivers[$driver];
