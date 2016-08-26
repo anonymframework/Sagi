@@ -9,10 +9,6 @@ namespace Sagi\Database\Drivers;
 class Driver
 {
 
-    /**
-     * @var bool
-     */
-    public $prepareValues = true;
 
     /**
      * @return string
@@ -108,52 +104,7 @@ class Driver
         return $string;
     }
 
-    public function prepareWhereQuery($where)
-    {
-        $string = '';
-        if (!empty($where)) {
-            $string .= $this->prepareAllWhereQueries($where);
-        }
 
-
-        if ($string !== '') {
-            $string = 'WHERE ' . $string;
-        }
-
-        return $string;
-    }
-
-    /**
-     * @return string
-     */
-    private function prepareAllWhereQueries($where)
-    {
-
-        $args = [];
-        $s = '';
-        foreach ($where as $item) {
-
-            if (isset($item[4]) && $item[4] === true || $this->prepareValues === false) {
-                $query = $item[2];
-            } else {
-                $query = '?';
-                $args[] = $item[2];
-            }
-
-            if ($s !== '') {
-                $s .= "$item[3] {$item[0]} {$item[1]} $query ";
-            } else {
-                $s .= "{$item[0]} {$item[1]} $query ";
-            }
-        }
-
-
-        $s = rtrim($s, $item[3]);
-
-        $this->args = array_merge($this->args, $args);
-
-        return $s;
-    }
 
 
     /**

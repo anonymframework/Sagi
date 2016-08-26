@@ -81,12 +81,15 @@ class Engine
     private $args = [];
 
 
-
     /**
      * @var string
      */
     private $as;
 
+    /**
+     * @var bool
+     */
+    private $prepareValues = true;
 
     /**
      * @var array
@@ -142,7 +145,7 @@ class Engine
 
         $handled = $this->handlePattern($pattern, array(
             ':from' => $this->getTable(),
-            ':where' => $this->driver->prepareWhereQuery($this->getWhere())
+            ':where' => $this->prepareWhereQuery($this->getWhere())
         ));
 
         return $handled;
@@ -163,7 +166,7 @@ class Engine
         $handled = $this->handlePattern($pattern, [
             ':from' => $this->getTable(),
             ':update' => $setted['content'],
-            ':where' => $this->driver->prepareWhereQuery($this->getWhere())
+            ':where' => $this->prepareWhereQuery($this->getWhere())
         ]);
 
         return $handled;
@@ -202,7 +205,7 @@ class Engine
             ':join' => $this->driver->prepareJoinQuery($this->getJoin()),
             ':group' => $this->driver->prepareGroupQuery($this->getGroupBy()),
             ':having' => $this->driver->prepareHavingQuery($this->getHaving()),
-            ':where' => $this->driver->prepareWhereQuery($this->getWhere()),
+            ':where' =>  $this->prepareWhereQuery($this->getWhere()),
             ':order' => $this->driver->prepareOrderQuery($this->getOrder()),
             ':limit' => $this->driver->prepareLimitQuery($this->getLimit())
         ]);
@@ -210,6 +213,52 @@ class Engine
         return $handled;
     }
 
+    public function prepareWhereQuery($where)
+    {
+        $string = '';
+        if (!empty($where)) {
+            $string .= $this->prepareAllWhereQueries($where);
+        }
+
+
+        if ($string !== '') {
+            $string = 'WHERE ' . $string;
+        }
+
+        return $string;
+    }
+
+    /**
+     * @return string
+     */
+    private function prepareAllWhereQueries($where)
+    {
+
+        $args = [];
+        $s = '';
+        foreach ($where as $item) {
+
+            if (isset($item[4]) && $item[4] === true || $this->prepareValues === false) {
+                $query = $item[2];
+            } else {
+                $query = '?';
+                $args[] = $item[2];
+            }
+
+            if ($s !== '') {
+                $s .= "$item[3] {$item[0]} {$item[1]} $query ";
+            } else {
+                $s .= "{$item[0]} {$item[1]} $query ";
+            }
+        }
+
+
+        $s = rtrim($s, $item[3]);
+
+        $this->args = array_merge($this->args, $args);
+
+        return $s;
+    }
     /**
      * @param $pattern
      * @param $args
