@@ -41,6 +41,7 @@ class MigrationManager extends Schema
 
         $glob = glob(static::$migrationDir . '/*');
 
+        $files = [];
         foreach ($glob as $file) {
             $class = explode('__', $file);
 
@@ -70,7 +71,11 @@ class MigrationManager extends Schema
                 'filename' => $prepared,
                 'path' => $file
             ]);
+
+            $files[] = $file;
         }
+
+        return $files;
     }
 
     public function down()
@@ -82,6 +87,8 @@ class MigrationManager extends Schema
         $migration = QueryBuilder::createNewInstance()->setTable($this->migrationTable)->all();
 
         $ids = [];
+        $files = [];
+
         foreach ($migration as $migrate) {
             $path = $migrate->path;
             $name = $migrate->filename;
@@ -95,12 +102,15 @@ class MigrationManager extends Schema
                 $class->down();
 
                 $ids[] = $migrate->id;
+                $files[] = $path;
             }
         }
 
         if (!empty($ids)) {
             $this->connection->in('id', $ids)->delete();
         }
+
+        return $files;
     }
 
     /**
