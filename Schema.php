@@ -69,7 +69,7 @@ class Schema
     }
 
     /**
-     * @param $prepare
+     * @param \PDOStatement $prepare
      * @return bool
      * @throws SchemaException
      */
@@ -78,7 +78,7 @@ class Schema
         if ($prepare) {
             return true;
         } else {
-            throw new SchemaException(sprintf('%s bir hata oluştu'));
+            throw new SchemaException(sprintf('bir hata oluştu'));
         }
     }
 
@@ -118,6 +118,7 @@ class Schema
      */
     public function prepareSchema()
     {
+        var_dump($this->commands);
         return join('', $this->commands);
     }
 

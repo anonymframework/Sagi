@@ -13,6 +13,10 @@ class MysqlDriver extends Driver
      */
     public function prepareLimitQuery($limit)
     {
+        if(empty($limit)){
+            return '';
+        }
+
         $limit = "LIMIT " . join(',', $limit);
 
 

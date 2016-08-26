@@ -147,9 +147,15 @@ class Row
         return $this->addCommand('auto_increment', $this->madeArray($name, $limit));
     }
 
+    /**
+     * @return $this
+     */
     public function timestamps()
     {
+        $this->current('created_at');
+        $this->current('updated_at');
 
+        return $this;
     }
 
     /**
