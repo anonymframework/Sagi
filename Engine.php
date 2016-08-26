@@ -101,7 +101,8 @@ class Engine
      * @var array
      */
     private $drivers = [
-        'mysql' => 'Sagi\Database\Drivers\MysqlDriver'
+        'mysql' => 'Sagi\Database\Drivers\MysqlDriver',
+        'sqlite' => 'Sagi\Database\Drivers\SqliteDriver',
     ];
 
     /**
@@ -179,7 +180,7 @@ class Engine
         $handled = $this->handlePattern($pattern, [
             ':from' => $this->getTable(),
             ':update' => $setted['content'],
-            ':where' =>  $this->driver->prepareWhereQuery($this->getWhere())
+            ':where' => $this->driver->prepareWhereQuery($this->getWhere())
         ]);
 
         return $handled;
@@ -215,12 +216,12 @@ class Engine
         $handled = $this->handlePattern($pattern, [
             ':select' => $this->prepareSelectQuery(),
             ':from' => $this->getTable(),
-            ':join' =>  $this->driver->prepareJoinQuery($this->getJoin()),
-            ':group' =>  $this->driver->prepareGroupQuery($this->getGroupBy()),
-            ':having' =>  $this->driver->prepareHavingQuery($this->getHaving()),
-            ':where' =>  $this->driver->prepareWhereQuery($this->getWhere()),
-            ':order' =>  $this->driver->prepareOrderQuery($this->getOrder()),
-            ':limit' =>  $this->driver->prepareLimitQuery($this->getLimit())
+            ':join' => $this->driver->prepareJoinQuery($this->getJoin()),
+            ':group' => $this->driver->prepareGroupQuery($this->getGroupBy()),
+            ':having' => $this->driver->prepareHavingQuery($this->getHaving()),
+            ':where' => $this->driver->prepareWhereQuery($this->getWhere()),
+            ':order' => $this->driver->prepareOrderQuery($this->getOrder()),
+            ':limit' => $this->driver->prepareLimitQuery($this->getLimit())
         ]);
 
         return $handled;
