@@ -98,6 +98,7 @@ class Engine
     private $drivers = [
         'mysql' => 'Sagi\Database\Drivers\MysqlDriver',
         'sqlite' => 'Sagi\Database\Drivers\SqliteDriver',
+        'pqsql' => 'Sagi\Database\Drivers\PorteqsqlDriver',
     ];
 
     /**
