@@ -32,6 +32,7 @@ class MigrationManager extends Schema
         $this->connection = new QueryBuilder();
     }
 
+
     public function migrate()
     {
         if (!$this->checkMigrationTable()) {
@@ -61,7 +62,44 @@ class MigrationManager extends Schema
 
             $migration = new $prepared;
 
-            $migration->up();
+            if ($migration instanceof MigrationInterface) {
+                $migration->up();
+            }
+
+            $this->connection->create([
+                'filename' => $prepared,
+                'path' => $file
+            ]);
+        }
+    }
+
+    public function down()
+    {
+        if (!$this->checkMigrationTable()) {
+            throw new \Exception('You did not migrate anything yet');
+        }
+
+        $migration = QueryBuilder::createNewInstance()->setTable($this->migrationTable)->all();
+
+        $ids = [];
+        foreach ($migration as $migrate) {
+            $path = $migrate->path;
+            $name = $migrate->filename;
+
+
+            include $path;
+
+            $class = new $name;
+
+            if ($class instanceof MigrationInterface) {
+                $class->down();
+
+                $ids[] = $migrate->id;
+            }
+        }
+
+        if (!empty($ids)) {
+            $this->connection->in('id', $ids)->delete();
         }
     }
 
@@ -70,7 +108,8 @@ class MigrationManager extends Schema
      * @param $class
      * @return bool
      */
-    public function checkMigrated($file, $class){
+    public function checkMigrated($file, $class)
+    {
         $builder = QueryBuilder::createNewInstance()->setTable($this->migrationTable)->where('filename', $class)->where('path', $file);
 
         return $builder->exists();
