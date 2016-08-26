@@ -75,19 +75,7 @@ class QueryBuilder extends Engine implements Iterator
     {
         return new static();
     }
-
-
-    /**
-     * @return QueryBuilder
-     */
-    public static function getInstance()
-    {
-        if (!static::$instance) {
-            static::$instance = static::createNewInstance();
-        }
-
-        return static::$instance;
-    }
+    
 
     /**
      * @return mixed
