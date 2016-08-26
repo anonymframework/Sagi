@@ -489,3 +489,26 @@ class CreateUserTable extends Schema{
     }
 }
 ```
+
+
+####run migrations
+
+```
+
+ $ php sagi migrate
+
+```
+
+####drop migrations
+
+```
+ $ php sagi migration:drop
+```
+
+####reset migrations
+
+####drop migrations
+
+```
+ $ php sagi migration:reset
+```
