@@ -78,7 +78,7 @@ class Schema
         if ($prepare) {
             return true;
         } else {
-            throw new SchemaException(sprintf('bir hata oluştu'));
+            throw new SchemaException(Connector::getConnection()->errorCode());
         }
     }
 
