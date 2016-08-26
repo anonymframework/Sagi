@@ -15,9 +15,8 @@ class Driver
     /**
      * @return string
      */
-    private function prepareLimitQuery()
+    public function prepareLimitQuery($limit)
     {
-        $limit = $this->getLimit();
 
         if (empty($limit)) {
             return "";
@@ -32,10 +31,8 @@ class Driver
         return $s;
     }
 
-    private function prepareOrderQuery()
+    public function prepareOrderQuery($order)
     {
-        $order = $this->getOrder();
-
         if (empty($order)) {
             return "";
         }
@@ -49,9 +46,8 @@ class Driver
     /**
      * @return string
      */
-    private function prepareSelectQuery()
+    public function prepareSelectQuery($select)
     {
-        $select = $this->getSelect();
 
         if (empty($select)) {
             $select = ["*"];
@@ -73,7 +69,7 @@ class Driver
     /**
      * @return string
      */
-    private function prepareGroupQuery($group)
+    public function prepareGroupQuery($group)
     {
 
         if (empty($group)) {
@@ -83,7 +79,7 @@ class Driver
         return "GROUP BY $group";
     }
 
-    private function prepareHavingQuery($having)
+    public function prepareHavingQuery($having)
     {
         return $having;
     }
@@ -91,7 +87,7 @@ class Driver
     /**
      * @return string
      */
-    private function prepareJoinQuery($joins)
+    public function prepareJoinQuery($joins)
     {
         if (empty($joins)) {
             return '';
@@ -110,7 +106,7 @@ class Driver
         return $string;
     }
 
-    private function prepareWhereQuery($where)
+    public function prepareWhereQuery($where)
     {
         $string = '';
         if (!empty($where)) {
