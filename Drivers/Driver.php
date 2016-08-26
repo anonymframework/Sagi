@@ -73,9 +73,8 @@ class Driver
     /**
      * @return string
      */
-    private function prepareGroupQuery()
+    private function prepareGroupQuery($group)
     {
-        $group = $this->getGroupBy();
 
         if (empty($group)) {
             return "";
@@ -84,20 +83,16 @@ class Driver
         return "GROUP BY $group";
     }
 
-    private function prepareHavingQuery()
+    private function prepareHavingQuery($having)
     {
-        $having = $this->getHaving();
-
         return $having;
     }
 
     /**
      * @return string
      */
-    private function prepareJoinQuery()
+    private function prepareJoinQuery($joins)
     {
-        $joins = $this->getJoin();
-
         if (empty($joins)) {
             return '';
         }
@@ -115,13 +110,11 @@ class Driver
         return $string;
     }
 
-    private function prepareWhereQuery()
+    private function prepareWhereQuery($where)
     {
-        $where = $this->getWhere();
-
         $string = '';
         if (!empty($where)) {
-            $string .= $this->prepareAllWhereQueries();
+            $string .= $this->prepareAllWhereQueries($where);
         }
 
 
@@ -135,9 +128,8 @@ class Driver
     /**
      * @return string
      */
-    private function prepareAllWhereQueries()
+    private function prepareAllWhereQueries($where)
     {
-        $where = $this->getWhere();
 
         $args = [];
         $s = '';
