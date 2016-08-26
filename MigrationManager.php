@@ -21,15 +21,11 @@ class MigrationManager extends Schema
     protected $migrationTable = 'migrations';
 
     /**
-     * @var \PDO
+     * MigrationManager constructor.
      */
-    protected $connection;
-
     public function __construct()
     {
         parent::__construct();
-
-        $this->connection = new QueryBuilder();
     }
 
 
@@ -63,14 +59,13 @@ class MigrationManager extends Schema
             include $file;
 
 
-
             $migration = new $prepared;
 
             if ($migration instanceof MigrationInterface) {
                 $migration->up();
             }
 
-            $this->connection->create([
+            QueryBuilder::createNewInstance()->setTable('migrations')->create([
                 'filename' => $prepared,
                 'path' => $file
             ]);
@@ -110,7 +105,7 @@ class MigrationManager extends Schema
         }
 
         if (!empty($ids)) {
-            $this->connection->in('id', $ids)->delete();
+            QueryBuilder::createNewInstance()->setTable('migrations')->in('id', $ids)->delete();
         }
 
 
@@ -154,7 +149,8 @@ class MigrationManager extends Schema
      */
     public function checkMigrationTable()
     {
-        return $this->connection->setTable($this->migrationTable)->where('id', 1)->exists();
+
+        return QueryBuilder::createNewInstance()->setTable($this->migrationTable)->where('id', 1)->exists();
     }
 
     public function createMigrationsTable()

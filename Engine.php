@@ -176,7 +176,7 @@ class Engine
      * @param array $sets
      * @return PDOStatement
      */
-    public function prepareCreate($sets = [])
+    protected function prepareCreate($sets = [])
     {
         $pattern = 'INSERT INTO :from SET :insert';
 
@@ -213,7 +213,7 @@ class Engine
         return $handled;
     }
 
-    public function prepareWhereQuery($where)
+    protected function prepareWhereQuery($where)
     {
         $string = '';
         if (!empty($where)) {

@@ -46,6 +46,8 @@ class QueryBuilder extends Engine implements Iterator
 
         $this->setArgs(array_slice($this->getArgs(), 0, count($this->getArgs())));
 
+        var_dump($query);
+        var_dump($this->getArgs());
         $result = $prepared->execute($this->getArgs());
 
         if ($ex) {
@@ -68,12 +70,18 @@ class QueryBuilder extends Engine implements Iterator
 
 
     /**
-     * @param $table
+     * @param string $table
      * @return static
      */
-    public static function createNewInstance()
+    public static function createNewInstance($table = null)
     {
-        return new static();
+        $insantce = new static();
+
+        if ($table !== null && is_string($table)) {
+            $insantce->setTable($table);
+        }
+
+        return $insantce;
     }
 
 
