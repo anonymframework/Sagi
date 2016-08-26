@@ -4,6 +4,7 @@ namespace Sagi\Database;
 
 use Exception;
 use PDO;
+use Sagi\Database\Drivers\Driver;
 use Sagi\Database\Drivers\MysqlDriver;
 
 /**
@@ -104,6 +105,11 @@ class Engine
     ];
 
     /**
+     * @var Driver
+     */
+    private $driver;
+
+    /**
      * Engine constructor.
      * @param array $configs
      * @param string $table
@@ -115,8 +121,17 @@ class Engine
             $this->pdo = $configs;
         } else {
             if (is_array($configs)) {
-                if (isset($configs['host']) && isset($configs['dbname']) && $configs['username'] && $configs['password']) {
-                    // do nothing
+                if (isset($configs['host']) && isset($configs['dbname']) && $configs['username'] && $configs['password'] && isset($configs['driver'])) {
+
+                    $driver = $configs['driver'];
+                    if (isset($this->drivers[$driver])) {
+                        $driver = $this->drivers[$driver];
+
+                        $this->driver = new $driver;
+                    } else {
+                        throw new Exception(sprintf('%s driver not found', $driver));
+                    }
+
                 } else {
                     throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
                 }
@@ -127,7 +142,6 @@ class Engine
             $this->pdo = Connector::getConnection();
 
         }
-
         if ($table !== null) {
             $this->setTable($table);
         }
@@ -145,7 +159,7 @@ class Engine
 
         $handled = $this->handlePattern($pattern, array(
             ':from' => $this->getTable(),
-            ':where' => $this->prepareWhereQuery()
+            ':where' => $this->driver->prepareWhereQuery($this->getWhere())
         ));
 
         return $handled;
@@ -166,7 +180,7 @@ class Engine
         $handled = $this->handlePattern($pattern, [
             ':from' => $this->getTable(),
             ':update' => $setted['content'],
-            ':where' => $this->prepareWhereQuery()
+            ':where' =>  $this->driver->prepareWhereQuery($this->getWhere())
         ]);
 
         return $handled;
@@ -202,12 +216,12 @@ class Engine
         $handled = $this->handlePattern($pattern, [
             ':select' => $this->prepareSelectQuery(),
             ':from' => $this->getTable(),
-            ':join' => $this->prepareJoinQuery(),
-            ':group' => $this->prepareGroupQuery(),
-            ':having' => $this->prepareHavingQuery(),
-            ':where' => $this->prepareWhereQuery(),
-            ':order' => $this->prepareOrderQuery(),
-            ':limit' => $this->prepareLimitQuery()
+            ':join' =>  $this->driver->prepareJoinQuery($this->getJoin()),
+            ':group' =>  $this->driver->prepareGroupQuery($this->getGroupBy()),
+            ':having' =>  $this->driver->prepareHavingQuery($this->getHaving()),
+            ':where' =>  $this->driver->prepareWhereQuery($this->getWhere()),
+            ':order' =>  $this->driver->prepareOrderQuery($this->getOrder()),
+            ':limit' =>  $this->driver->prepareLimitQuery($this->getLimit())
         ]);
 
         return $handled;
@@ -534,8 +548,6 @@ class Engine
 
         return $this;
     }
-
-
 
 
     /**

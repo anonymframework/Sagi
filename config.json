@@ -2,5 +2,6 @@
   "host": "localhost",
   "username": "root",
   "password": "sanane123",
-  "dbname": "test"
+  "dbname": "test",
+  "driver": "mysql"
 }
