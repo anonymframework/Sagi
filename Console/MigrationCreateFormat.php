@@ -3,6 +3,7 @@
 namespace Sagi\Database\Console;
 
 
+use Sagi\Database\MigrationManager;
 use Sagi\Database\Schema;
 use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Command\Command;
@@ -33,7 +34,7 @@ class MigrationCreateFormat extends Command
     {
         $file = $input->getArgument('file');
 
-        $fileName = 'migrations/migration_file' . date('y_m_d_h_m') . '__' . $file . '.php';
+        $fileName = MigrationManager::$migrationDir.'/migration_file' . date('y_m_d_h_m') . '__' . $file . '.php';
 
         if (!file_exists($fileName)) {
 

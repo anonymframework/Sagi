@@ -1,16 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sagi
- * Date: 25.08.2016
- * Time: 23:13
- */
 
 namespace Sagi\Database\Drivers;
 
-
+/**
+ * Class Driver
+ * @package Sagi\Database\Drivers
+ */
 class Driver
 {
+
+    /**
+     * @var bool
+     */
+    public $prepareValues = true;
 
     /**
      * @return string
@@ -151,6 +153,47 @@ class Driver
         $this->args = array_merge($this->args, $args);
 
         return $s;
+    }
+
+
+    /**
+     * @param $callback
+     * @return string
+     */
+    private function prepareSubQuery($callback)
+    {
+        /**
+         * @var $builder QueryBuilder
+         */
+        $builder = call_user_func_array($callback, [$this->newInstance($this->table)]);
+
+        $query = '(' . $builder->prepareGetQuery() . ')';
+
+        if ($builder->hasAs()) {
+            $query .= ' AS ' . $builder->getAs();
+        }
+
+        $this->setArgs(array_merge($this->getArgs(), $builder->getArgs()));
+
+        return $query;
+    }
+
+
+    /**
+     * @return mixeds|string
+     */
+    public function prepareInQuery($datas)
+    {
+        $inQuery = '';
+        if (is_array($datas)) {
+            $inQuery = '[' . implode(',', $datas) . ']';
+        } elseif (is_callable($datas)) {
+            $inQuery = $this->prepareSubQuery($datas);
+        } else {
+            $inQuery = '[' . $datas . ']';
+        }
+
+        return $inQuery;
     }
 
 }

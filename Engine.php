@@ -80,10 +80,6 @@ class Engine
      */
     private $args = [];
 
-    /**
-     * @var bool
-     */
-    private $prepareValues = true;
 
 
     /**
@@ -201,7 +197,7 @@ class Engine
         $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
 
         $handled = $this->handlePattern($pattern, [
-            ':select' => $this->prepareSelectQuery(),
+            ':select' => $this->driver->prepareSelectQuery($this->getSelect()),
             ':from' => $this->getTable(),
             ':join' => $this->driver->prepareJoinQuery($this->getJoin()),
             ':group' => $this->driver->prepareGroupQuery($this->getGroupBy()),
@@ -363,54 +359,13 @@ class Engine
         return $this->orWhere([$column, $like, $type]);
     }
 
-
-    /**
-     * @param $callback
-     * @return string
-     */
-    private function prepareSubQuery($callback)
-    {
-        /**
-         * @var $builder QueryBuilder
-         */
-        $builder = call_user_func_array($callback, [$this->newInstance($this->table)]);
-
-        $query = '(' . $builder->prepareGetQuery() . ')';
-
-        if ($builder->hasAs()) {
-            $query .= ' AS ' . $builder->getAs();
-        }
-
-        $this->setArgs(array_merge($this->getArgs(), $builder->getArgs()));
-
-        return $query;
-    }
-
-
-    /**
-     * @return mixeds|string
-     */
-    private function prepareInQuery($datas)
-    {
-        $inQuery = '';
-        if (is_array($datas)) {
-            $inQuery = '[' . implode(',', $datas) . ']';
-        } elseif (is_callable($datas)) {
-            $inQuery = $this->prepareSubQuery($datas);
-        } else {
-            $inQuery = '[' . $datas . ']';
-        }
-
-        return $inQuery;
-    }
-
     /**
      * @param $bool
      * @return $this
      */
     public function prepareValues($bool)
     {
-        $this->prepareValues = $bool;
+        $this->driver->prepareValues = $bool;
         return $this;
     }
 
@@ -421,7 +376,7 @@ class Engine
      */
     public function in($column, $datas, $not = false)
     {
-        $query = $this->prepareInQuery($datas);
+        $query = $this->driver->prepareInQuery($datas);
 
         $in = ' IN ';
 

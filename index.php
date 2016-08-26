@@ -20,12 +20,16 @@ $schema->createTable('users', function (\Sagi\Database\Row $row) {
     $row->int('id');
 });
 
-*/
-
 $user = \Sagi\Database\User::findOne(1);
 
 foreach ($user->posts as $post){
     echo $post->id;
 }
+
+*/
+
+$migration = new \Sagi\Database\MigrationManager();
+
+$migration->migrate();
 
 

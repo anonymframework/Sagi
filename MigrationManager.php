@@ -13,6 +13,11 @@ class MigrationManager extends Schema
     /**
      * @var string
      */
+    public static $migrationDir = 'migrations';
+
+    /**
+     * @var string
+     */
     protected $migrationTable = 'migrations';
 
     /**
@@ -24,17 +29,26 @@ class MigrationManager extends Schema
     {
         parent::__construct();
 
-        $this->connection = Connector::getConnection();
+        $this->connection = new QueryBuilder();
     }
 
     public function migrate()
     {
+        if (!$this->checkMigrationTable()) {
+            $this->createMigrationsTable();
+        }
 
+        $glob = glob(static::$migrationDir.'/*');
+
+        var_dump($glob);
     }
 
+    /**
+     * @return bool
+     */
     public function checkMigrationTable()
     {
-
+        return $this->connection->setTable($this->migrationTable)->where('id', 1)->exists();
     }
 
     public function createMigrationsTable()
