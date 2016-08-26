@@ -38,10 +38,63 @@ class MigrationManager extends Schema
             $this->createMigrationsTable();
         }
 
-        $glob = glob(static::$migrationDir.'/*');
+        $glob = glob(static::$migrationDir . '/*');
 
-        var_dump($glob);
+        foreach ($glob as $file) {
+            $class = explode('__', $file);
+
+            if (!isset($class[1])) {
+                continue;
+            }
+
+
+            $class = str_replace(".php", "", $class[1]);
+
+            if ($this->checkMigrated($file, $class)) {
+                continue;
+            }
+
+            include $file;
+
+            $prepared = static::prepareClassName($class);
+
+
+            $migration = new $prepared;
+
+            $migration->up();
+        }
     }
+
+    /**
+     * @param $file
+     * @param $class
+     * @return bool
+     */
+    public function checkMigrated($file, $class){
+        $builder = QueryBuilder::createNewInstance()->setTable($this->migrationTable)->where('filename', $class)->where('path', $file);
+
+        return $builder->exists();
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public static function prepareClassName($name)
+    {
+        if (strpos($name, "_")) {
+            $exp = explode("_", $name);
+
+            $exp = array_map(function ($value) {
+                return ucfirst($value);
+            }, $exp);
+
+            return join('', $exp);
+        }
+
+        return $name;
+    }
+
 
     /**
      * @return bool

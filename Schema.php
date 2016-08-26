@@ -118,26 +118,8 @@ class Schema
      */
     public function prepareSchema()
     {
-        var_dump($this->commands);
         return join('', $this->commands);
     }
 
-    /**
-     * @param $name
-     * @return string
-     */
-    public static function prepareClassName($name)
-    {
-        if (strpos($name, "_")) {
-            $exp = explode("_", $name);
 
-            $exp = array_map(function ($value) {
-                return ucfirst($value);
-            }, $exp);
-
-            return join('', $exp);
-        }
-
-        return $name;
-    }
 }

@@ -75,7 +75,7 @@ class QueryBuilder extends Engine implements Iterator
     {
         return new static();
     }
-    
+
 
     /**
      * @return mixed

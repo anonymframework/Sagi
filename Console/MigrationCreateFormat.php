@@ -39,7 +39,7 @@ class MigrationCreateFormat extends Command
         if (!file_exists($fileName)) {
 
             if (touch($fileName)) {
-                $put = file_put_contents($fileName, TemplateManager::prepareContent('migration', ['name' => Schema::prepareClassName($file)]));
+                $put = file_put_contents($fileName, TemplateManager::prepareContent('migration', ['name' => MigrationManager::prepareClassName($file)]));
 
                 if ($put) {
                     $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');
