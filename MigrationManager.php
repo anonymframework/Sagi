@@ -52,13 +52,16 @@ class MigrationManager extends Schema
 
             $class = str_replace(".php", "", $class[1]);
 
-            if ($this->checkMigrated($file, $class)) {
+            $prepared = static::prepareClassName($class);
+
+
+            if ($this->checkMigrated($file, $prepared)) {
                 continue;
             }
 
+
             include $file;
 
-            $prepared = static::prepareClassName($class);
 
 
             $migration = new $prepared;
