@@ -110,6 +110,7 @@ class MigrationManager extends Schema
             $this->connection->in('id', $ids)->delete();
         }
 
+
         return $files;
     }
 
