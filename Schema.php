@@ -12,9 +12,10 @@ class Schema
      *
      */
     protected $patterns = [
-        'create' => 'CREATE TABLE IF NOT EXISTS `%s`(',
+        'create' => 'CREATE TABLE `%s`(',
         'end' => ') DEFAULT CHARSET=%s;',
-        'drop' => 'DROP TABLE %s;'
+        'drop' => 'DROP TABLE %s;',
+        'create_if' => 'CREATE TABLE IF NOT EXISTS `%s`(',
     ];
 
     /**
@@ -68,6 +69,22 @@ class Schema
         $this->checkResult($prepare);
     }
 
+    /**
+     * @param string $table
+     * @param Closure $closure
+     * @return $this
+     */
+    public function createTableIfNotExists($table, Closure $closure)
+    {
+        $this->addCommand('create_if', [$table]);
+
+        call_user_func_array($closure, [$this->row]);
+
+        $this->commands[] = $this->row->prepareRow();
+        $this->addCommand('end', [$this->charset]);
+        $prepare = Connector::getConnection()->query($this->prepareSchema());
+        $this->checkResult($prepare);
+    }
     /**
      * @param \PDOStatement $prepare
      * @return bool
