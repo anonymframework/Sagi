@@ -28,8 +28,9 @@ foreach ($user->posts as $post){
 
 */
 
-$migration = new \Sagi\Database\MigrationManager();
+$db =  \Sagi\Database\QueryBuilder::createNewInstance();
 
-$migration->migrate();
+
+var_dump($db->tableExists());
 
 

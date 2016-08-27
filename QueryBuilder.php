@@ -159,6 +159,18 @@ class QueryBuilder extends Engine implements Iterator
     }
 
     /**
+     * @return bool|int
+     */
+    public function tableExists()
+    {
+
+        $inst = $this->pdo->query("SHOW TABLES LIKE '{$this->table}'");
+
+
+        return $inst ? $inst->rowCount() : false;
+    }
+
+    /**
      * @param string $name
      * @return mixed
      */
