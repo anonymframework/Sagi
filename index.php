@@ -36,7 +36,7 @@ var_dump($db->tableExists());
 
 */
 
-/**
+
 
 $users = \Sagi\Database\Users::findAll();
 
@@ -44,4 +44,3 @@ $users->paginate(1, 1);
 
 $users->displayPagination();
 
- */

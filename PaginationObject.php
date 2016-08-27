@@ -19,23 +19,14 @@ class PaginationObject
     private $isCurrentPage;
 
     /**
-     * @var bool
-     */
-    private $hasMore;
-
-    /**
      * PaginationObject constructor.
      * @param $data
      * @param $isCurrentPage
-     * @param bool $hasMore
-     * @param int $totalCount
      */
-    public function __construct($data, $isCurrentPage, $hasMore, $totalCount)
+    public function __construct($data, $isCurrentPage)
     {
         $this->data = $data;
         $this->isCurrentPage = $isCurrentPage;
-        $this->hasMore = $hasMore;
-        $this->totalCount = $totalCount;
     }
 
     /**
@@ -54,45 +45,10 @@ class PaginationObject
         return $this->isCurrentPage;
     }
 
-    /**
-     * @return mixed
-     */
-    public function hasMore()
-    {
-        return $this->hasMore();
-    }
 
-    /**
-     * @return bool
-     */
-    public function hasLess()
-    {
-        return $this->data !== 1 ? true : false;
-    }
 
-    /**
-     * @return int
-     */
-    public function getNext()
-    {
-        return $this->data++;
-    }
 
-    /**
-     * @return int
-     */
-    public function getBefore()
-    {
-        return $this->data--;
-    }
 
-    /**
-     * @return mixed
-     */
-    public function totalCount()
-    {
-        return $this->totalCount;
-    }
 
     /**
      * @return string

@@ -74,14 +74,17 @@ trait Pagination
 
             $is = $currentPage === $value ? true:false;
 
-            $hasMore = $currentPage < $totalCount ? true:false;
-            $class = new PaginationObject($value, $is, $hasMore, $totalCount);
+            $class = new PaginationObject($value, $is, $totalCount);
 
             return $class;
 
         }, $datas);
 
-         $view->with('pagination', $datas);
+        $hasMore = $currentPage < $totalCount ? true:false;
+
+        $base = new PaginationBase($currentPage, $hasMore, $totalCount, $datas);
+
+        $view->with('pagination', $base);
 
         echo $view->show();
     }
