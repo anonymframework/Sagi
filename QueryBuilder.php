@@ -45,9 +45,6 @@ class QueryBuilder extends Engine implements Iterator
         $prepared = $this->pdo->prepare($query);
 
         $this->setArgs(array_slice($this->getArgs(), 0, count($this->getArgs())));
-
-        var_dump($query);
-        var_dump($this->getArgs());
         $result = $prepared->execute($this->getArgs());
 
         if ($ex) {
@@ -59,6 +56,14 @@ class QueryBuilder extends Engine implements Iterator
 
     }
 
+    /**
+     * @param $query
+     * @return \PDOStatement
+     */
+    public function query($query)
+    {
+        return $this->pdo->query($query);
+    }
 
     /**
      * @return mixed
@@ -242,5 +247,21 @@ class QueryBuilder extends Engine implements Iterator
         return $this;
     }
 
+    /**
+     * @return PDO
+     */
+    public function getPdo()
+    {
+        return $this->pdo;
+    }
 
+    /**
+     * @param PDO $pdo
+     * @return Engine
+     */
+    public function setPdo($pdo)
+    {
+        $this->pdo = $pdo;
+        return $this;
+    }
 }

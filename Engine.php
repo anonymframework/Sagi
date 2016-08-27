@@ -205,7 +205,7 @@ class Engine
             ':join' => $this->driver->prepareJoinQuery($this->getJoin()),
             ':group' => $this->driver->prepareGroupQuery($this->getGroupBy()),
             ':having' => $this->driver->prepareHavingQuery($this->getHaving()),
-            ':where' =>  $this->prepareWhereQuery($this->getWhere()),
+            ':where' => $this->prepareWhereQuery($this->getWhere()),
             ':order' => $this->driver->prepareOrderQuery($this->getOrder()),
             ':limit' => $this->driver->prepareLimitQuery($this->getLimit())
         ]);
@@ -259,6 +259,7 @@ class Engine
 
         return $s;
     }
+
     /**
      * @param $pattern
      * @param $args
@@ -562,6 +563,7 @@ class Engine
     }
 
 
+    
     /**
      * @return array
      */

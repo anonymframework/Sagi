@@ -77,7 +77,7 @@ trait Validation
         'column_exists' => ':key value is must be exists in your database table',
 
     ];
-    
+
     /**
      * determine datas is correct or not
      *
@@ -517,9 +517,9 @@ trait Validation
     {
         $data = $datas[$key];
 
-        $advanced = Database::table($data)->tableExists();
+        $advanced = QueryBuilder::createNewInstance()->query("SHOW TABLES LIKE '$data'");
 
-        if (!$advanced->isSuccess()) {
+        if (!$advanced) {
             $this->fails[] = $messageKey = "$rule.$key";
 
             $this->addMessage($key, $rule, $messageKey);
