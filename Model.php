@@ -28,6 +28,12 @@ class Model extends QueryBuilder
      */
     protected $updateKey = 'id';
 
+
+    /**
+     * @var bool
+     */
+    protected $autoValidation = false;
+
     /**
      * Model constructor.
      * @param null $configs
@@ -39,8 +45,19 @@ class Model extends QueryBuilder
             $table = static::getTableName();
         }
 
+        $this->prepareRules();
+
         parent::__construct($configs, $table);
 
+    }
+
+    private function prepareRules()
+    {
+        if (method_exists($this, "rules")) {
+            $rules = $this->rules();
+
+            $this->setRules($rules);
+        }
     }
 
     /**
@@ -172,10 +189,19 @@ class Model extends QueryBuilder
     }
 
     /**
-     * @return Model
+     * @return Model|false
      */
     public function save()
     {
+        if ($this->autoValidation === true && method_exists($this, "validate")) {
+
+            $this->setDatas($this->attributes);
+            if (!$this->validate()) {
+                return false;
+            }
+        }
+
+
         if (!empty($this->attributes)) {
             $updateKey = $this->updateKey;
 

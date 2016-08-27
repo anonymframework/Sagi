@@ -44,7 +44,7 @@ trait Validation
      *
      * @var array
      */
-    protected $messageReposity;
+    protected $messageReposity = [];
 
     /**
      * story extended functions(methods)
@@ -77,22 +77,7 @@ trait Validation
         'column_exists' => ':key value is must be exists in your database table',
 
     ];
-
-    /**
-     * Validation constructor.
-     *
-     * @param array $datas
-     * @param array $rules
-     * @param array $messages
-     */
-    public function __construct(array $datas = [], array  $rules = [], array $messages = [])
-    {
-        $this->setDatas($datas)
-            ->setRules($rules)
-            ->setMessageReposity($messages);
-    }
-
-
+    
     /**
      * determine datas is correct or not
      *
