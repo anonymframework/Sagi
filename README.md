@@ -531,7 +531,7 @@ class CreateUserTable extends Schema{
   use Validation;
   
   public function rules(){
-     
+      return $yourRules;
   }
  }
 
