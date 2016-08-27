@@ -529,6 +529,10 @@ class CreateUserTable extends Schema{
  
  class Users extends Model{
   use Validation;
+  
+  public function rules(){
+     
+  }
  }
 
 ```
