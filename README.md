@@ -536,3 +536,23 @@ class CreateUserTable extends Schema{
  }
 
 ```
+
+#Pagination
+
+```php
+
+class Users extends Model
+{
+  use Pagination;
+}
+
+$users = Users::findAll();
+
+$user->paginate($_GET['page'], 15);
+
+$user->displayPagination();
+
+```
+
+> you can edit pagination template in `templates/pagination.temp`
+

@@ -75,7 +75,7 @@ trait Pagination
             $is = $currentPage === $value ? true:false;
 
             $hasMore = $currentPage < $totalCount ? true:false;
-            $class = new PaginationObject($value, $is, $hasMore);
+            $class = new PaginationObject($value, $is, $hasMore, $totalCount);
 
             return $class;
 
