@@ -2,7 +2,10 @@
 
 namespace Sagi\Database;
 
-
+/**
+ * Class Pagination
+ * @package Sagi\Database
+ */
 trait Pagination
 {
 
@@ -16,10 +19,16 @@ trait Pagination
      */
     protected $currentPage;
 
+    /**
+     * @var string
+     */
+    protected $template;
+
 
     /**
      * @param int $currentPage
      * @param int $itemPerPage
+     * @return mixed
      */
     public function paginate($currentPage = 0, $itemPerPage = 15)
     {
@@ -30,9 +39,13 @@ trait Pagination
         $this->setCurrentPage($currentPage)->setİtemPerPage($itemPerPage);
 
         $this->prepareModal();
+
+        return $this;
     }
 
-
+    /**
+     * prepares modal
+     */
     private function prepareModal()
     {
         $start = $this->getCurrentPage() * $this->getİtemPerPage();
