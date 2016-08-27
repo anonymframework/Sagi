@@ -149,8 +149,7 @@ class MigrationManager extends Schema
      */
     public function checkMigrationTable()
     {
-
-        return QueryBuilder::createNewInstance()->setTable($this->migrationTable)->where('id', 1)->exists();
+        return QueryBuilder::createNewInstance('migrations')->tableExists();
     }
 
     public function createMigrationsTable()

@@ -29,11 +29,13 @@ foreach ($user->posts as $post){
 */
 
 /*
-$db =  \Sagi\Database\QueryBuilder::createNewInstance();
+$db =  \Sagi\Database\QueryBuilder::createNewInstance('migrations');
 
 
 var_dump($db->tableExists());
 
 */
+
+$builder = \Sagi\Database\QueryBuilder::createNewInstance('users');
 
 
