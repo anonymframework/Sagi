@@ -28,9 +28,12 @@ foreach ($user->posts as $post){
 
 */
 
+/*
 $db =  \Sagi\Database\QueryBuilder::createNewInstance();
 
 
 var_dump($db->tableExists());
+
+*/
 
 

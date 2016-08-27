@@ -2,7 +2,7 @@
 namespace Sagi\Database;
 
 use Sagi\Database\Validation\MethodNotExistsException;
-use Sagi\Database\QueryBuilder;
+use Exception;
 
 /**
  * Class Validation
@@ -536,9 +536,9 @@ trait Validation
      */
     protected function runColumnExists($column, $key, $datas, $rule)
     {
-        $advanced = Database::table($datas[$key])->columnExists($column);
+        $advanced = QueryBuilder::createNewInstance($datas[$key])->columnExists($column);
 
-        if (!$advanced->isSuccess()) {
+        if (!$advanced) {
             $this->fails[] = $messageKey = "$rule.$key";
 
             $this->addMessage($key, $rule, $messageKey);

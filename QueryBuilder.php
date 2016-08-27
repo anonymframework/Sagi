@@ -171,6 +171,16 @@ class QueryBuilder extends Engine implements Iterator
     }
 
     /**
+     * @param $column
+     * @return bool|int
+     */
+    public function columnExists($column)
+    {
+        $ins = $this->pdo->query("SHOW COLUMNS FROM `{$this->table}` LIKE '$column';");
+
+        return $ins ? $ins->rowCount() : false;
+    }
+    /**
      * @param string $name
      * @return mixed
      */
