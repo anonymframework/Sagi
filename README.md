@@ -507,8 +507,14 @@ class CreateUserTable extends Schema{
 
 ####reset migrations
 
+```
+
+ $ php sahi migration:reset
+
+```
+
 ####drop migrations
 
 ```
- $ php sagi migration:reset
+ $ php sagi migration:drop
 ```
