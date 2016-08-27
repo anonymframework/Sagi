@@ -6,17 +6,13 @@ namespace Sagi\Database;
  * Class PaginationBase
  * @package Sagi\Database
  */
-class PaginationBase
+class PaginationBase implements \Iterator
 {
     /**
      * @var array
      */
     private $datas;
 
-    /**
-     * @var bool
-     */
-    private $hasMore;
 
     /**
      * @var int
@@ -31,14 +27,12 @@ class PaginationBase
     /**
      * PaginationBase constructor.
      * @param $currentPage
-     * @param $hasMore
      * @param int $totalCount
      * @param array $datas
      */
-    public function __construct($currentPage, $hasMore, $totalCount, $datas)
+    public function __construct($currentPage, $totalCount, $datas)
     {
         $this->currentPage = $currentPage;
-        $this->hasMore = $hasMore;
         $this->totalCount = $totalCount;
         $this->datas = $datas;
     }
@@ -48,7 +42,7 @@ class PaginationBase
      */
     public function hasMore()
     {
-        return $this->hasMore;
+        return $this->currentPage < $this->totalCount  ? true:false;
     }
 
     /**
@@ -56,7 +50,7 @@ class PaginationBase
      */
     public function hasLess()
     {
-        return $this->currentPage !== 1 ? true : false;
+        return $this->currentPage > 1 ? true : false;
     }
 
     /**
@@ -64,7 +58,8 @@ class PaginationBase
      */
     public function getNext()
     {
-        return $this->currentPage++;
+        $current = $this->currentPage;
+        return ++$current;
     }
 
 
@@ -73,7 +68,8 @@ class PaginationBase
      */
     public function getBefore()
     {
-        return $this->currentPage--;
+        $current = $this->currentPage;
+        return --$current;
     }
 
     /**

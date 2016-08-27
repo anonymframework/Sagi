@@ -46,10 +46,6 @@ class PaginationObject
     }
 
 
-
-
-
-
     /**
      * @return string
      */

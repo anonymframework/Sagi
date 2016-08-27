@@ -8,7 +8,7 @@
     </li>
     @endif
    @foreach($pagination as $data)
-       <li {!! $data->isCurrentPage() ? 'class="active"': "" !!}><a href="?page={{$data}}">{{$data}}</a> </li>
+       <li {!! $data->isCurrentPage() ? 'class="active"': "" !!}><a href="?page={{$data}}">{{$data}}</a></li>
    @endforeach
 
    @if($pagination->hasMore())

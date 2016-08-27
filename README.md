@@ -582,3 +582,22 @@ $user->displayPagination();
 </ul>
 
 ```
+
+output will be like this;
+
+```
+
+ <ul class="pagination">
+
+          <li ><a href="?page=1">1</a></li>
+          <li ><a href="?page=2">2</a></li>
+          <li ><a href="?page=3">3</a></li>
+   
+      <li>
+         <a href="?page=2" aria-label="Next">
+           <span aria-hidden="true">&raquo;</span>
+         </a>
+       </li>
+   </ul>
+
+```

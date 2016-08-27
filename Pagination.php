@@ -49,8 +49,8 @@ trait Pagination
     {
         $view = !empty($this->template) ? new View($this->template) : View::createContentWithFile('pagination');
 
-        if ($this->currentPage !== 0) {
-            $before = range($this->currentPage, 1);
+        if ($this->currentPage > 2) {
+            $before = range(1, $this->currentPage - 1);
         } else {
             $before = [];
         }
@@ -80,9 +80,8 @@ trait Pagination
 
         }, $datas);
 
-        $hasMore = $currentPage < $totalCount ? true:false;
 
-        $base = new PaginationBase($currentPage, $hasMore, $totalCount, $datas);
+        $base = new PaginationBase($currentPage, $totalCount, $datas);
 
         $view->with('pagination', $base);
 
