@@ -24,6 +24,11 @@ trait Pagination
      */
     protected $template;
 
+    /**
+     * @var int
+     */
+    protected $totalCount;
+
 
     /**
      * @param int $currentPage
@@ -44,11 +49,28 @@ trait Pagination
         return $this;
     }
 
+    public function template($template){
+        $this->template = $template;
+
+        return $this;
+    }
+
+    public function displayPagination()
+    {
+        $view = !empty($this->template) ? new View($this->template) : View::createContentWithFile('pagination');
+
+
+        echo $view->show();
+    }
+
+
     /**
      * prepares modal
      */
     private function prepareModal()
     {
+        $this->totalCount = $this->count() / $this->getİtemPerPage();
+
         $start = $this->getCurrentPage() * $this->getİtemPerPage();
 
         $this->limit([$start, $this->getİtemPerPage()]);
