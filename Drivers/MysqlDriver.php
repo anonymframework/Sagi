@@ -16,10 +16,8 @@ class MysqlDriver extends Driver
         if(empty($limit)){
             return '';
         }
-
         $limit = "LIMIT " . join(',', $limit);
 
-
-        return rtrim(',', $limit);
+        return rtrim($limit, ",");
     }
 }

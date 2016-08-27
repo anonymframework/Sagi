@@ -36,9 +36,10 @@ var_dump($db->tableExists());
 
 */
 
-$builder = \Sagi\Database\QueryBuilder::createNewInstance('users');
+$user = \Sagi\Database\Users::findAll();
 
+$user->paginate(1, 15);
 
-var_dump($builder->create(['username' => 'aa', 'password' => 'bbb']));
-
-
+foreach ($user as $item){
+    var_dump($item);
+}

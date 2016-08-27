@@ -17,16 +17,6 @@ class QueryBuilder extends Engine implements Iterator
     public $attributes;
 
     /**
-     * QueryBuilder constructor.
-     * @param array|null $configs
-     * @param null|string $table
-     */
-    public function __construct($configs = null, $table = null)
-    {
-        parent::__construct($configs, $table);
-    }
-
-    /**
      * @return array
      */
     public function error()
@@ -116,7 +106,6 @@ class QueryBuilder extends Engine implements Iterator
     {
         $handled = $this->prepareGetQuery();
 
-
         return $this->returnPreparedResults($handled);
     }
 
@@ -180,6 +169,7 @@ class QueryBuilder extends Engine implements Iterator
 
         return $ins ? $ins->rowCount() : false;
     }
+
     /**
      * @param string $name
      * @return mixed
@@ -200,6 +190,10 @@ class QueryBuilder extends Engine implements Iterator
 
     public function rewind()
     {
+        if (empty($this->attributes)) {
+            $this->attributes = $this->all();
+        }
+
         reset($this->attributes);
     }
 

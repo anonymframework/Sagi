@@ -36,18 +36,15 @@ class Model extends QueryBuilder
 
     /**
      * Model constructor.
-     * @param null $configs
-     * @param null $table
      */
-    public function __construct($configs = null, $table = null)
+    public function __construct()
     {
-        if (!$table) {
-            $table = static::getTableName();
-        }
+
+        parent::__construct();
+        $table = static::getTableName();
+        $this->setTable($table);
 
         $this->prepareRules();
-
-        parent::__construct($configs, $table);
 
     }
 
@@ -124,7 +121,7 @@ class Model extends QueryBuilder
             }
         }
 
-        return $instance->all();
+        return $instance;
     }
 
     /**
