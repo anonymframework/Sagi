@@ -80,6 +80,8 @@ class View
      */
     public function __construct($content)
     {
+        $this->with('this', $this);
+
         $this->content = $content;
     }
 
@@ -171,7 +173,7 @@ class View
 
             for ($i = 0; $i < count($matches[0]); $i++) {
                 $match = $matches[0][$i];
-                $content = str_replace($match, '<?php _e(' . $matches[1][$i] . ', false); ?>', $content);
+                $content = str_replace($match, '<?php $this->_e(' . $matches[1][$i] . ', false); ?>', $content);
             }
         }
 
@@ -190,7 +192,7 @@ class View
             for ($i = 0; $i < count($matches[0]);
                  $i++) {
                 $match = $matches[0][$i];
-                $content = str_replace($match, '<?php _e(' . $matches[1][$i] . '); ?>', $content);
+                $content = str_replace($match, '<?php $this->_e(' . $matches[1][$i] . '); ?>', $content);
             }
         }
 
@@ -347,14 +349,12 @@ class View
         return $this;
     }
 
-
-}
-
-function _e($content, $cleanHtml = true)
-{
-    if ($cleanHtml) {
-        echo htmlspecialchars(htmlentities(strip_tags($content)));
-    } else {
-        echo $content;
+    public function _e($content, $cleanHtml = true)
+    {
+        if ($cleanHtml) {
+            echo htmlspecialchars(htmlentities(strip_tags($content)));
+        } else {
+            echo $content;
+        }
     }
 }

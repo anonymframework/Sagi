@@ -20,11 +20,6 @@ trait Pagination
     protected $currentPage;
 
     /**
-     * @var string
-     */
-    protected $template;
-
-    /**
      * @var int
      */
     protected $totalCount;
@@ -49,16 +44,44 @@ trait Pagination
         return $this;
     }
 
-    public function template($template){
-        $this->template = $template;
-
-        return $this;
-    }
 
     public function displayPagination()
     {
         $view = !empty($this->template) ? new View($this->template) : View::createContentWithFile('pagination');
 
+        if ($this->currentPage !== 0) {
+            $before = range($this->currentPage, 1);
+        } else {
+            $before = [];
+        }
+
+        $plusFive = $this->currentPage + 5;
+
+        $start = $this->currentPage === 0 ? 1: $this->currentPage;
+        if ($plusFive !== $this->totalCount && !$plusFive > $this->totalCount) {
+            $after = range($start, 5);
+        } else {
+            $after = range($start, $this->totalCount);
+        }
+
+
+        $datas = array_merge($before, $after);
+
+        $currentPage = $this->currentPage;
+        $totalCount = $this->totalCount;
+
+        $datas = array_map(function ($value) use ($currentPage, $totalCount) {
+
+            $is = $currentPage === $value ? true:false;
+
+            $hasMore = $currentPage < $totalCount ? true:false;
+            $class = new PaginationObject($value, $is, $hasMore);
+
+            return $class;
+
+        }, $datas);
+
+         $view->with('pagination', $datas);
 
         echo $view->show();
     }
@@ -111,6 +134,5 @@ trait Pagination
         $this->currentPage = $currentPage;
         return $this;
     }
-
-
 }
+

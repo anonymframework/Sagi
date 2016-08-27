@@ -36,7 +36,12 @@ var_dump($db->tableExists());
 
 */
 
-$view = \Sagi\Database\View::createContentWithFile('pagination');
-$view->with('datas', [1,2,3,4,5]);
+/**
 
-$view->show();
+$users = \Sagi\Database\Users::findAll();
+
+$users->paginate(1, 1);
+
+$users->displayPagination();
+
+ */

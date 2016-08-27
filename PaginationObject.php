@@ -6,93 +6,62 @@ namespace Sagi\Database;
  * Class PaginationObject
  * @package Sagi\Database
  */
-class PaginationObject implements \Iterator
+class PaginationObject
 {
     /**
-     * @var array
-     */
-    private $datas;
-
-    /**
      * @var int
      */
-    private $totalCount;
+    private $data;
 
     /**
-     * @var int
+     * @var bool
      */
-    private $currentPage;
+    private $isCurrentPage;
 
-
+    /**
+     * @var bool
+     */
+    private $hasMore;
     /**
      * PaginationObject constructor.
-     * @param $datas
-     * @param $totalCount
-     * @param $currentPage
+     * @param $data
+     * @param $isCurrentPage
+     * @param bool $hasMore
      */
-    public function __construct($datas, $totalCount, $currentPage)
+    public function __construct($data, $isCurrentPage, $hasMore)
     {
-        $this->datas = $datas;
-        $this->totalCount = $totalCount;
-        $this->currentPage = $currentPage;
-    }
-
-
-    /**
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
-     * @since 5.0.0
-     */
-    public function current()
-    {
-        return current($this->datas);
+        $this->data = $data;
+        $this->isCurrentPage = $isCurrentPage;
+        $this->hasMore = $hasMore;
     }
 
     /**
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
+     * @return mixed
      */
-    public function next()
-    {
-        return next($this->datas);
+    public function getData(){
+        return $this->getData();
     }
 
     /**
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
-     * @since 5.0.0
+     * @return bool
      */
-    public function key()
-    {
-        return key($this->datas);
+    public function isCurrentPage(){
+        return $this->isCurrentPage;
     }
 
     /**
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
-     * @since 5.0.0
+     * @return mixed
      */
-    public function valid()
+    public function hasMore()
     {
-        $key = key($this->datas);
-        $var = ($key !== NULL && $key !== FALSE);
-        return $var;
+        return $this->hasMore();
     }
 
     /**
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
+     * @return string
      */
-    public function rewind()
+    public function __toString()
     {
-        reset($this->datas);
+        return strval($this->data);
     }
 }
