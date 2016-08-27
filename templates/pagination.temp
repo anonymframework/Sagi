@@ -1,0 +1,7 @@
+<ul class="pagination">
+
+   @foreach($datas as $data)
+
+   @endforeach
+
+</ul>

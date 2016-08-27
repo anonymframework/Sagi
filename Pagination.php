@@ -40,6 +40,7 @@ trait Pagination
 
         $this->prepareModal();
 
+
         return $this;
     }
 
