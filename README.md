@@ -518,3 +518,17 @@ class CreateUserTable extends Schema{
 ```
  $ php sagi migration:drop
 ```
+
+------------
+
+#Validation
+
+```php
+ use Sagi\Database\Model;
+ use Sagi\Database\Validation;
+ 
+ class Users extends Model{
+  use Validation;
+ }
+
+```
