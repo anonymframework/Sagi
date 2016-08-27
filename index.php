@@ -39,3 +39,6 @@ var_dump($db->tableExists());
 $builder = \Sagi\Database\QueryBuilder::createNewInstance('users');
 
 
+var_dump($builder->create(['username' => 'aa', 'password' => 'bbb']));
+
+

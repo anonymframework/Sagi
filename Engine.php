@@ -178,9 +178,9 @@ class Engine
      */
     protected function prepareCreate($sets = [])
     {
-        $pattern = 'INSERT INTO :from SET :insert';
+        $pattern = 'INSERT INTO :from :insert';
 
-        $setted = $this->databaseSetBuilder($sets);
+        $setted = $this->prepareInsertQuery($sets);
         $this->args = array_merge($this->args, $setted['args']);
 
         $handled = $this->handlePattern($pattern, [
@@ -190,6 +190,31 @@ class Engine
 
 
         return $handled;
+    }
+
+    private function prepareInsertQuery($sets)
+    {
+        $s = '(';
+
+        $args = array_values($sets);
+
+        $count = count($args);
+
+        foreach ($sets as $key => $value) {
+            $s .= $key . ",";
+        }
+
+        $s = rtrim($s, ",");
+
+        $s .= ") VALUES  (";
+
+        $s .= join(",", array_fill(0, $count, '?'));
+
+        $s = rtrim($s, ",");
+
+        $s .= ")";
+
+        return ['args' => $args, 'content' => $s];
     }
 
     /**
@@ -563,7 +588,6 @@ class Engine
     }
 
 
-    
     /**
      * @return array
      */
