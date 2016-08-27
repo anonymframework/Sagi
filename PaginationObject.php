@@ -22,6 +22,7 @@ class PaginationObject
      * @var bool
      */
     private $hasMore;
+
     /**
      * PaginationObject constructor.
      * @param $data
@@ -40,14 +41,16 @@ class PaginationObject
     /**
      * @return mixed
      */
-    public function getData(){
+    public function getData()
+    {
         return $this->getData();
     }
 
     /**
      * @return bool
      */
-    public function isCurrentPage(){
+    public function isCurrentPage()
+    {
         return $this->isCurrentPage;
     }
 
@@ -60,18 +63,29 @@ class PaginationObject
     }
 
     /**
+     * @return bool
+     */
+    public function hasLess()
+    {
+        return $this->data !== 1 ? true : false;
+    }
+
+    /**
      * @return int
      */
-    public function getNext(){
+    public function getNext()
+    {
         return $this->data++;
     }
 
     /**
      * @return int
      */
-    public function getBefore(){
+    public function getBefore()
+    {
         return $this->data--;
     }
+
     /**
      * @return mixed
      */

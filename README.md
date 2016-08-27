@@ -556,3 +556,29 @@ $user->displayPagination();
 
 > you can edit pagination template in `templates/pagination.temp`
 
+
+```html
+
+<ul class="pagination">
+
+   @if($pagination->hasLess())
+    <li>
+         <a href="?page={{$pagination->getBefore()}}" aria-label="Previous">
+           <span aria-hidden="true">&laquo;</span>
+         </a>
+    </li>
+    @endif
+   @foreach($pagination as $data)
+       <li {!! $data->isCurrentPage() ? 'class="active"': "" !!}><a href="?page={{$data}}">{{$data}}</a> </li>
+   @endforeach
+
+   @if($pagination->hasMore())
+   <li>
+         <a href="?page={{$pagination->getNext()}}" aria-label="Next">
+           <span aria-hidden="true">&raquo;</span>
+         </a>
+       </li>
+   @endif
+</ul>
+
+```
