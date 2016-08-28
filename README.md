@@ -520,6 +520,56 @@ class CreateUserTable extends Schema{
 ```
 
 ------------
+#Create Models
+
+```
+ 
+  $ php sagi create:models
+```
+
+this method will be create your model auto into `models` file.
+
+an model file will be like this;
+
+```php
+
+<?php
+namespace Models;
+/**
+ * @class Users
+ *
+ */
+class Users extends Model
+{
+
+    /**
+     * @var array
+     *
+     */
+    protected $fields = [
+       'id','username','password','registered_date','email','name','auth_key','profile_image','role','reset_token'
+    ];
+
+    /**
+     * @var string
+     */
+    public $primaryKey = 'id';
+
+    /**
+     * @var array|bool
+     *
+     */
+    protected $timestamps = ['created_at', 'updated_at'];
+
+    public static function getTableName()
+    {
+        return  'users';
+    }
+
+}
+```
+
+------------
 
 #Validation
 
@@ -601,3 +651,4 @@ output will be like this;
    </ul>
 
 ```
+
