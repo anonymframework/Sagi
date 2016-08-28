@@ -6,13 +6,15 @@ use Sagi\Database\Console\MigrationCreateFormat;
 use Symfony\Component\Console\Application;
 use Sagi\Database\Console\MigrateCommand;
 use Sagi\Database\Console\MigrationDropCommand;
+use Sagi\Database\Console\CreateModelsCommand;
 
 $application = new Application();
 
 $application->addCommands([
     new MigrationCreateFormat(),
     new MigrateCommand(),
-    new MigrationDropCommand()
+    new MigrationDropCommand(),
+    new CreateModelsCommand()
 ]);
 
 $application->run();

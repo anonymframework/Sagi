@@ -1,0 +1,15 @@
+<?php
+namespace Models;
+/**
+ * @class Users
+ *
+ */
+class {{name}} extends Model
+{
+
+    public static function getTableName()
+    {
+        return  '{{table}}';
+    }
+
+}

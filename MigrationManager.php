@@ -140,7 +140,7 @@ class MigrationManager extends Schema
             return join('', $exp);
         }
 
-        return $name;
+        return ucfirst($name);
     }
 
 
