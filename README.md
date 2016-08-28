@@ -532,8 +532,6 @@ this method will be create your model auto into `models` file.
 an model file will be like this;
 
 ```php
-
-<?php
 namespace Models;
 /**
  * @class Users
