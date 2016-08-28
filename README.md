@@ -527,7 +527,23 @@ class CreateUserTable extends Schema{
   $ php sagi create:models
 ```
 
-this method will be create your model auto into `models` file.
+this method will be create your model auto into `models` dir.
+
+output will be like this;
+
+```
+AuthAssignment created successfully in models/AuthAssignment.php
+Authitem created successfully in models/Authitem.php
+AuthitemChild created successfully in models/AuthitemChild.php
+AuthRule created successfully in models/AuthRule.php
+Categories created successfully in models/Categories.php
+Comments created successfully in models/Comments.php
+Likes created successfully in models/Likes.php
+Migration created successfully in models/Migration.php
+Posts created successfully in models/Posts.php
+Users created successfully in models/Users.php
+
+```
 
 an model file will be like this;
 
