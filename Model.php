@@ -35,6 +35,11 @@ class Model extends QueryBuilder
     protected $autoValidation = false;
 
     /**
+     * @var array
+     */
+    protected $fields;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -50,7 +55,7 @@ class Model extends QueryBuilder
 
     private function prepareRules()
     {
-        if (method_exists($this, "rules")) {
+        if (method_exists($this, "rules") && method_exists($this, "setRules")) {
             $rules = $this->rules();
 
             $this->setRules($rules);
