@@ -1,7 +1,7 @@
 {
   "name": "sagi/sagi",
   "description": "sagi basic database orm",
-  "type": "library",
+  "type": "project",
   "license": "MIT",
   "authors": [
     {
