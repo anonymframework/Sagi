@@ -28,24 +28,81 @@ class CreateModelsCommand extends Command
         }, $tables);
 
         foreach ($tables as $table) {
+
+            $columns = QueryBuilder::createNewInstance()->query("SHOW COLUMNS FROM `$table`")->fetchAll();
+
+
+            $fields = array_column($columns, 'Field');
+
+            $timestamps = $this->findTimestamps($fields);
+
             $content = TemplateManager::prepareContent('model', [
                 'table' => $table,
-                'name' => $name = MigrationManager::prepareClassName($table)
+                'name' => $name = MigrationManager::prepareClassName($table),
+                'fields' => $this->prepareFields($fields),
+                'primary' => $primary = $this->findPrimaryKey($columns),
+                'timestamps' => $timestamps
             ]);
+
 
             $path = 'models/' . $name . '.php';
 
-            if(!file_exists($path)){
+            if (!file_exists($path)) {
                 if (file_put_contents($path, $content)) {
-                    $output->writeln("<info>". $name . ' created successfully in ' . $path. "</info>");
+                    $output->writeln("<info>" . $name . ' created successfully in ' . $path . "</info>");
                 }
-            }else{
-                $output->writeln("<error>".$name . ' already exists in ' . $path."</error>");
+            } else {
+                $output->writeln("<error>" . $name . ' already exists in ' . $path . "</error>");
 
             }
 
 
         }
 
+    }
+
+    /**
+     * @param $fields
+     * @return array|bool
+     */
+    private function findTimestamps($fields)
+    {
+        $timestamps = [];
+
+        if (in_array('created_at', $fields)) {
+            $timestamps[] = "'created_at'";
+        }
+
+        if (in_array('updated_at', $fields)) {
+            $timestamps[] = "'updated_at'";
+        }
+
+        return empty($timestamps) ? 'false' : '[' . join(',', $timestamps) . ']';
+    }
+
+    private function prepareFields($fields)
+    {
+        $fields = array_map(function ($value) {
+            return "'$value'";
+        }, $fields);
+
+
+        return join(',', $fields);
+    }
+
+    /**
+     * @param $array
+     * @return mixed
+     */
+    private function findPrimaryKey($array)
+    {
+        foreach ($array as $item) {
+            if ($item['Key'] === 'PRI') {
+                return "'{$item['Field']}'";
+
+            }
+        }
+
+        return "'id'";
     }
 }

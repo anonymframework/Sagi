@@ -7,6 +7,25 @@ namespace Models;
 class {{name}} extends Model
 {
 
+    /**
+     * @var array
+     *
+     */
+    protected $fields = [
+       {{fields}}
+    ];
+
+    /**
+     * @var string
+     */
+    public $primaryKey = {{primary}};
+
+    /**
+     * @var array|bool
+     *
+     */
+    protected $timestamps = {{timestamps}};
+
     public static function getTableName()
     {
         return  '{{table}}';

@@ -36,11 +36,19 @@ var_dump($db->tableExists());
 
 */
 
-
+/*
 
 $users = \Sagi\Database\Users::findAll();
 
 $users->paginate($_GET['page'], 1);
 
 $users->displayPagination();
+
+*/
+
+use Sagi\Database\QueryBuilder;
+
+$columns = QueryBuilder::createNewInstance()->query("SHOW COLUMNS FROM `users`")->fetchAll();
+
+print_r($columns);
 

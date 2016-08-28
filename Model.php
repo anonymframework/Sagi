@@ -97,6 +97,13 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @return bool
+     */
+    public function hasPrimaryKey(){
+        return !empty($this->primaryKey);
+    }
+
+    /**
      * @param int $id
      * @return mixed
      */
