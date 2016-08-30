@@ -13,7 +13,7 @@
     "php": ">=5.4.0",
     "symfony/console": "2.8"
   },
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
       "Sagi\\Database\\": "database/",
