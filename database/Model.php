@@ -247,11 +247,12 @@ class Model extends QueryBuilder
             }
         }
 
-        if (!empty($this->where) or !empty($this->orWhere)) {
-            $updateKey = $this->updateKey;
+        $attributes = $this->getAttributes();
 
-            $this->where($updateKey, $this->attribute($updateKey));
-            $this->setUpdatedAt()->update($this->getAttributes());
+        if (isset($attributes[$this->updateKey])) {
+            $this->where($this->updateKey, $attributes[$this->updateKey]);
+
+            $this->setUpdatedAt()->update($attributes);
         } else {
             $this->setCreatedAt()->create($this->attributes);
 
@@ -262,8 +263,8 @@ class Model extends QueryBuilder
             }
 
             return $created;
-
         }
+
 
         return $this;
     }
@@ -336,7 +337,7 @@ class Model extends QueryBuilder
     {
         $attrs = $this->getAttributes();
 
-        return array_intersect_key($attrs,array_flip($fields));
+        return array_intersect_key($attrs, array_flip($fields));
     }
 
     /**

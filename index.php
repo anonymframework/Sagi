@@ -49,5 +49,4 @@ $users->displayPagination();
 use Models\Users;
 
 $user = Users::findOne(1);
-
-echo $user;
+$user->save();
