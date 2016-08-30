@@ -34,12 +34,12 @@ class MigrationCreateFormat extends Command
     {
         $file = $input->getArgument('file');
 
-        $fileName = MigrationManager::$migrationDir.'/migration_file' . date('y_m_d_h_m') . '__' . $file . '.php';
+        $fileName = MigrationManager::$migrationDir . '/migration_file' . date('y_m_d_h_m') . '__' . $file . '.php';
 
         if (!file_exists($fileName)) {
 
             if (touch($fileName)) {
-                $put = file_put_contents($fileName, TemplateManager::prepareContent('migration', ['name' => MigrationManager::prepareClassName($file)]));
+                $put = file_put_contents('../' . $fileName, TemplateManager::prepareContent('migration', ['name' => MigrationManager::prepareClassName($file)]));
 
                 if ($put) {
                     $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');
@@ -50,7 +50,7 @@ class MigrationCreateFormat extends Command
             } else {
                 $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
             }
-        }else{
+        } else {
             $output->writeln('<error>' . $fileName . ' : already exists</error>');
 
         }

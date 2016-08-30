@@ -45,7 +45,7 @@ class CreateModelsCommand extends Command
             ]);
 
 
-            $path = 'models/' . $name . '.php';
+            $path = '../models/' . $name . '.php';
 
             if (!file_exists($path)) {
                 if (file_put_contents($path, $content)) {
