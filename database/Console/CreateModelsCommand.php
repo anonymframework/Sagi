@@ -19,6 +19,10 @@ class CreateModelsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if(!is_dir('models')){
+            mkdir('models', 0777);
+        }
+
         $tables = QueryBuilder::createNewInstance()->query("SHOW TABLES LIKE ''")->fetchAll();
 
         $tables = array_map(function ($value) {
@@ -45,15 +49,17 @@ class CreateModelsCommand extends Command
             ]);
 
 
-            $path = '../models/' . $name . '.php';
+            $path = 'models/' . $name . '.php';
 
             if (!file_exists($path)) {
                 if (file_put_contents($path, $content)) {
                     $output->writeln("<info>" . $name . ' created successfully in ' . $path . "</info>");
+                }else{
+                    $output->writeln("<error>" . $name . ' couldnt create in ' . $path . "</error>");
+
                 }
             } else {
                 $output->writeln("<error>" . $name . ' already exists in ' . $path . "</error>");
-
             }
 
 

@@ -12,7 +12,7 @@ class TemplateManager
     /**
      * @var string
      */
-    private static $tempDir = 'templates/';
+    private static $tempDir = 'database/templates/';
 
     /**
      * @var string

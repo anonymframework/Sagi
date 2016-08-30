@@ -47,7 +47,7 @@ class View
     /**
      * @var string
      */
-    public static $templatePath = 'templates';
+    public static $templatePath = 'database/templates';
 
     /**
      * @var string
