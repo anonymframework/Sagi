@@ -48,6 +48,10 @@ trait Authorization
         return $this->is('admin');
     }
 
+    /**
+     * @param string $role
+     * @return bool
+     */
     public function is($role)
     {
         return $this->getAuth()->role === $role;
