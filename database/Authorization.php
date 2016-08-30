@@ -9,6 +9,7 @@
 namespace Sagi\Database;
 
 use Models\Auth;
+
 /**
  * Class Authorization
  * @package Sagi\Database
@@ -18,8 +19,9 @@ trait Authorization
     /**
      * @return mixed
      */
-    public function getAuth(){
-        return $this->hasOne(Auth::class, ['user_id', 'id'] );
+    public function getAuth()
+    {
+        return $this->hasOne(Auth::class, ['user_id', 'id']);
     }
 
     /**
@@ -28,5 +30,26 @@ trait Authorization
     public function checkAuthorizationTable()
     {
         return $this->tableExists('auth');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSuperAdmin()
+    {
+        return $this->is('superadmin');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return $this->is('admin');
+    }
+
+    public function is($role)
+    {
+        return $this->getAuth()->role === $role;
     }
 }
