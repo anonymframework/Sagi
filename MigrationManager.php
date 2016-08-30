@@ -63,6 +63,8 @@ class MigrationManager extends Schema
 
             if ($migration instanceof MigrationInterface) {
                 $migration->up();
+            } else {
+                throw new \Exception(get_class($migration) . 'is not a instance of MigrationInterface');
             }
 
             QueryBuilder::createNewInstance()->setTable('migrations')->create([
