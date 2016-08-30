@@ -46,9 +46,5 @@ $users->displayPagination();
 
 */
 
-use Sagi\Database\QueryBuilder;
 
-$columns = QueryBuilder::createNewInstance()->query("SHOW COLUMNS FROM `users`")->fetchAll();
-
-print_r($columns);
 
