@@ -51,4 +51,4 @@ use Models\Users;
 
 $user = Users::findOne(1);
 
-var_dump($user);
+var_dump($user->validate());
