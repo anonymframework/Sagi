@@ -83,10 +83,7 @@ trait Validation
             $rules = $this->convertToArray($rules);
         }
 
-
-        if (!is_array($datas = $this->getAttributes())) {
-            $datas = $this->convertToArray($datas);
-        }
+        $datas = $this->getAttributes();
 
         foreach ($rules as $key => $rule) {
             $parsedRules = explode("|", $rule);
@@ -95,10 +92,12 @@ trait Validation
                 $required = $this->handleRule($parsedRule, $key, $datas);
 
                 if ($required !== null && $required === false) {
-                    break;
+                      return false;
                 }
             }
         }
+
+        return true;
     }
 
     /**
@@ -124,6 +123,7 @@ trait Validation
             $methodName = $methodName . join("", $parsedName);
         }
 
+
         if (!strstr($rule, ":")) {
             $called = $this->callMethod($methodName, [$key, $allDatas, $rule]);
         } else {
@@ -136,6 +136,7 @@ trait Validation
 
             $called = $this->callMethod($methodName, $sendDatas);
         }
+
 
         return $called;
 
