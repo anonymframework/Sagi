@@ -20,13 +20,15 @@ class ConfigManager
     /**
      * @var string
      */
-    public static $jsonFile = "config.json";
+    public static $jsonFile = "../config.php";
 
 
     public static function loadConfigs()
     {
         if (file_exists(static::$jsonFile)) {
-            static::$configs = json_decode(file_get_contents(static::$jsonFile), true);
+            static::$configs = include static::$jsonFile;
+        }else{
+            throw new ConfigException(static::$jsonFile. 'is not exists');
         }
     }
 

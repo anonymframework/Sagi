@@ -1,6 +1,0 @@
-{
-  "username": "root",
-  "password": "sanane123",
-  "driver": "mysql",
-  "dsn": "mysql:host=localhost;dbname=test"
-}
