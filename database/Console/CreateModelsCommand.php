@@ -12,6 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CreateModelsCommand extends Command
 {
 
+    protected $expects = ['migrations'];
+
     protected function configure()
     {
         $this->setName('create:models')->setDescription('auto create model files');
@@ -19,7 +21,7 @@ class CreateModelsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if(!is_dir('models')){
+        if (!is_dir('models')) {
             mkdir('models', 0777);
         }
 
@@ -32,6 +34,10 @@ class CreateModelsCommand extends Command
         }, $tables);
 
         foreach ($tables as $table) {
+
+            if (in_array($table, $this->expects)) {
+                continue;
+            }
 
             $columns = QueryBuilder::createNewInstance()->query("SHOW COLUMNS FROM `$table`")->fetchAll();
 
@@ -54,7 +60,7 @@ class CreateModelsCommand extends Command
             if (!file_exists($path)) {
                 if (file_put_contents($path, $content)) {
                     $output->writeln("<info>" . $name . ' created successfully in ' . $path . "</info>");
-                }else{
+                } else {
                     $output->writeln("<error>" . $name . ' couldnt create in ' . $path . "</error>");
 
                 }

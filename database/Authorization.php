@@ -8,12 +8,23 @@
 
 namespace Sagi\Database;
 
+use Models\Auth;
 /**
  * Class Authorization
  * @package Sagi\Database
  */
 trait Authorization
 {
+    /**
+     * @return mixed
+     */
+    public function getAuth(){
+        return $this->hasOne(Auth::class, ['user_id', 'id'] );
+    }
+
+    /**
+     * @return mixed
+     */
     public function checkAuthorizationTable()
     {
         return $this->tableExists('auth');
