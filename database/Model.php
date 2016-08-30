@@ -16,7 +16,7 @@ class Model extends QueryBuilder
     /**
      * @var array
      */
-    protected $usedModules;
+    protected $usedModules = [];
     /**
      * @var string
      */
@@ -259,7 +259,7 @@ class Model extends QueryBuilder
             $created = static::createNewInstance()->setAttributes($this->attributes);
 
             if ($this->isValidationUsed()) {
-                $this->createUserAuth($created->id, $this->role);
+                $this->createUserAuth($created->id, isset($this->role) ? $this->role : 'user');
             }
 
             return $created;
@@ -268,30 +268,6 @@ class Model extends QueryBuilder
 
         return $this;
     }
-
-    /**
-     * @param array $datas
-     * @return mixed
-     */
-    public function create($datas)
-    {
-        $datas = array_merge_recursive($datas, $this->fields);
-
-        return parent::create($datas);
-    }
-
-
-    /**
-     * @param array $datas
-     * @return mixed
-     */
-    public function update($datas)
-    {
-        $datas = array_merge_recursive($datas, $this->fields);
-
-        return parent::update($datas);
-    }
-
 
     /**
      * @return Model
@@ -367,6 +343,8 @@ class Model extends QueryBuilder
     {
         if ($this->isField($name)) {
             $this->attributes[$name] = $value;
+        } else {
+            $this->$name = $value;
         }
     }
 }

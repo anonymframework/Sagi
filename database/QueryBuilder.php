@@ -119,21 +119,21 @@ class QueryBuilder extends Engine implements Iterator
     }
 
     /**
-     * @param array $sets
+     * @param array $datas
      * @return PDOStatement
      */
-    public function update($sets = [])
+    public function update($datas = [])
     {
-        return $this->returnPreparedResults($this->prepareUpdate($sets), true);
+        return $this->returnPreparedResults($this->prepareUpdate($datas), true);
     }
 
     /**
-     * @param array $sets
+     * @param array $datas
      * @return PDOStatement
      */
-    public function create($sets = [])
+    public function create($datas = [])
     {
-        return $this->returnPreparedResults($this->prepareCreate($sets), true);
+        return $this->returnPreparedResults($this->prepareCreate($datas), true);
     }
 
 
