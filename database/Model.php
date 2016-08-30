@@ -62,13 +62,41 @@ class Model extends QueryBuilder
         $this->usedModules = class_uses(static::className());
     }
 
+    /**
+     *
+     */
     private function prepareRules()
     {
-        if (method_exists($this, "rules") && method_exists($this, "setRules")) {
+        if ($this->isValidationUsed()) {
             $rules = $this->rules();
 
             $this->setRules($rules);
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isValidationUsed()
+    {
+        return $this->isModuleUsed('Sagi\Database\Validation');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAuthorizationUsed()
+    {
+        return $this->isModuleUsed('Sagi\Database\Authorization');
+    }
+
+    /**
+     * @param $module
+     * @return bool
+     */
+    public function isModuleUsed($module)
+    {
+        return in_array($module, $this->usedModules);
     }
 
     /**
@@ -212,7 +240,7 @@ class Model extends QueryBuilder
      */
     public function save()
     {
-        if ($this->autoValidation === true && method_exists($this, "validate")) {
+        if ($this->autoValidation === true && $this->isValidationUsed()) {
 
             $this->setDatas($this->attributes);
             if (!$this->validate()) {
@@ -228,11 +256,42 @@ class Model extends QueryBuilder
         } else {
             $this->setCreatedAt()->create($this->attributes);
 
-            return static::createNewInstance()->setAttributes($this->attributes);
+            $created = static::createNewInstance()->setAttributes($this->attributes);
+
+            if ($this->isValidationUsed()) {
+                $this->createUserAuth($created->id, $this->role);
+            }
+
+            return $created;
+
         }
 
         return $this;
     }
+
+    /**
+     * @param array $datas
+     * @return mixed
+     */
+    public function create($datas)
+    {
+        $datas = array_merge_recursive($datas, $this->fields);
+
+        return parent::create($datas);
+    }
+
+
+    /**
+     * @param array $datas
+     * @return mixed
+     */
+    public function update($datas)
+    {
+        $datas = array_merge_recursive($datas, $this->fields);
+
+        return parent::update($datas);
+    }
+
 
     /**
      * @return Model
