@@ -1,0 +1,33 @@
+<?php
+
+/**
+ *  Created by Sagi Database Console
+ *
+ */
+
+use Sagi\Database\Schema;
+use Sagi\Database\MigrationInterface;
+
+/**
+ * @class {{name}}
+ */
+class {{name}} extends Schema implements MigrationInterface{
+
+    /**
+     * includes createTable functions
+     *
+     */
+    public function up(){
+
+
+    }
+
+    /**
+     * includes dropTable function
+     *
+     */
+    public function down(){
+
+
+    }
+}
