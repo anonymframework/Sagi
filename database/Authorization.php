@@ -56,4 +56,17 @@ trait Authorization
     {
         return $this->getAuth()->role === $role;
     }
+
+    /**
+     * @param $id
+     * @param $role
+     */
+    public function createUserAuth($id, $role){
+        $auth = new Auth();
+
+        $auth->role = $role;
+        $auth->user_id = $id;
+
+        $auth->save();
+    }
 }
