@@ -46,5 +46,4 @@ $users->displayPagination();
 
 */
 
-var_dump(posix_getuid());
 

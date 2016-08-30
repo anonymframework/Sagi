@@ -210,7 +210,6 @@ class Model extends QueryBuilder
             }
         }
 
-
         if (!empty($this->attributes)) {
             $updateKey = $this->updateKey;
 
@@ -264,6 +263,14 @@ class Model extends QueryBuilder
     private function hasTimestamp($value)
     {
         return (is_array($this->timestamps)) ? array_search($value, $this->timestamps) : false;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+         return json_encode($this->attributes);
     }
 
     /**
