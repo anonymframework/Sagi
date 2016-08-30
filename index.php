@@ -46,11 +46,8 @@ $users->displayPagination();
 
 */
 
-
 use Models\Users;
 
 $user = Users::findOne(1);
 
-$user->role = 'admin';
-
-var_dump($user);
+echo $user;

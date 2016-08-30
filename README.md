@@ -693,4 +693,18 @@ var_dump($this->isSuperAdmin());
 var_dump($this->isAdmin());
 var_dump($this->isUser());
 var_dump($this->is('editor'));
+
+
+```
+
+### set role
+
+```php
+
+ $user = Users::findOne(1);
+ 
+ $user->role = 'superadmin';
+ 
+ $user->save();
+
 ```

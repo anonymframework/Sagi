@@ -242,7 +242,6 @@ class Model extends QueryBuilder
     {
         if ($this->autoValidation === true && $this->isValidationUsed()) {
 
-            $this->setDatas($this->attributes);
             if (!$this->validate()) {
                 return false;
             }
@@ -299,7 +298,7 @@ class Model extends QueryBuilder
      */
     private function isField($field)
     {
-        return in_array($field, $this->fields) && !in_array($field, $this->expects);
+        return in_array($field, $this->fields);
     }
 
     /**
@@ -324,13 +323,27 @@ class Model extends QueryBuilder
      */
     public function __toString()
     {
-        return json_encode($this->attributes);
+        $fields = array_diff($this->fields, $this->expects);
+
+        return json_encode($this->getAttributesByFields($fields));
+    }
+
+    /**
+     * @param $fields
+     * @return array
+     */
+    public function getAttributesByFields($fields)
+    {
+        $attrs = $this->getAttributes();
+
+        return array_intersect_key($attrs,array_flip($fields));
     }
 
     /**
      * @return string|array
      */
-    public static function getTableName()
+    public
+    static function getTableName()
     {
         return '';
     }
@@ -339,7 +352,8 @@ class Model extends QueryBuilder
      * @param $name
      * @param $value
      */
-    public function __set($name, $value)
+    public
+    function __set($name, $value)
     {
         if ($this->isField($name)) {
             $this->attributes[$name] = $value;
