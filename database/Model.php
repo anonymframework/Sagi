@@ -215,7 +215,7 @@ class Model extends QueryBuilder
             }
         }
 
-        if (!empty($this->attributes)) {
+        if (!empty($this->where) or !empty($this->orWhere)) {
             $updateKey = $this->updateKey;
 
             $this->where($updateKey, $this->attribute($updateKey));

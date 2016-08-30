@@ -45,7 +45,7 @@ trait Authorization
      */
     public function isAdmin()
     {
-        return $this->is('admin');
+        return $this->isSuperAdmin() or $this->is('admin');
     }
 
     /**
@@ -66,6 +66,7 @@ trait Authorization
 
         $auth->role = $role;
         $auth->user_id = $id;
+
 
         $auth->save();
     }
