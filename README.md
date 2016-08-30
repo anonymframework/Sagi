@@ -679,3 +679,18 @@ output will be like this;
    </ul>
 
 ```
+
+----------------
+#Authorization
+
+```php
+
+class Users extends Model{
+   use Authorization;
+}
+
+var_dump($this->isSuperAdmin());
+var_dump($this->isAdmin());
+var_dump($this->isUser());
+var_dump($this->is('editor'));
+```

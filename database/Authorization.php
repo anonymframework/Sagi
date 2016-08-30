@@ -49,6 +49,14 @@ trait Authorization
     }
 
     /**
+     * @return bool
+     */
+    public function isUser()
+    {
+        return $this->isSuperAdmin() or $this->isAdmin() or $this->is('user');
+    }
+
+    /**
      * @param string $role
      * @return bool
      */
@@ -61,7 +69,8 @@ trait Authorization
      * @param $id
      * @param $role
      */
-    public function createUserAuth($id, $role){
+    public function createUserAuth($id, $role)
+    {
         $auth = new Auth();
 
         $auth->role = $role;

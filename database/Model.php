@@ -14,6 +14,10 @@ class Model extends QueryBuilder
 {
 
     /**
+     * @var array
+     */
+    protected $usedModules;
+    /**
      * @var string
      */
     public $primaryKey = 'id';
@@ -43,6 +47,7 @@ class Model extends QueryBuilder
      * @var array
      */
     protected $expects = [];
+
     /**
      * Model constructor.
      */
@@ -54,7 +59,7 @@ class Model extends QueryBuilder
         $this->setTable($table);
 
         $this->prepareRules();
-
+        $this->usedModules = class_uses(static::className());
     }
 
     private function prepareRules()
