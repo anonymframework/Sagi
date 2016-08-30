@@ -254,9 +254,9 @@ class Model extends QueryBuilder
 
             $this->setUpdatedAt()->update($attributes);
         } else {
-            $this->setCreatedAt()->create($this->attributes);
+            $this->setCreatedAt()->create($attributes);
 
-            $created = static::createNewInstance()->setAttributes($this->attributes);
+            $created = static::set($attributes);
 
             if ($this->isValidationUsed()) {
                 $this->createUserAuth($created->id, isset($this->role) ? $this->role : 'user');
@@ -267,6 +267,15 @@ class Model extends QueryBuilder
 
 
         return $this;
+    }
+
+    /**
+     * @param $datas
+     * @return QueryBuilder
+     */
+    public static function set($datas)
+    {
+        return static::createNewInstance()->setAttributes($datas);
     }
 
     /**
