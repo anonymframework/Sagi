@@ -253,6 +253,8 @@ class Model extends QueryBuilder
             $this->where($this->updateKey, $attributes[$this->updateKey]);
 
             $this->setUpdatedAt()->update($attributes);
+        }elseif(!empty($this->where) or !empty($this->orWhere)){
+            $this->setUpdatedAt()->update($attributes);
         } else {
             $this->setCreatedAt()->create($attributes);
 
