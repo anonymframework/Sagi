@@ -13,8 +13,8 @@ class MigrationDropCommand extends Command
 {
     protected function configure()
     {
-        $this->setName('migrate')
-            ->setDescription('run migration files');
+        $this->setName('migration:drop')
+            ->setDescription('drop migration files');
 
     }
 
