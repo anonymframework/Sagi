@@ -12,15 +12,19 @@ use Sagi\Database\MigrationInterface;
 /**
  * @class CreateAuthTable
  */
-class CreateAuthTable extends Schema implements MigrationInterface{
+class CreateAuthTable extends Schema implements MigrationInterface
+{
 
     /**
      * includes createTable functions
      *
      */
-    public function up(){
-        $this->createTableIfNotExists('auth', function (Table $row){
-
+    public function up()
+    {
+        $this->createTableIfNotExists('auth', function (Table $table) {
+            $table->pk('user_id');
+            $table->string('role');
+            $table->timestamps();
         });
     }
 
@@ -28,8 +32,8 @@ class CreateAuthTable extends Schema implements MigrationInterface{
      * includes dropTable function
      *
      */
-    public function down(){
-
-
+    public function down()
+    {
+        $this->dropTable('auth');
     }
 }
