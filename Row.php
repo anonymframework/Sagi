@@ -121,7 +121,7 @@ class Row
      */
     public function timestamp($name)
     {
-        return $this->addCommand('timestamp', $this->madeArray($name));
+        return $this->addCommand('current', $this->madeArray($name));
     }
 
     /**
