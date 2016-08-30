@@ -37,8 +37,12 @@ class Model extends QueryBuilder
     /**
      * @var array
      */
-    protected $fields;
+    protected $fields = [];
 
+    /**
+     * @var array
+     */
+    protected $expects = [];
     /**
      * Model constructor.
      */
@@ -104,7 +108,8 @@ class Model extends QueryBuilder
     /**
      * @return bool
      */
-    public function hasPrimaryKey(){
+    public function hasPrimaryKey()
+    {
         return !empty($this->primaryKey);
     }
 
@@ -249,6 +254,15 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @param string $field
+     * @return bool
+     */
+    private function isField($field)
+    {
+        return in_array($field, $this->fields) && !in_array($field, $this->expects);
+    }
+
+    /**
      * @return int
      */
     public function getCurrentTime()
@@ -270,7 +284,7 @@ class Model extends QueryBuilder
      */
     public function __toString()
     {
-         return json_encode($this->attributes);
+        return json_encode($this->attributes);
     }
 
     /**
@@ -287,6 +301,8 @@ class Model extends QueryBuilder
      */
     public function __set($name, $value)
     {
-        $this->attributes[$name] = $value;
+        if ($this->isField($name)) {
+            $this->attributes[$name] = $value;
+        }
     }
 }

@@ -316,6 +316,20 @@ class User extends Model{
   
 ```
  
+ ####fields
+ 
+ ```php
+ 
+  
+  protected $fields = ['id', 'username'];
+ ```
+ 
+ ####expects
+ 
+ 
+```php
+ protected $expects = ['password'];
+ ```
  
  ####create
  
@@ -665,4 +679,3 @@ output will be like this;
    </ul>
 
 ```
-

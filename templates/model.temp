@@ -1,5 +1,7 @@
 <?php
 namespace Models;
+
+use Sagi\Database\Model;
 /**
  * @class Users
  *

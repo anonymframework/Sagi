@@ -47,3 +47,8 @@ $users->displayPagination();
 */
 
 
+use Models\Users;
+
+$user = Users::findOne(1);
+
+var_dump($user);
