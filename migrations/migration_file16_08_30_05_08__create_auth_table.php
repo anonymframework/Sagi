@@ -10,17 +10,18 @@ use Sagi\Database\Row as Table;
 use Sagi\Database\MigrationInterface;
 
 /**
- * @class {{name}}
+ * @class CreateAuthTable
  */
-class {{name}} extends Schema implements MigrationInterface{
+class CreateAuthTable extends Schema implements MigrationInterface{
 
     /**
      * includes createTable functions
      *
      */
     public function up(){
+        $this->createTableIfNotExists('auth', function (Table $row){
 
-
+        });
     }
 
     /**
