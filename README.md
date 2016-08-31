@@ -693,6 +693,12 @@ output will be like this;
 ----------------
 #Authorization
 
+add to your user table migration schema;
+
+```php
+$row->auth();
+```
+
 ```php
 
 class Users extends Model{
@@ -702,7 +708,7 @@ class Users extends Model{
 var_dump($this->isSuperAdmin());
 var_dump($this->isAdmin());
 var_dump($this->isUser());
-var_dump($this->isEditor);
+var_dump($this->isEditor());
 
 
 ```
