@@ -54,6 +54,12 @@ class Model extends QueryBuilder
     protected $policy;
 
     /**
+     * @var array
+     */
+    private $protected =
+        ['role'];
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -124,11 +130,13 @@ class Model extends QueryBuilder
      * @param PolicyInterface $policy
      * @return $this
      */
-    public function policy(PolicyInterface $policy){
+    public function policy(PolicyInterface $policy)
+    {
         $this->policy = $policy;
 
         return $this;
     }
+
     /**
      * @param string $method
      * @return bool
@@ -357,6 +365,7 @@ class Model extends QueryBuilder
         return static::createNewInstance()->setAttributes($datas);
     }
 
+
     /**
      * @return Model
      */
@@ -387,7 +396,16 @@ class Model extends QueryBuilder
      */
     private function isField($field)
     {
-        return in_array($field, $this->fields);
+        return  in_array($field, $this->fields) && !$this->isProtected($field);
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    private function isProtected($name)
+    {
+        return isset($this->protected[$name]);
     }
 
     /**
