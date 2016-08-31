@@ -169,6 +169,13 @@ class Row
         return $this->addCommand('current', $this->madeArray($name));
     }
 
+    /**
+     * @return Command
+     */
+    public function auth(){
+        return $this->string('role');
+    }
+
 
     /**
      * get all args
