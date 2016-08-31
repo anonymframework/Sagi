@@ -46,13 +46,4 @@ $users->displayPagination();
 
 */
 
-$user = \Models\Users::set([
-    'username' => 'a',
-    'password' => 'b',
-    'email' => 'c',
-    'name' => 'd ',
-    'profile_image' => 'e',
-    'reset_token' => 'f'
-]);
 
-var_dump($user->save());
