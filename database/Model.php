@@ -121,6 +121,15 @@ class Model extends QueryBuilder
 
 
     /**
+     * @param PolicyInterface $policy
+     * @return $this
+     */
+    public function policy(PolicyInterface $policy){
+        $this->policy = $policy;
+
+        return $this;
+    }
+    /**
      * @param string $method
      * @return bool
      */

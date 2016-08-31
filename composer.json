@@ -17,7 +17,8 @@
   "autoload": {
     "psr-4": {
       "Sagi\\Database\\": "database/",
-      "Models\\": "models/"
+      "Models\\": "models/",
+      "Sagi\\Policies\\": "policies/"
     }
   },
   "extra": {
