@@ -248,6 +248,13 @@ class QueryBuilder extends Engine implements Iterator
     }
 
     /**
+     * @param $name
+     * @return bool
+     */
+    public function hasAttribute($name){
+        return isset($this->attributes[$name]);
+    }
+    /**
      * @return array
      */
     public function getAttributes()
