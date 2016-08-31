@@ -51,4 +51,4 @@ $user = \Models\Users::findOne(1);
 
 $user->policy(new \Sagi\Policies\UsersPolicy());
 
-var_dump($user);
+var_dump($user->can());
