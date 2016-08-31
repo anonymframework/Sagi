@@ -8,6 +8,7 @@ use Sagi\Database\Console\MigrateCommand;
 use Sagi\Database\Console\MigrationDropCommand;
 use Sagi\Database\Console\CreateModelsCommand;
 use Sagi\Database\Console\MigrationResetCommand;
+use Sagi\Database\Console\CreatePolicyCommand;
 
 $application = new Application();
 
@@ -16,7 +17,8 @@ $application->addCommands([
     new MigrateCommand(),
     new MigrationDropCommand(),
     new MigrationResetCommand(),
-    new CreateModelsCommand()
+    new CreateModelsCommand(),
+    new CreatePolicyCommand()
 ]);
 
 $application->run();
