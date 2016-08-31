@@ -70,7 +70,7 @@ trait Validation
                 $filterFunc = 'handleFilter' . ucfirst($subFilter);
 
                 if ($this->hasAttribute($index)) {
-                    $filtred = call_user_func_array(array($this, $filterFunc), [$this->attribute($name)]);
+                    $filtred = call_user_func_array(array($this, $filterFunc), [$this->attribute($index)]);
                     $this->attributes[$index] = $filtred;
                 }
             }
@@ -241,10 +241,9 @@ trait Validation
 
     /**
      * @param $index
-     * @param array $params
      * @return bool
      */
-    protected function handleRuleRequired($index, $params = [])
+    protected function handleRuleRequired($index)
     {
         return ($this->hasAttribute($index) && !empty($this->attributes[$index]));
     }
