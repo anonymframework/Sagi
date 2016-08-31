@@ -609,8 +609,17 @@ class Users extends Model
   use Validation;
   
   public function rules(){
-      return $yourRules;
+      return [
+          'content' => 'required',
+           'title' => 'required|digit_min:6',
+           'category' => 'required|numeric'
+            ];
   }
+  
+  public function filters(){
+    return [  'content' => 'xss',
+              'title' => 'xss|strip_tags'
+          ];
  }
 
 ```
@@ -692,7 +701,7 @@ class Users extends Model{
 var_dump($this->isSuperAdmin());
 var_dump($this->isAdmin());
 var_dump($this->isUser());
-var_dump($this->is('editor'));
+var_dump($this->isEditor);
 
 
 ```
