@@ -133,7 +133,11 @@ class QueryBuilder extends Engine implements Iterator
      */
     public function create($datas = [])
     {
-        return $this->returnPreparedResults($this->prepareCreate($datas), true);
+        $create = $this->returnPreparedResults($this->prepareCreate($datas), true);
+
+        $this->setArgs([]);
+
+        return $create;
     }
 
 
@@ -251,9 +255,11 @@ class QueryBuilder extends Engine implements Iterator
      * @param $name
      * @return bool
      */
-    public function hasAttribute($name){
+    public function hasAttribute($name)
+    {
         return isset($this->attributes[$name]);
     }
+
     /**
      * @return array
      */
