@@ -1,0 +1,15 @@
+<?php
+
+namespace Sagi\Policies;
+
+use Sagi\Database\PolicyInterface;
+
+class {{name}} implements PolicyInterface{
+
+
+       public function get()
+       {
+            // Do something here.
+       }
+
+}

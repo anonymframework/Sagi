@@ -49,6 +49,11 @@ class Model extends QueryBuilder
     protected $expects = [];
 
     /**
+     * @var mixed
+     */
+    protected $policy;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -112,6 +117,21 @@ class Model extends QueryBuilder
     public function isModuleUsed($module)
     {
         return in_array($module, $this->usedModules);
+    }
+
+
+    /**
+     * @param string $method
+     * @return bool
+     */
+    public function can($method = 'get')
+    {
+        if (!$this->policy instanceof PolicyInterface) {
+            return true;
+        }
+
+
+        return $this->policy->$method($this);
     }
 
     /**
@@ -284,21 +304,39 @@ class Model extends QueryBuilder
         if (isset($attributes[$this->updateKey])) {
             $this->where($this->updateKey, $attributes[$this->updateKey]);
 
-            $this->setUpdatedAt()->update($attributes);
+            if ($this->can('update')) {
+                $this->setUpdatedAt()->update($attributes);
+            } else {
+                $this->throwPolicyException('update');
+            }
         } elseif (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
             $this->setUpdatedAt()->update($attributes);
         } else {
-            $this->setCreatedAt()->create($attributes);
 
-            if (!empty($this->primaryKey)) {
-                $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
+            if ($this->can('create')) {
+                $this->setCreatedAt()->create($attributes);
+
+                if (!empty($this->primaryKey)) {
+                    $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
+                }
+
+                return $created;
+            } else {
+                $this->throwPolicyException('create');
             }
-
-            return $created;
         }
 
 
         return $this;
+    }
+
+    /**
+     * @param $method
+     * @throws \Exception
+     */
+    private function throwPolicyException($method)
+    {
+        throw new \Exception(sprintf('You cannot use %s method', $method));
     }
 
     /**
