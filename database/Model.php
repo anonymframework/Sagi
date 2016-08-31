@@ -130,10 +130,14 @@ class Model extends QueryBuilder
         $class = get_called_class();
 
         if ($this->isCacheUsed()) {
+            $this->makeCacheConnection();
+
             if ($result = $this->getCache($key = $this->prepareCacheKey())) {
                 $result = $this->setAttributes(unserialize($result));
             } else {
-                $result = $this->setCache($key, serialize($this->get()->fetchObject($class)));
+                $this->setCache($key, serialize($get = $this->get()->fetch(PDO::FETCH_ASSOC)));
+
+                $result = $this->setAttributes($get);
             }
 
 

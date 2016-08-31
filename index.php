@@ -46,6 +46,10 @@ $users->displayPagination();
 
 */
 
+
+
+$start = microtime();
 $user = new \Models\Users();
 $user->where('id', 1);
-var_dump($user->get());
+$user->one();
+echo microtime() - $start;

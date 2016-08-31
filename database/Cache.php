@@ -60,7 +60,7 @@ trait Cache
 
         $merged = array_merge($this->getWhere(), $this->getOrWhere(), $limit, $order);
 
-        return md5(serialize($this->getTable() . $merged));
+        return md5(serialize($this->getTable() . serialize($merged)));
     }
 
 
