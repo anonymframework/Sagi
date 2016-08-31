@@ -2,6 +2,7 @@
 
 namespace Sagi\Policies;
 
+use Models\{{model}}
 use Sagi\Database\PolicyInterface;
 
 class {{name}} implements PolicyInterface{
