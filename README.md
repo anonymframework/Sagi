@@ -724,3 +724,19 @@ var_dump($user->isEditor());
  $user->save();
 
 ```
+
+
+#Cache
+
+>!works only with `one` method(including `findOne`).
+
+```php
+ use Sagi\Database\Cache;
+ use Sagi\Database\Model;
+
+ class Users extends Model{
+ 
+     use Cache;
+     
+ }
+```
