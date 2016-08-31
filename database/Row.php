@@ -172,8 +172,9 @@ class Row
     /**
      * @return Command
      */
-    public function auth(){
-        return $this->string('role');
+    public function auth()
+    {
+        return $this->string('role')->defaultValue('user');
     }
 
 
@@ -220,7 +221,7 @@ class Row
         if (is_array(static::$sqlCommands)) {
             foreach (static::$sqlCommands as $command) {
                 if ($command instanceof Command) {
-                    $query .= $command->prepareCommand().",";
+                    $query .= $command->prepareCommand() . ",";
                 }
             }
         }
