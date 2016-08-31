@@ -610,14 +610,15 @@ class Users extends Model
   
   public function rules(){
       return [
-          'content' => 'required',
-           'title' => 'required|digit_min:6',
-           'category' => 'required|numeric'
-            ];
+              'content' => 'required',
+              'title' => 'required|digit_min:6',
+              'category' => 'required|numeric'
+           ];
   }
   
   public function filters(){
-    return [  'content' => 'xss',
+    return [  
+              'content' => 'xss',
               'title' => 'xss|strip_tags'
           ];
  }
