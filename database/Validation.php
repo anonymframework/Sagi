@@ -56,6 +56,8 @@ trait Validation
 
         $this->handleFilters($filters);
         $this->handleRules($rules);
+
+        return !$this->failed();
     }
 
     /**

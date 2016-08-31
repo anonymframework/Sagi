@@ -68,9 +68,16 @@ class Model extends QueryBuilder
     private function prepareRules()
     {
         if ($this->isValidationUsed()) {
-            $rules = $this->rules();
 
-            $this->setRules($rules);
+            if (method_exists($this, 'rules')) {
+                $this->setRules($this->rules());
+            }
+
+
+            if (method_exists($this, 'filters')) {
+                 $this->setFilters($this->filters());
+            }
+
         }
     }
 
