@@ -98,6 +98,14 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @return bool
+     */
+    public function isCacheUsed()
+    {
+        return $this->isModuleUsed('Sagi\Database\Cache');
+    }
+
+    /**
      * @param $module
      * @return bool
      */

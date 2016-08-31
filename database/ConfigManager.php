@@ -57,6 +57,10 @@ class ConfigManager
 
         $array = static::getConfigs();
 
+        if (isset($array[$key])) {
+            return $array[$key];
+        }
+
         foreach (explode('.', $key) as $segment) {
             foreach ($array as $value) {
                 if (array_key_exists($segment, $value = (array)$value)) {
@@ -65,6 +69,7 @@ class ConfigManager
             }
             $array = array_values($results);
         }
+
 
         return array_values($results);
     }

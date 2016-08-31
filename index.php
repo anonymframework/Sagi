@@ -46,4 +46,6 @@ $users->displayPagination();
 
 */
 
+$user = new \Models\Users();
 
+var_dump($user);
