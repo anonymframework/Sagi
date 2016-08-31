@@ -131,7 +131,7 @@ class Model extends QueryBuilder
         }
 
 
-        return $this->policy->$method($this);
+        return $this->policy->$method($this) !== false ? true : false;
     }
 
     /**
