@@ -7,7 +7,7 @@ use Sagi\Database\PolicyInterface;
 class {{name}} implements PolicyInterface{
 
 
-       public function get()
+       public function get({{$model}} {{$variable}})
        {
             // Do something here.
        }

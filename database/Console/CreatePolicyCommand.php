@@ -4,6 +4,7 @@ namespace Sagi\Database\Console;
 
 use Sagi\Database\TemplateManager;
 use Sagi\Database\MigrationManager;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,12 +23,15 @@ class CreatePolicyCommand extends Command
     {
         $file = $input->getArgument('file');
 
-        $fileName = 'policies/'. DIRECTORY_SEPARATOR . ucfirst($file) . '.php';
+        $model = ucfirst($file);
+        $name = $model . 'Policy';
+
+        $fileName = 'policies'. DIRECTORY_SEPARATOR . $name .'.php';
 
         if (!file_exists($fileName)) {
 
             if (touch($fileName)) {
-                $put = file_put_contents($fileName, $content = TemplateManager::prepareContent('policy', ['name' => MigrationManager::prepareClassName($file)]));
+                $put = file_put_contents($fileName, $content = TemplateManager::prepareContent('policy', ['name' => $name, 'model' => $model, 'variable' => $file]));
                 if ($put) {
                     $output->writeln('<info>' . $fileName . ' : policy created successfully</info>');
                 } else {
