@@ -11,6 +11,10 @@ trait Cache
 {
 
     /**
+     * @var int
+     */
+    protected $expiration = 600;
+    /**
      * @var \Memcached
      */
     private $memcache;
@@ -23,6 +27,7 @@ trait Cache
         $configs = ConfigManager::get('cache');
 
         $this->memcache = new Memcached();
+
 
         $this->memcache->addServer($configs['host'], $configs['port']);
     }
@@ -63,8 +68,18 @@ trait Cache
      * @param $key
      * @return mixed
      */
-    protected function getCache($key)
+    public function getCache($key)
     {
         return $this->memcache->get($key);
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return bool
+     */
+    public function setCache($key, $value)
+    {
+        return $this->memcache->set($key, $value, $this->expiration);
     }
 }
