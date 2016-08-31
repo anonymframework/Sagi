@@ -16,21 +16,6 @@ use Models\Auth;
  */
 trait Authorization
 {
-    /**
-     * @return mixed
-     */
-    public function getAuth()
-    {
-        return $this->hasOne(Auth::class, ['user_id', 'id']);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function checkAuthorizationTable()
-    {
-        return $this->tableExists('auth');
-    }
 
     /**
      * @return bool
@@ -45,7 +30,7 @@ trait Authorization
      */
     public function isAdmin()
     {
-        return $this->isSuperAdmin() or $this->is('admin');
+        return $this->is('admin');
     }
 
     /**
@@ -53,7 +38,15 @@ trait Authorization
      */
     public function isUser()
     {
-        return $this->isSuperAdmin() or $this->isAdmin() or $this->is('user');
+        return $this->is('user');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEditor()
+    {
+        return $this->is('editor');
     }
 
     /**
@@ -62,7 +55,11 @@ trait Authorization
      */
     public function is($role)
     {
-        return $this->getAuth()->role === $role;
+        if (!isset($this->attributes['role'])) {
+            return false;
+        }
+
+        return RoleBag::hasPermission($this->attribute('role'), $role);
     }
 
     /**

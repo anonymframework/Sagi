@@ -260,10 +260,6 @@ class Model extends QueryBuilder
 
             $created = static::set($attributes);
 
-            if ($this->isValidationUsed()) {
-                $this->createUserAuth($created->id, isset($this->role) ? $this->role : 'user');
-            }
-
             return $created;
         }
 

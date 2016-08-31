@@ -46,8 +46,13 @@ $users->displayPagination();
 
 */
 
-use Models\Users;
+$user = \Models\Users::set([
+    'username' => 'a',
+    'password' => 'b',
+    'email' => 'c',
+    'name' => 'd ',
+    'profile_image' => 'e',
+    'reset_token' => 'f'
+]);
 
-$user = Users::findOne(1);
-
-$user->save();
+var_dump($user->save());
