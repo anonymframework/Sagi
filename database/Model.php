@@ -75,7 +75,7 @@ class Model extends QueryBuilder
 
 
             if (method_exists($this, 'filters')) {
-                 $this->setFilters($this->filters());
+                $this->setFilters($this->filters());
             }
 
         }
@@ -127,9 +127,22 @@ class Model extends QueryBuilder
      */
     public function one()
     {
-        $get = $this->get();
+        $class = get_called_class();
 
-        return $get->fetchObject(get_called_class());
+        if ($this->isCacheUsed()) {
+            if ($result = $this->getCache($key = $this->prepareCacheKey())) {
+                $result = $this->setAttributes(unserialize($result));
+            } else {
+                $result = $this->setCache($key, serialize($this->get()->fetchObject($class)));
+            }
+
+
+            return $result;
+        } else {
+            $get = $this->get();
+
+            return $get->fetchObject($class);
+        }
     }
 
 

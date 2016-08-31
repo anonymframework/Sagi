@@ -47,5 +47,5 @@ $users->displayPagination();
 */
 
 $user = new \Models\Users();
-
-var_dump($user);
+$user->where('id', 1);
+var_dump($user->get());
