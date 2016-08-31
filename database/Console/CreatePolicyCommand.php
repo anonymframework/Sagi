@@ -23,15 +23,14 @@ class CreatePolicyCommand extends Command
     {
         $file = $input->getArgument('file');
 
-        $model = ucfirst($file);
-        $name = $model . 'Policy';
+        $name = $file . 'Policy';
 
-        $fileName = 'policies'. DIRECTORY_SEPARATOR . $name .'.php';
+        $fileName = 'policies' . DIRECTORY_SEPARATOR . $name . '.php';
 
         if (!file_exists($fileName)) {
 
             if (touch($fileName)) {
-                $put = file_put_contents($fileName, $content = TemplateManager::prepareContent('policy', ['name' => $name, 'model' => $model, 'variable' => $file]));
+                $put = file_put_contents($fileName, $content = TemplateManager::prepareContent('policy', ['name' => $name, 'model' => $file, 'variable' => mb_strtolower($file)]));
                 if ($put) {
                     $output->writeln('<info>' . $fileName . ' : policy created successfully</info>');
                 } else {
