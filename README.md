@@ -705,10 +705,10 @@ class Users extends Model{
    use Authorization;
 }
 
-var_dump($this->isSuperAdmin());
-var_dump($this->isAdmin());
-var_dump($this->isUser());
-var_dump($this->isEditor());
+var_dump($user->isSuperAdmin());
+var_dump($user->isAdmin());
+var_dump($user->isUser());
+var_dump($user->isEditor());
 
 
 ```
