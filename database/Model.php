@@ -230,10 +230,13 @@ class Model extends QueryBuilder
                 $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
             }
 
-            return $instance;
-        } else {
-            return $instance->where($instance->primaryKey, $conditions);
+            $instance;
+        } elseif (is_integer($conditions)) {
+            $instance->where($instance->primaryKey, $conditions);
         }
+
+        return $instance;
+
     }
 
     /**
