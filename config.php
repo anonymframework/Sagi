@@ -3,7 +3,7 @@
 return [
     'username' => 'root',
     'password' => 'sanane123',
-    'dsn' => 'mysql:host=localhost;dbname=test',
+    'dsn' => 'mysql:host=localhost;dbname=snap',
     'driver' => 'mysql',
 
     'cache' => [
