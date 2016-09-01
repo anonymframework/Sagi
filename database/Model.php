@@ -255,13 +255,17 @@ class Model extends QueryBuilder
      */
     public function where($a, $b = null, $c = null, $prepare = false)
     {
+        $name = is_array($a) ? $a[0] : $a;
+
+        $value = is_array($a) ? $a[2] : $b;
+
         if (
+
         $this->can(
-            'where',
+            $name . 'Where',
             array(
-                is_array($a) ? $a[0] : $a
-            )
-        )
+                $value
+            ))
         ) {
             parent::where($a, $b, $c, $prepare);
 
