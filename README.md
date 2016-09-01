@@ -728,8 +728,7 @@ var_dump($user->isEditor());
 
 #Cache
 
->!works only with `one` method(including `findOne`).
-
+>Makes your query 2x faster
 ```php
  use Sagi\Database\Cache;
  use Sagi\Database\Model;
