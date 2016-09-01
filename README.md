@@ -788,7 +788,44 @@ class UserPolicy implements PolicyInterface
      {
          
      }
+     
 
 }
 ```
 
+###update policy
+
+```php
+
+
+public function update(User $user)
+{
+
+}
+
+```
+
+###create policy
+
+```php
+
+
+public function create(User $user)
+{
+
+}
+
+```
+### where policy
+
+function name should be like this `columnNameWhere`
+
+```php
+
+
+public function idWhere(User $user)
+{
+
+}
+
+```
