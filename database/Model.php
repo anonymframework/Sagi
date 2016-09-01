@@ -424,6 +424,19 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @param $template
+     * @return string
+     */
+    public function display($template)
+    {
+        $view = new View($template);
+
+        $view->with('this', $this);
+
+        return $view->render();
+    }
+
+    /**
      * @return Model
      */
     public function delete()
