@@ -11,9 +11,9 @@ class RoleBag
      */
     public static $roles = [
         'superadmin' => ['admin', 'user', 'editor'],
-        'admin' => ['user', 'premium'],
-        'user' => ['premium'],
-        'premium' => []
+        'admin' => ['user', 'editor'],
+        'user' => ['editor'],
+        'editor' => []
     ];
 
     /**

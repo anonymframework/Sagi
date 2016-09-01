@@ -33,11 +33,5 @@ class Auth extends Model
         return  'auth';
     }
 
-    /**
-     * @return Model
-     */
-    public function getUser(){
-        return $this->hasOne(User::className(), ['user_id', 'id']);
-    }
 
 }
