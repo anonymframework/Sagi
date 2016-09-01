@@ -432,11 +432,11 @@ class Model extends QueryBuilder
      */
     public function display($template)
     {
-        $view = new View($template);
+        $view = View::createContentWithFile($template);
 
-        $view->with('this', $this);
+        $view->with('datas', $this);
 
-        return $view->render();
+        return $view->show();
     }
 
     /**
