@@ -387,13 +387,11 @@ class Model extends QueryBuilder
     public function save()
     {
 
-        $attributes = $this->getAttributes();
 
         if (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
 
             if ($this->can('update')) {
-                $this->setUpdatedAt()->update($attributes);
-
+                $this->setUpdatedAt()->update($this->getAttributes());
 
             } else {
                 $this->throwPolicyException('create');
@@ -401,14 +399,21 @@ class Model extends QueryBuilder
 
         } else {
             if ($this->can('create')) {
-                $this->setCreatedAt()->create($attributes);
+                $created =  $this->create($this->getAttributes());
 
-                if (!empty($this->primaryKey)) {
-                    $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
+                if ($created) {
+                    if (!empty($this->primaryKey)) {
+                        $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
+                    }else{
+                        $created = static::set($this->getAttributes());
+                    }
                 }
 
-                if ($this - $this->isAuthorizationUsed()) {
-                    $this->createUserAuth();
+
+
+
+                if ($this->isAuthorizationUsed()) {
+                    $this->createUserAuth($created->id);
                 }
 
                 return $created;
@@ -470,20 +475,9 @@ class Model extends QueryBuilder
      */
     private function setUpdatedAt()
     {
-        if ($this->hasTimestamp($updated = 'created_at')) {
-            $this->attributes[$updated] = $this->getCurrentTime();
-        }
 
-        return $this;
-    }
-
-    /**
-     * @return Model
-     */
-    private function setCreatedAt()
-    {
-        if ($this->hasTimestamp($created = 'created_at')) {
-            $this->attributes[$created] = $this->getCurrentTime();
+        if ($this->hasTimestamp($updated = 'updated_at')) {
+            $this->attributes[$updated] = date('Y-m-d H:i:s', $this->getCurrentTime());
         }
 
         return $this;
@@ -521,7 +515,7 @@ class Model extends QueryBuilder
      */
     private function hasTimestamp($value)
     {
-        return (is_array($this->timestamps)) ? array_search($value, $this->timestamps) : false;
+        return (is_array($this->timestamps)) ? in_array($value, $this->timestamps) : false;
     }
 
     /**

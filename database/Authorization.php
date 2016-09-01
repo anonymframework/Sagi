@@ -71,7 +71,7 @@ trait Authorization
      * @param $id
      * @param $role
      */
-    public function createUserAuth($id, $role)
+    public function createUserAuth($id, $role = null)
     {
         $auth = Auth::set([
             'role' => $role,
