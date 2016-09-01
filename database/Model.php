@@ -393,7 +393,7 @@ class Model extends QueryBuilder
 
         if (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
 
-            if ($this->can('create')) {
+            if ($this->can('update')) {
                 $this->setUpdatedAt()->update($attributes);
 
 
@@ -407,6 +407,10 @@ class Model extends QueryBuilder
 
                 if (!empty($this->primaryKey)) {
                     $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
+                }
+
+                if ($this-$this->isAuthorizationUsed()) {
+                    $this->createUserAuth();
                 }
 
                 return $created;

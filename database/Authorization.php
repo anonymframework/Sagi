@@ -71,11 +71,10 @@ trait Authorization
      */
     public function createUserAuth($id, $role)
     {
-        $auth = new Auth();
-
-        $auth->role = $role;
-        $auth->user_id = $id;
-
+        $auth = Auth::set([
+            'role' => $role,
+            'user_id' => $id
+        ]);
 
         $auth->save();
     }
