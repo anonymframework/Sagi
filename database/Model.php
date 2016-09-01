@@ -222,14 +222,20 @@ class Model extends QueryBuilder
 
 
     /**
-     * @param int $id
+     * @param array|int $conditions
      * @return Model
      */
-    public static function find($id)
+    public static function find($conditions = [])
     {
         $instance = static::createNewInstance();
 
-        return $instance->where($instance->primaryKey, $id);
+        if (is_array($conditions)) {
+            foreach ($conditions as $item){
+                $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
+            }
+        }else{
+            return $instance->where($instance->primaryKey, $conditions);
+        }
     }
 
     /**
