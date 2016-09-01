@@ -765,3 +765,30 @@ or
  
 
 ```
+
+###Create Policy
+
+```
+ $ php sagi policy:create User
+```
+
+```php
+
+<?php
+
+namespace Policies;
+
+use Models\User;
+use Sagi\Database\PolicyInterface;
+
+class UserPolicy implements PolicyInterface
+{
+
+     public function get(User $user)
+     {
+         
+     }
+
+}
+```
+
