@@ -20,9 +20,11 @@ trait Authorization
     /**
      * @return mixed
      */
-    public function getAuth(){
+    public function getAuth()
+    {
         return $this->hasOne(Auth::className(), ['user_id', 'id']);
     }
+
     /**
      * @return bool
      */
@@ -77,6 +79,14 @@ trait Authorization
         ]);
 
         $auth->save();
+    }
+
+    /**
+     * @return Model
+     */
+    protected function deleteAuthRow()
+    {
+        return Auth::find($this->{$this->primaryKey})->delete();
     }
 
 
