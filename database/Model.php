@@ -399,17 +399,15 @@ class Model extends QueryBuilder
 
         } else {
             if ($this->can('create')) {
-                $created =  $this->create($this->getAttributes());
+                $created = $this->create($this->getAttributes());
 
                 if ($created) {
                     if (!empty($this->primaryKey)) {
                         $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
-                    }else{
+                    } else {
                         $created = static::set($this->getAttributes());
                     }
                 }
-
-
 
 
                 if ($this->isAuthorizationUsed()) {
@@ -477,10 +475,18 @@ class Model extends QueryBuilder
     {
 
         if ($this->hasTimestamp($updated = 'updated_at')) {
-            $this->attributes[$updated] = date('Y-m-d H:i:s', $this->getCurrentTime());
+            $this->attributes[$updated] = date($this->timestampFormat(), $this->getCurrentTime());
         }
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function timestampFormat()
+    {
+        return 'Y-m-d H:i:s';
     }
 
     /**
