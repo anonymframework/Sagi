@@ -826,7 +826,7 @@ function name should be like this `columnNameWhere`
 
 public function idWhere(User $user, $value)
 {
-        return $user->id === $value;
+        return $user->id == $value;
 }
 
 ```
