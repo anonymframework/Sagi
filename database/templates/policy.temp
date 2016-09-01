@@ -1,6 +1,6 @@
 <?php
 
-namespace Sagi\Policies;
+namespace Policies;
 
 use Models\{{model}};
 use Sagi\Database\PolicyInterface;

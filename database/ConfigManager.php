@@ -51,7 +51,7 @@ class ConfigManager
      * @return array
      *
      */
-    public static function get($key)
+    public static function get($key, $default = null)
     {
         $results = [];
 
@@ -62,16 +62,14 @@ class ConfigManager
         }
 
         foreach (explode('.', $key) as $segment) {
-            foreach ($array as $value) {
-                if (array_key_exists($segment, $value = (array)$value)) {
-                    $results[] = $value[$segment];
-                }
+            if (!is_array($array) || !array_key_exists($segment, $array)) {
+                return $default;
             }
-            $array = array_values($results);
+
+            $array = $array[$segment];
         }
 
-
-        return array_values($results);
+        return $array;
     }
 
     /**

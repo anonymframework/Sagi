@@ -65,6 +65,10 @@ class Model extends QueryBuilder
 
         $this->prepareRules();
         $this->usedModules = class_uses(static::className());
+
+        if ($policy = ConfigManager::get('policies.' . get_called_class())) {
+            $this->policy(new $policy);
+        }
     }
 
     /**
@@ -144,6 +148,7 @@ class Model extends QueryBuilder
 
         array_unshift($args, $this);
 
+
         return call_user_func_array([$this->policy, $method], $args) !== false ? true : false;
     }
 
@@ -218,7 +223,7 @@ class Model extends QueryBuilder
 
     /**
      * @param int $id
-     * @return QueryBuilder
+     * @return Model
      */
     public static function find($id)
     {
