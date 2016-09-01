@@ -46,7 +46,9 @@ $users->displayPagination();
 
 */
 
+$start = microtime();
+$user = \Models\Users::findAll();
 
-$user = \Models\Users::findOne(1);
+$all = $user->all();
 
-
+echo microtime() - $start;

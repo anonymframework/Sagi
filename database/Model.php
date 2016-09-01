@@ -56,9 +56,7 @@ class Model extends QueryBuilder
     /**
      * @var array
      */
-    private $protected =
-        ['role'];
-
+    private $protected = [];
     /**
      * Model constructor.
      */
@@ -252,7 +250,7 @@ class Model extends QueryBuilder
 
     /**
      * @param null $conditions
-     * @return array
+     * @return $this
      */
     public static function findAll($conditions = null)
     {
