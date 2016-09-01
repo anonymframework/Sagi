@@ -409,7 +409,7 @@ class Model extends QueryBuilder
                     $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
                 }
 
-                if ($this-$this->isAuthorizationUsed()) {
+                if ($this - $this->isAuthorizationUsed()) {
                     $this->createUserAuth();
                 }
 
@@ -423,6 +423,9 @@ class Model extends QueryBuilder
         return $this;
     }
 
+    /**
+     * @return Model
+     */
     public function delete()
     {
         if ($this->isAuthorizationUsed()) {
