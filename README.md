@@ -785,7 +785,7 @@ class UserPolicy implements PolicyInterface
 
      public function get(User $user)
      {
-         
+         return $user->isAdmin();   
      }
      
 
@@ -799,6 +799,7 @@ class UserPolicy implements PolicyInterface
 
 public function update(User $user)
 {
+         return $user->isAdmin();   
 
 }
 
@@ -811,6 +812,7 @@ public function update(User $user)
 
 public function create(User $user)
 {
+         return $user->isAdmin();   
 
 }
 
@@ -822,9 +824,9 @@ function name should be like this `columnNameWhere`
 ```php
 
 
-public function idWhere(User $user)
+public function idWhere(User $user, $value)
 {
-
+        return $user->id === $value;
 }
 
 ```
