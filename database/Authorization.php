@@ -62,7 +62,7 @@ trait Authorization
     public function is($role)
     {
 
-        return RoleBag::hasPermission($this->auth->role, $role);
+        return RoleBag::hasPermission($this->getAuth()->role, $role);
     }
 
     /**

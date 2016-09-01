@@ -156,7 +156,28 @@ class Model extends QueryBuilder
      */
     public function all()
     {
-        return $this->get()->fetchAll(PDO::FETCH_CLASS, get_called_class());
+        $class = get_called_class();
+
+        if ($this->isCacheUsed()) {
+            $this->makeCacheConnection();
+
+            if ($result = $this->getCache($key = $this->prepareCacheKey())) {
+                $result = $this->setAttributes(unserialize($result));
+            } else {
+                $this->setCache(
+                    $key, serialize(
+                    $get = $this->get()->fetchAll(PDO::FETCH_CLASS, $class)
+                ));
+
+                $result = $this->setAttributes($get);
+            }
+
+
+            return $result;
+        } else {
+
+            return $this->get()->fetchAll(PDO::FETCH_CLASS, get_called_class());
+        }
     }
 
     /**
@@ -172,7 +193,10 @@ class Model extends QueryBuilder
             if ($result = $this->getCache($key = $this->prepareCacheKey())) {
                 $result = $this->setAttributes(unserialize($result));
             } else {
-                $this->setCache($key, serialize($get = $this->get()->fetch(PDO::FETCH_ASSOC)));
+                $this->setCache(
+                    $key,
+                    serialize($get = $this->get()->fetch(PDO::FETCH_ASSOC))
+                );
 
                 $result = $this->setAttributes($get);
             }
@@ -396,7 +420,7 @@ class Model extends QueryBuilder
      */
     private function isField($field)
     {
-        return  in_array($field, $this->fields) && !$this->isProtected($field);
+        return in_array($field, $this->fields) && !$this->isProtected($field);
     }
 
     /**
@@ -433,6 +457,24 @@ class Model extends QueryBuilder
         $fields = array_diff($this->fields, $this->expects);
 
         return json_encode($this->getAttributesByFields($fields));
+    }
+
+    /**
+     * @return string
+     */
+    public function __sleep()
+    {
+        $this->pdo = null;
+
+        return array('attributes');
+    }
+
+    /**
+     *
+     */
+    public function __wakeup()
+    {
+        $this->pdo = Connector::getConnection();
     }
 
     /**

@@ -49,8 +49,4 @@ $users->displayPagination();
 
 $user = \Models\Users::findOne(1);
 
-$user->policy(new \Sagi\Policies\UsersPolicy());
 
-$user->username  = 'superadmin';
-
-$user->save();
