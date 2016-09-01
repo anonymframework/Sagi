@@ -728,7 +728,7 @@ var_dump($user->isEditor());
 
 #Cache
 
->Makes your query 2x faster
+>uses Memcache for caching, Makes your query 2x faster
 ```php
  use Sagi\Database\Cache;
  use Sagi\Database\Model;
