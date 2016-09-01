@@ -49,16 +49,21 @@ trait Validation
         'same_digit' => '$0 alanına girilen karekter uzunluğu $1 alanıyla eşit olmalıdır'
     ];
 
+    /**
+     * @var bool
+     */
+    protected $usingAttributes = false;
 
     /**
      *
      */
-    public function validate($datas = null )
+    public function validate($datas = null)
     {
         if ($datas !== null && is_array($datas)) {
             $this->datas = $datas;
-        }else{
+        } else {
             $this->datas = $this->getAttributes();
+            $this->usingAttributes = true;
         }
 
         $rules = $this->getRules();
@@ -83,6 +88,11 @@ trait Validation
 
                 if (isset($this->datas[$index])) {
                     $filtred = call_user_func_array(array($this, $filterFunc), [$this->datas[$index]]);
+
+                    if ($this->usingAttributes) {
+                        $this->attributes[$index] = $filtred;
+                    }
+
                     $this->datas[$index] = $filtred;
                 }
             }
