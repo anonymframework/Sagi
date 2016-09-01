@@ -72,7 +72,7 @@ trait Validation
         $this->handleFilters($filters);
         $this->handleRules($rules);
 
-        return $this->failed();
+        return !$this->failed();
     }
 
     /**
@@ -221,6 +221,7 @@ trait Validation
                 $func = "handleRule" . ucfirst($name);
 
                 $return = call_user_func_array(array($this, $func), [$index, $args]);
+
 
                 if ($name === 'required' && !$return) {
                     $this->errors[$name . '.' . $index] = $this->prepareErrorMessage($index, $this->messages[$name], $args);
@@ -491,7 +492,7 @@ trait Validation
      */
     public function failed()
     {
-        return (count($this->errors) > 0);
+        return !empty($this->errors);
     }
 
     /**
