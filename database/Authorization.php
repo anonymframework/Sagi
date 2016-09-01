@@ -18,6 +18,12 @@ trait Authorization
 {
 
     /**
+     * @return mixed
+     */
+    public function getAuth(){
+        return $this->hasOne(Auth::className(), ['user_id', 'id']);
+    }
+    /**
      * @return bool
      */
     public function isSuperAdmin()
@@ -55,11 +61,8 @@ trait Authorization
      */
     public function is($role)
     {
-        if (!isset($this->attributes['role'])) {
-            return false;
-        }
 
-        return RoleBag::hasPermission($this->attribute('role'), $role);
+        return RoleBag::hasPermission($this->auth->role, $role);
     }
 
     /**
@@ -76,4 +79,6 @@ trait Authorization
 
         $auth->save();
     }
+
+
 }
