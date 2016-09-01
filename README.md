@@ -740,3 +740,28 @@ var_dump($user->isEditor());
      
  }
 ```
+
+
+#Policy
+
+you can add a policy to a model in `configs.php`
+
+```php
+
+ 'policies' => [
+    'Models\User' => 'Policies\UserPolicy'
+    ];
+   
+
+``` 
+
+or 
+
+```php
+
+ $user = User::find(1);
+ 
+ $user->policy(new UserPolicy());
+ 
+
+```
