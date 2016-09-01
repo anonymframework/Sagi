@@ -29,11 +29,6 @@ class Model extends QueryBuilder
 
 
     /**
-     * @var bool
-     */
-    protected $autoValidation = false;
-
-    /**
      * @var array
      */
     protected $fields = [];
@@ -63,8 +58,8 @@ class Model extends QueryBuilder
         $table = static::getTableName();
         $this->setTable($table);
 
-        $this->prepareRules();
         $this->usedModules = class_uses(static::className());
+        $this->prepareRules();
 
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
             $this->policy(new $policy);
@@ -76,6 +71,7 @@ class Model extends QueryBuilder
      */
     private function prepareRules()
     {
+
         if ($this->isValidationUsed()) {
 
             if (method_exists($this, 'rules')) {
@@ -230,10 +226,12 @@ class Model extends QueryBuilder
         $instance = static::createNewInstance();
 
         if (is_array($conditions)) {
-            foreach ($conditions as $item){
+            foreach ($conditions as $item) {
                 $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
             }
-        }else{
+
+            return $instance;
+        } else {
             return $instance->where($instance->primaryKey, $conditions);
         }
     }
@@ -388,12 +386,6 @@ class Model extends QueryBuilder
      */
     public function save()
     {
-        if ($this->autoValidation === true && $this->isValidationUsed()) {
-
-            if (!$this->validate()) {
-                return false;
-            }
-        }
 
         $attributes = $this->getAttributes();
 
@@ -536,6 +528,11 @@ class Model extends QueryBuilder
      * @return string
      */
     public function __toString()
+    {
+        return $this->json();
+    }
+
+    public function json()
     {
         $fields = array_diff($this->fields, $this->expects);
 

@@ -17,13 +17,17 @@ trait Validation
     /**
      * @var array
      */
-    protected $errors;
+    protected $errors = [];
 
     /**
      * @var array
      */
     protected $filtredDatas;
 
+    /**
+     * @var array
+     */
+    protected $datas;
     /**
      * @var array
      */
@@ -49,15 +53,21 @@ trait Validation
     /**
      *
      */
-    public function validate()
+    public function validate($datas = null )
     {
+        if ($datas !== null && is_array($datas)) {
+            $this->datas = $datas;
+        }else{
+            $this->datas = $this->getAttributes();
+        }
+
         $rules = $this->getRules();
         $filters = $this->getFilters();
 
         $this->handleFilters($filters);
         $this->handleRules($rules);
 
-        return !$this->failed();
+        return $this->failed();
     }
 
     /**
@@ -71,9 +81,9 @@ trait Validation
             foreach ($subFilters as $subFilter) {
                 $filterFunc = 'handleFilter' . ucfirst($subFilter);
 
-                if ($this->hasAttribute($index)) {
-                    $filtred = call_user_func_array(array($this, $filterFunc), [$this->attribute($index)]);
-                    $this->attributes[$index] = $filtred;
+                if (isset($this->datas[$index])) {
+                    $filtred = call_user_func_array(array($this, $filterFunc), [$this->datas[$index]]);
+                    $this->datas[$index] = $filtred;
                 }
             }
         }
@@ -203,6 +213,7 @@ trait Validation
                 $return = call_user_func_array(array($this, $func), [$index, $args]);
 
                 if ($name === 'required' && !$return) {
+                    $this->errors[$name . '.' . $index] = $this->prepareErrorMessage($index, $this->messages[$name], $args);
                     break;
                 }
 
@@ -247,7 +258,7 @@ trait Validation
      */
     protected function handleRuleRequired($index)
     {
-        return ($this->hasAttribute($index) && !empty($this->attributes[$index]));
+        return ($this->hasAttribute($index) && !empty($this->datas[$index]));
     }
 
     /**
@@ -258,7 +269,7 @@ trait Validation
     protected function handleRuleMin($index, $params = [])
     {
         $min = $params[0];
-        $data = $this->attributes[$index];
+        $data = $this->datas[$index];
 
         return ($data >= $min);
     }
@@ -271,7 +282,7 @@ trait Validation
     protected function handleRuleDigit_min($index, $params = [])
     {
         $min = $params[0];
-        $data = $this->attributes[$index];
+        $data = $this->datas[$index];
 
         return (strlen($data) >= $min);
     }
@@ -284,7 +295,7 @@ trait Validation
     protected function handleRuleMax($index, $params = [])
     {
         $max = $params[0];
-        $data = $this->attributes[$index];
+        $data = $this->datas[$index];
 
         return ($data < $max);
     }
@@ -297,7 +308,7 @@ trait Validation
     protected function handleRuleDigit_max($index, $params = [])
     {
         $max = $params[0];
-        $data = $this->attributes[$index];
+        $data = $this->datas[$index];
 
         return (strlen($data) < $max);
     }
@@ -311,7 +322,7 @@ trait Validation
     {
         $min = $params[0];
         $max = $params[1];
-        $data = $this->attributes[$index];
+        $data = $this->datas[$index];
 
         return (strlen($data) >= $min && strlen($data) < $max);
     }
@@ -325,7 +336,7 @@ trait Validation
     {
         $min = $params[0];
         $max = $params[1];
-        $data = $this->attributes[$index];
+        $data = $this->datas[$index];
 
         return ($data >= $min && $data < $max);
     }
@@ -336,7 +347,7 @@ trait Validation
      */
     public function handleRuleNumeric($index)
     {
-        return (is_numeric($this->attributes[$index]));
+        return (is_numeric($this->datas[$index]));
     }
 
     /**
@@ -345,7 +356,7 @@ trait Validation
      */
     public function handleRuleAlpha($index)
     {
-        return (preg_match("#^[a-zA-ZÀ-ÿ]+$#", $this->attributes[$index]) === 1);
+        return (preg_match("#^[a-zA-ZÀ-ÿ]+$#", $this->datas[$index]) === 1);
     }
 
     /**
@@ -354,7 +365,7 @@ trait Validation
      */
     public function handleRuleUrl($index)
     {
-        return filter_var($this->attributes[$index], FILTER_VALIDATE_URL);
+        return filter_var($this->datas[$index], FILTER_VALIDATE_URL);
     }
 
     /**
@@ -363,7 +374,7 @@ trait Validation
      */
     public function handleRuleEmail($index)
     {
-        return filter_var($this->attributes[$index], FILTER_VALIDATE_EMAIL);
+        return filter_var($this->datas[$index], FILTER_VALIDATE_EMAIL);
     }
 
     /**
@@ -372,7 +383,7 @@ trait Validation
      */
     public function handleRuleAlpha_numeric($index)
     {
-        return (preg_match("#^[a-zA-ZÀ-ÿ0-9]+$#", $this->attributes[$index]) === 1);
+        return (preg_match("#^[a-zA-ZÀ-ÿ0-9]+$#", $this->datas[$index]) === 1);
     }
 
     /**
@@ -384,7 +395,7 @@ trait Validation
     {
         $target = $args[0];
 
-        return ($this->attributes[$index] === $this->attributes[$target]);
+        return ($this->datas[$index] === $this->datas[$target]);
     }
 
     /**
@@ -396,7 +407,7 @@ trait Validation
     {
         $target = $args[0];
 
-        return (strlen($this->attributes[$index]) === strlen($this->attributes[$target]));
+        return (strlen($this->datas[$index]) === strlen($this->datas[$target]));
     }
 
     /**
@@ -405,7 +416,7 @@ trait Validation
      */
     public function ip($index)
     {
-        return filter_var($this->attributes[$index], FILTER_VALIDATE_IP);
+        return filter_var($this->datas[$index], FILTER_VALIDATE_IP);
     }
 
 
@@ -476,9 +487,28 @@ trait Validation
     /**
      * @return array
      */
-    public function errors()
+    public function failings()
     {
         return $this->errors;
     }
+
+    /**
+     * @return array
+     */
+    public function getDatas()
+    {
+        return $this->datas;
+    }
+
+    /**
+     * @param array $datas
+     * @return Validation
+     */
+    public function setDatas($datas)
+    {
+        $this->datas = $datas;
+        return $this;
+    }
+
 
 }
