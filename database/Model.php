@@ -133,16 +133,18 @@ class Model extends QueryBuilder
 
     /**
      * @param string $method
+     * @param array $args
      * @return bool
      */
-    public function can($method = 'get')
+    public function can($method = 'get', array $args = [])
     {
         if (!$this->policy instanceof PolicyInterface) {
             return true;
         }
 
+        array_unshift($args, $this);
 
-        return $this->policy->$method($this) !== false ? true : false;
+        return call_user_func_array([$this->policy, $method], $args) !== false ? true : false;
     }
 
     /**
@@ -245,6 +247,50 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @param $a
+     * @param null $b
+     * @param null $c
+     * @param bool $prepare
+     * @return $this
+     */
+    public function where($a, $b = null, $c = null, $prepare = false)
+    {
+        if (
+        $this->can(
+            'where',
+            array(
+                is_array($a) ? $a[0] : $a
+            )
+        )
+        ) {
+            parent::where($a, $b, $c, $prepare);
+
+            return $this;
+        } else {
+            $this->throwPolicyException('where');
+        }
+    }
+
+    /**
+     * @param $a
+     * @param null $b
+     * @param null $c
+     * @param bool $prepare
+     * @return $this
+     */
+    public function orWhere($a, $b = null, $c = null, $prepare = false)
+    {
+        if ($this->can('orWhere')) {
+            parent::orWhere($a, $b, $c, $prepare);
+
+            return $this;
+        } else {
+            $this->throwPolicyException('where');
+        }
+
+    }
+
+    /**
      * @param null $conditions
      * @return $this
      */
@@ -342,7 +388,7 @@ class Model extends QueryBuilder
                 $this->setUpdatedAt()->update($attributes);
 
 
-            }else{
+            } else {
                 $this->throwPolicyException('create');
             }
 
