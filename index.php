@@ -45,10 +45,3 @@ $users->paginate($_GET['page'], 1);
 $users->displayPagination();
 
 */
-
-$start = microtime();
-$user = \Models\Users::findAll();
-
-$all = $user->all();
-
-echo microtime() - $start;

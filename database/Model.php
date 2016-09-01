@@ -27,11 +27,6 @@ class Model extends QueryBuilder
      */
     protected $timestamps = ['created_at', 'updated_at'];
 
-    /**
-     * @var string
-     */
-    protected $updateKey = 'id';
-
 
     /**
      * @var bool
@@ -57,6 +52,7 @@ class Model extends QueryBuilder
      * @var array
      */
     private $protected = [];
+
     /**
      * Model constructor.
      */
@@ -340,18 +336,17 @@ class Model extends QueryBuilder
 
         $attributes = $this->getAttributes();
 
-        if (isset($attributes[$this->updateKey])) {
-            $this->where($this->updateKey, $attributes[$this->updateKey]);
+        if (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
 
-            if ($this->can('update')) {
+            if ($this->can('create')) {
                 $this->setUpdatedAt()->update($attributes);
-            } else {
-                $this->throwPolicyException('update');
-            }
-        } elseif (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
-            $this->setUpdatedAt()->update($attributes);
-        } else {
 
+
+            }else{
+                $this->throwPolicyException('create');
+            }
+
+        } else {
             if ($this->can('create')) {
                 $this->setCreatedAt()->create($attributes);
 
