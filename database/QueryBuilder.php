@@ -36,6 +36,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         $prepared = $this->pdo->prepare($query);
 
         $this->setArgs(array_slice($this->getArgs(), 0, count($this->getArgs())));
+
         $result = $prepared->execute($this->getArgs());
 
         if ($ex) {
@@ -101,7 +102,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
 
 
     /**
-     * @return PDOStatement
+     * @return \PDOStatement
      */
     public function get()
     {

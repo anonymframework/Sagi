@@ -159,7 +159,10 @@ class Model extends QueryBuilder
             $this->makeCacheConnection();
 
             if ($result = $this->getCache($key = $this->prepareCacheKey())) {
+
+
                 $result = $this->setAttributes(unserialize($result));
+
             } else {
                 $this->setCache(
                     $key, serialize(
@@ -169,11 +172,9 @@ class Model extends QueryBuilder
                 $result = $this->setAttributes($get);
             }
 
-
             return $result;
         } else {
-
-            return $this->get()->fetchAll(PDO::FETCH_CLASS, get_called_class());
+            return static::set($this->get()->fetchAll(PDO::FETCH_CLASS, $class));
         }
     }
 
@@ -230,7 +231,6 @@ class Model extends QueryBuilder
                 $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
             }
 
-            $instance;
         } elseif (is_integer($conditions)) {
             $instance->where($instance->primaryKey, $conditions);
         }
@@ -312,15 +312,7 @@ class Model extends QueryBuilder
      */
     public static function findAll($conditions = null)
     {
-        $instance = static::createNewInstance();
-
-        if (is_array($conditions)) {
-            foreach ($conditions as $key => $value) {
-                $instance->where($key, $value);
-            }
-        }
-
-        return $instance;
+        return static::find($conditions)->all();
     }
 
     /**

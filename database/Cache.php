@@ -14,6 +14,7 @@ trait Cache
      * @var int
      */
     protected $expiration = 600;
+
     /**
      * @var \Memcached
      */
@@ -60,6 +61,7 @@ trait Cache
 
         $merged = array_merge($this->getWhere(), $this->getOrWhere(), $limit, $order);
 
+
         return md5(serialize($this->getTable() . serialize($merged)));
     }
 
@@ -82,4 +84,6 @@ trait Cache
     {
         return $this->memcache->set($key, $value, $this->expiration);
     }
+
+
 }

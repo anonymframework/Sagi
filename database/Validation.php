@@ -60,7 +60,7 @@ trait Validation
     public function validate($datas = null)
     {
         if ($datas !== null && is_array($datas)) {
-            $this->datas = $datas;
+            $this->setDatas($datas);
         } else {
             $this->datas = $this->getAttributes();
             $this->usingAttributes = true;
@@ -269,7 +269,7 @@ trait Validation
      */
     protected function handleRuleRequired($index)
     {
-        return ($this->hasAttribute($index) && !empty($this->datas[$index]));
+        return (!empty($this->datas[$index]));
     }
 
     /**

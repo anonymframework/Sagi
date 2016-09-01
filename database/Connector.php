@@ -21,7 +21,7 @@ class Connector
             $password = isset($configs['password']) ? $configs['password'] : null;
 
             $pdo = new PDO($configs['dsn'], $username, $password);
-            $pdo->query(sprintf("SET CHARACTER SET %s", isset($configs['charset']) ? $configs['charset'] : 'utf-8'));
+            $pdo->query(sprintf("SET CHARACTER SET %s", isset($configs['charset']) ? $configs['charset'] : 'utf8'));
         } catch (PDOException $p) {
             throw new PDOException("Something went wrong, message: " . $p->getMessage());
 
