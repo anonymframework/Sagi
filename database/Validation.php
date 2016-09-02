@@ -290,7 +290,11 @@ trait Validation
      */
     protected function handleRuleDigit_min($index, $params = [])
     {
-        $min = $params[0];
+        $min = isset($params[0]) ? $params[0] : false;
+
+        if (false === $min) {
+            return false;
+        }
         $data = $this->datas[$index];
 
         return (strlen($data) >= $min);

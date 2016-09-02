@@ -2,4 +2,10 @@
 
 include "vendor/autoload.php";
 
-var_dump($_COOKIE);
+$user = new \Models\Users();
+
+var_dump($user->login([
+    'username' => 'vserifsaglam',
+    'password' => 'sanane123'
+]));
+
