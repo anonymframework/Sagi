@@ -30,13 +30,15 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      * @param bool $ex
      * @return PDOStatement
      */
-    private function returnPreparedResults($query, $ex = false)
+    private function returnPreparedResults($query, $ex = false, $reset = true)
     {
         $query = trim($query);
         $prepared = $this->pdo->prepare($query);
 
         $result = $prepared->execute($this->getArgs());
-        $this->setArgs([]);
+        if ($reset === true) {
+            $this->setArgs([]);
+        }
         if ($ex) {
             return $result;
         } else {
@@ -131,7 +133,8 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function count()
     {
-        $handled = $this->returnPreparedResults($this->prepareGetQuery())->rowCount();
+
+        $handled = $this->returnPreparedResults($this->prepareGetQuery(), false, false)->rowCount();
 
         return $handled;
     }
