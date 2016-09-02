@@ -20,7 +20,8 @@ class SesssionManager
             'value' => $value
         ]);
 
-        $value = base64_encode(CryptManager::encode($value));
+
+        $value = base64_encode(CryptManager::encode(base64_encode($value)));
 
 
         $_SESSION[$name] = $value;
@@ -47,9 +48,12 @@ class SesssionManager
             return false;
         }
 
-        $value = unserialize($_SESSION[$name]);
+        $value = base64_decode(CryptManager::decode(base64_decode($_SESSION[$name])));
 
-        if ($value['expiration'] > time()) {
+        $value = unserialize($value);
+
+
+        if ($value['expiration'] < time()) {
             static::delete($name);
 
             return false;

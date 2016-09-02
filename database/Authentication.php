@@ -1,17 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sagi
- * Date: 02.09.2016
- * Time: 14:47
- */
 
 namespace Sagi\Database;
 
+use Sagi\Database\SesssionManager;
 
 trait Authentication
 {
 
+    /**
+     * @param $datas
+     * @param bool $remember
+     * @return bool
+     * @throws ModuleException
+     */
     public function login($datas, $remember = false)
     {
         if ($configs = ConfigManager::get('authentication.login')) {
@@ -31,32 +32,34 @@ trait Authentication
                 ]);
 
                 if ($this->validate($datas)) {
+
+                    $datas[$password] = md5(sha1($datas[$password]));
+
                     $find = static::find($datas);
 
                     if ($find->exists()) {
 
                         if ($remember === true) {
                             CookieManager::set('identity', $find, 7200);
-                        }else{
-                            SessionManager::set('identity', $find);
+                        } else {
+                            SesssionManager::set('identity', $find);
                         }
+
 
                         return $find;
                     } else {
                         return false;
                     }
 
-
-
                 }
             } else {
                 throw new ModuleException('You need to use Validation module');
             }
 
-
         } else {
             return false;
         }
     }
+
 
 }
