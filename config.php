@@ -15,7 +15,7 @@ return [
         //
     ],
 
-    'PRIVATE_KEY' => sha1('YOUR KEY'),
+    'PRIVATE_KEY' => md5('YOUR KEY'),
 
     'authentication' => [
         'login' => ['username', 'password']

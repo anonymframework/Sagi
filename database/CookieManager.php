@@ -14,10 +14,10 @@ class CookieManager
     public static function set($name, $value, $time = 3600)
     {
         if (is_array($value) or is_object($value)) {
-            $value = base64_encode(serialize($value)) . '__serialized';
+            $value =serialize($value) . '__serialized';
         }
 
-        $value = CryptManager::encode($value);
+        $value =  base64_encode(CryptManager::encode($value));
 
         return setcookie($name, $value, time() + $time);
     }
@@ -41,13 +41,13 @@ class CookieManager
             return false;
         }
 
-        $value = CryptManager::decode($_COOKIE[$name]);
+        $value = CryptManager::decode(base64_decode($_COOKIE[$name]));
 
 
         if (strpos($value, $explode = "__serialized") !== false) {
             $value = explode($explode, $value)[0];
 
-            return unserialize(base64_decode($value));
+            return unserialize($value);
         }
 
         return $value;
