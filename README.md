@@ -607,22 +607,19 @@ class Users extends Model
  
  class Users extends Model{
   use Validation;
-  
-  public function rules(){
-      return [
-              'content' => 'required',
-              'title' => 'required|digit_min:6',
-              'category' => 'required|numeric'
-           ];
   }
-  
-  public function filters(){
-    return [  
-              'content' => 'xss',
-              'title' => 'xss|strip_tags'
-          ];
- }
 
+ $user = new User();
+ 
+ $user->setRules( return [
+                               'content' => 'required',
+                               'title' => 'required|digit_min:6',
+                               'category' => 'required|numeric'
+                            ]);
+ $user->setFilters( return [  
+                                 'content' => 'xss',
+                                 'title' => 'xss|strip_tags'
+                             ]);
 ```
 
 #Pagination

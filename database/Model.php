@@ -59,32 +59,12 @@ class Model extends QueryBuilder
         $this->setTable($table);
 
         $this->usedModules = class_uses(static::className());
-        $this->prepareRules();
 
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
             $this->policy(new $policy);
         }
     }
 
-    /**
-     *
-     */
-    private function prepareRules()
-    {
-
-        if ($this->isValidationUsed()) {
-
-            if (method_exists($this, 'rules')) {
-                $this->setRules($this->rules());
-            }
-
-
-            if (method_exists($this, 'filters')) {
-                $this->setFilters($this->filters());
-            }
-
-        }
-    }
 
     /**
      * @return mixed
