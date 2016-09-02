@@ -827,3 +827,24 @@ public function idWhere(User $user, $value)
 }
 
 ```
+
+#Authentication
+
+```php
+
+class User extends Model { 
+ 
+  use Authentication, Validation;
+}
+
+
+$user = new User();
+
+$login = user->login($_POST);
+
+var_dump($login); // a instance of User
+
+var_dump(Sagi\Database\Identity::user());
+
+var_dump(Sagi\Database\Identity::isLogined()); // true or false
+```
