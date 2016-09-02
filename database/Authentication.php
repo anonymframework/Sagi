@@ -39,12 +39,7 @@ trait Authentication
 
                     if ($find->exists()) {
 
-                        if ($remember === true) {
-                            CookieManager::set('identity', $find, 7200);
-                        } else {
-                            SesssionManager::set('identity', $find);
-                        }
-
+                        Identitiy::login($find, $remember);
 
                         return $find;
                     } else {

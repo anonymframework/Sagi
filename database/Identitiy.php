@@ -28,4 +28,17 @@ class Identitiy
         return static::findLogin();
     }
 
+    /**
+     * @param Model $model
+     * @param $remember
+     */
+    public static function login(Model $model, $remember){
+        if ($remember === true) {
+            CookieManager::set('identity', $model, 7200);
+        } else {
+            SesssionManager::set('identity', $model);
+        }
+
+    }
+
 }
