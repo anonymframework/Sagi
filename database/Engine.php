@@ -265,19 +265,23 @@ class Engine
         foreach ($where as $column => $item) {
 
 
+
+
             if (isset($item[3]) && $item[3] === true || $this->prepareValues === false) {
-                $query = $item[2];
+                $query = $item[1];
             } else {
                 $query = '?';
                 $args[] = $item[1];
             }
 
 
+
             if ($s !== '') {
                 $s .= "$item[2] {$column} {$item[0]} $query ";
             } else {
-                $s .= "{$column} {$item[0]} $query ";
+                $s .= " {$column} {$item[0]} $query ";
             }
+
 
         }
 
@@ -452,7 +456,7 @@ class Engine
      * @param string $column
      * @param array|callable|string $datas
      * @param bool $not
-     * @return QueryBuilder
+     * @return Model
      */
     public function in($column, $datas, $not = false)
     {
@@ -480,11 +484,12 @@ class Engine
 
         $query = '(' . $builder->prepareGetQuery() . ')';
 
+
         if ($builder->hasAs()) {
             $query .= ' AS ' . $builder->getAs();
         }
 
-        $this->setArgs(array_merge($this->getArgs(), $builder->get()));
+        $this->setArgs(array_merge($this->getArgs(), $builder->getArgs()));
 
         return $query;
     }
@@ -510,7 +515,7 @@ class Engine
     /**
      * @param string $column
      * @param array|callable|string $datas
-     * @return QueryBuilder
+     * @return Model
      */
     public function notIn($column, $datas)
     {
@@ -520,7 +525,7 @@ class Engine
     /**
      * @param string $column
      * @param array|callable|string $datas
-     * @return QueryBuilder
+     * @return Model
      */
     public function orNotIn($column, $datas)
     {
@@ -531,7 +536,7 @@ class Engine
     /**
      * @param string $column
      * @param array|callable|string $datas
-     * @return QueryBuilder
+     * @return Model
      */
     public function orIn($column, $datas, $not = false)
     {
@@ -549,7 +554,7 @@ class Engine
 
     /**
      * @param $join
-     * @return QueryBuilder
+     * @return Model
      */
     public function join($table, array $columns = [], $type = 'INNER JOIN')
     {
@@ -564,7 +569,7 @@ class Engine
      * @param null $b
      * @param null $c
      * @param bool $prepare
-     * @return $this
+     * @return Model
      */
     public function where($a, $b = null, $c = null, $prepare = false)
     {
@@ -593,7 +598,7 @@ class Engine
      * @param $a
      * @param null $b
      * @param null $c
-     * @return $this
+     * @return Model
      */
     public function orWhere($a, $b = null, $c = null, $prepare = false)
     {
@@ -640,27 +645,9 @@ class Engine
     }
 
 
-    /**
-     * @return array
-     */
-    public function getConfigs()
-    {
-        return $this->configs;
-    }
 
     /**
-     * @param array $configs
-     * @return QueryBuilder
-     */
-    public function setConfigs($configs)
-    {
-        $this->configs = $configs;
-        return $this;
-    }
-
-
-    /**
-     * @return select
+     * @return string
      */
     public function getSelect()
     {
