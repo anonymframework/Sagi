@@ -451,11 +451,12 @@ class Engine
     /**
      * @param string $column
      * @param array|callable|string $datas
+     * @param bool $not
      * @return QueryBuilder
      */
     public function in($column, $datas, $not = false)
     {
-        $query = $this->driver->prepareInQuery($datas);
+        $query = $this->prepareInQuery($datas);
 
         $in = ' IN ';
 
@@ -465,6 +466,46 @@ class Engine
 
         return $this->where([$column, $in, $query], null, null, true);
     }
+
+    /**
+     * @param $callback
+     * @return string
+     */
+    private function prepareSubQuery($callback, $instance)
+    {
+        /**
+         * @var $builder QueryBuilder
+         */
+        $builder = call_user_func_array($callback, [$instance]);
+
+        $query = '(' . $builder->prepareGetQuery() . ')';
+
+        if ($builder->hasAs()) {
+            $query .= ' AS ' . $builder->getAs();
+        }
+
+        $this->setArgs(array_merge($this->getArgs(), $builder->get()));
+
+        return $query;
+    }
+
+
+    /**
+     * @return mixeds|string
+     */
+    public function prepareInQuery($datas)
+    {
+        if (is_array($datas)) {
+            $inQuery = '[' . implode(',', $datas) . ']';
+        } elseif (is_callable($datas)) {
+            $inQuery = $this->prepareSubQuery($datas, static::createNewInstance());
+        } else {
+            $inQuery = '[' . $datas . ']';
+        }
+
+        return $inQuery;
+    }
+
 
     /**
      * @param string $column

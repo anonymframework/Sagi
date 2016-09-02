@@ -77,12 +77,28 @@ class View
     /**
      * View constructor.
      * @param string $file
+     * @param array|null $datas
      */
-    public function __construct($content)
+    public function __construct($file, $datas = null)
     {
         $this->with('this', $this);
 
-        $this->content = $content;
+        if ($datas !== null) {
+            $this->with($datas);
+        }
+
+        $this->content = static::createContentWithFile($file);
+    }
+
+
+    /**
+     * @param $file
+     * @param $datas
+     * @return static
+     */
+    public static function createInstance($file, $datas)
+    {
+        return new static($file, $datas);
     }
 
     /**
@@ -270,7 +286,7 @@ class View
         if ($path = static::findFile($file)) {
             $content = file_get_contents($path);
 
-            return new static($content);
+            return $content;
         } else {
             return false;
         }

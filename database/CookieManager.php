@@ -9,9 +9,10 @@ class CookieManager
      * @param string $name
      * @param mixed $value
      * @param int $time
+     * @param string $path
      * @return bool
      */
-    public static function set($name, $value, $time = 3600)
+    public static function set($name, $value, $time = 3600, $path = "/")
     {
         if (is_array($value) or is_object($value)) {
             $value =serialize($value) . '__serialized';
@@ -19,7 +20,7 @@ class CookieManager
 
         $value =  base64_encode(CryptManager::encode($value));
 
-        return setcookie($name, $value, time() + $time);
+        return setcookie($name, $value, time() + $time, $path);
     }
 
     /**
@@ -55,11 +56,12 @@ class CookieManager
 
     /**
      * @param string $name
+     * @param string $path
      * @return bool
      */
-    public static function delete($name)
+    public static function delete($name, $path = "/")
     {
-        return setcookie($name, '', time() - 3600);
+        return setcookie($name, '', time() - 3600, $path);
     }
 
     /**

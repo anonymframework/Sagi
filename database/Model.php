@@ -406,19 +406,6 @@ class Model extends QueryBuilder
     }
 
     /**
-     * @param $template
-     * @return string
-     */
-    public function display($template)
-    {
-        $view = View::createContentWithFile($template);
-
-        $view->with('datas', $this);
-
-        return $view->show();
-    }
-
-    /**
      * @return Model
      */
     public function delete()
