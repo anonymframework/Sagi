@@ -37,7 +37,7 @@ class CreateModelCommand extends Command
 
         $content = TemplateManager::prepareContent('model', [
             'table' => $name,
-            'name' => $name = MigrationManager::prepareClassName($table),
+            'name' => $name = MigrationManager::prepareClassName($name),
             'fields' => $this->prepareFields($fields),
             'primary' => $primary = $this->findPrimaryKey($columns),
             'timestamps' => $timestamps
