@@ -55,7 +55,7 @@ class CreateModelCommand extends Command
 
             }
         } else {
-            $output->writeln("<error>" . $class . ' already exists in ' . $path . "</error>");
+            $output->writeln("<error>" . $name . ' already exists in ' . $path . "</error>");
         }
     }
 }
