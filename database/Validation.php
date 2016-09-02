@@ -54,22 +54,23 @@ trait Validation
      */
     protected $usingAttributes = false;
 
+
     /**
-     *
+     * @param null $datas
+     * @return bool
      */
-    public function validate($datas = null)
+    public function validate(&$datas = null)
     {
         if ($datas !== null && is_array($datas)) {
             $this->setDatas($datas);
         } else {
             $this->datas = $this->getAttributes();
-            $this->usingAttributes = true;
         }
 
         $rules = $this->getRules();
         $filters = $this->getFilters();
 
-        $this->handleFilters($filters);
+        $this->handleFilters($filters, $datas);
         $this->handleRules($rules);
 
         return !$this->failed();
@@ -78,7 +79,7 @@ trait Validation
     /**
      * @param array $filters
      */
-    private function handleFilters(array $filters)
+    private function handleFilters(array $filters, &$datas)
     {
         foreach ($filters as $index => $subFilters) {
             $subFilters = explode("|", $subFilters);
@@ -87,13 +88,9 @@ trait Validation
                 $filterFunc = 'handleFilter' . ucfirst($subFilter);
 
                 if (isset($this->datas[$index])) {
-                    $filtred = call_user_func_array(array($this, $filterFunc), [$this->datas[$index]]);
+                    $filtred = call_user_func_array(array($this, $filterFunc), [$datas[$index]]);
 
-                    if ($this->usingAttributes) {
-                        $this->attributes[$index] = $filtred;
-                    }
-
-                    $this->datas[$index] = $filtred;
+                    $datas[$index] = $filtred;
                 }
             }
         }
