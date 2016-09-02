@@ -34,6 +34,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     {
         $query = trim($query);
         $prepared = $this->pdo->prepare($query);
+
         $result = $prepared->execute($this->getArgs());
         $this->setArgs([]);
         if ($ex) {

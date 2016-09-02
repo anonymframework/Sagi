@@ -58,6 +58,7 @@ class Identitiy
 
     public static function logout()
     {
+
         if (SessionManager::has('identity')) {
             SessionManager::delete('identity');
         } elseif (CookieManager::has('identity')) {
