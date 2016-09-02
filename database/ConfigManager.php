@@ -19,10 +19,14 @@ class ConfigManager
 
     public static function loadConfigs()
     {
-        static::$configFile = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "config.php";
+        $rootDir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
+
+        static::$configFile = $rootDir . "config.php";
 
         if (file_exists(static::$configFile)) {
             static::$configs = include static::$configFile;
+
+            static::set('root_dir', $rootDir);
         } else {
             throw new ConfigException(static::$configFile . 'is not exists');
         }
