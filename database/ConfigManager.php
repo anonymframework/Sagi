@@ -19,12 +19,12 @@ class ConfigManager
 
     public static function loadConfigs()
     {
-        static::$configFile = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR."config.php";
+        static::$configFile = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "config.php";
 
         if (file_exists(static::$configFile)) {
             static::$configs = include static::$configFile;
-        }else{
-            throw new ConfigException(static::$configFile. 'is not exists');
+        } else {
+            throw new ConfigException(static::$configFile . 'is not exists');
         }
     }
 
@@ -64,6 +64,30 @@ class ConfigManager
 
             $array = $array[$segment];
         }
+
+        return $array;
+    }
+
+    public static function set($key, $value)
+    {
+        $array = &static::$configs;
+
+        $keys = explode('.', $key);
+
+        while (count($keys) > 1) {
+            $key = array_shift($keys);
+
+            // If the key doesn't exist at this depth, we will just create an empty array
+            // to hold the next value, allowing us to create the arrays to hold final
+            // values at the correct depth. Then we'll keep digging into the array.
+            if (!isset($array[$key]) || !is_array($array[$key])) {
+                $array[$key] = [];
+            }
+
+            $array = &$array[$key];
+        }
+
+        $array[array_shift($keys)] = $value;
 
         return $array;
     }
