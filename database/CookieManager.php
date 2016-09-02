@@ -17,7 +17,7 @@ class CookieManager
             $value = serialize($value) . '__serialized';
         }
 
-        return setcookie($name, $value, time() + 3600);
+        return setcookie($name, $value, time() + $time);
     }
 
     /**
@@ -56,7 +56,7 @@ class CookieManager
      */
     public static function delete($name)
     {
-
+        return setcookie($name, '', time() - 3600);
     }
 
     /**
@@ -64,6 +64,8 @@ class CookieManager
      */
     public static function flush()
     {
-
+        foreach ($_COOKIE as $item => $value) {
+            static::delete($item);
+        }
     }
 }
