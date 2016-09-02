@@ -331,6 +331,14 @@ class User extends Model{
  protected $expects = ['password'];
  ```
  
+ ####json
+ 
+ ```php
+ 
+ protected $json = ['datas'];
+ 
+ ```
+ 
  ####create
  
  

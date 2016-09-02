@@ -49,6 +49,11 @@ class Model extends QueryBuilder
     protected $protected = [];
 
     /**
+     * @var array
+     */
+    protected $json;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -562,6 +567,11 @@ class Model extends QueryBuilder
     function __set($name, $value)
     {
         if ($this->isField($name)) {
+
+            if (isset($this->json[$name])) {
+                $value = json_decode($value);
+            }
+
             $this->attributes[$name] = $value;
         } else {
             $this->$name = $value;
