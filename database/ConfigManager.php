@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sagi
- * Date: 25.08.2016
- * Time: 19:34
- */
 
 namespace Sagi\Database;
 
@@ -20,11 +14,13 @@ class ConfigManager
     /**
      * @var string
      */
-    public static $configFile = "config.php";
+    public static $configFile;
 
 
     public static function loadConfigs()
     {
+        static::$configFile = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR."config.php";
+
         if (file_exists(static::$configFile)) {
             static::$configs = include static::$configFile;
         }else{

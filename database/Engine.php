@@ -13,10 +13,6 @@ use Sagi\Database\Drivers\MysqlDriver;
  */
 class Engine
 {
-    /**
-     * @var array
-     */
-    private $configs;
 
     /**
      * @var PDO
@@ -114,12 +110,23 @@ class Engine
     public function __construct()
     {
 
+        $this->prepareDriver();
 
+
+        Connector::madeConnection();
+        $this->pdo = Connector::getConnection();
+
+    }
+
+
+    protected function prepareDriver()
+    {
         if ($driver = ConfigManager::get('driver')) {
             if (isset($this->drivers[$driver])) {
                 $driver = $this->drivers[$driver];
 
                 $this->driver = new $driver;
+
             } else {
                 throw new Exception(sprintf('%s driver not found', $driver));
             }
@@ -127,11 +134,6 @@ class Engine
         } else {
             throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
         }
-
-
-        Connector::madeConnection();
-        $this->pdo = Connector::getConnection();
-
     }
 
 
@@ -817,5 +819,12 @@ class Engine
     {
         return $this->order;
     }
+    /**
+     * @return string
+     */
+    public function __sleep()
+    {
 
+        return ['driver', 'where', 'orWhere', 'limit', 'order', 'select', 'groupBy', 'having', 'table', 'join'];
+    }
 }

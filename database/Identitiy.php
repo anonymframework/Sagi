@@ -10,7 +10,7 @@ class Identitiy
 {
 
     protected static function findLogin(){
-        return SesssionManager::get('identity') ?: CookieManager::get('identity');
+        return SessionManager::get('identity') ?: CookieManager::get('identity');
     }
 
     /**
@@ -36,7 +36,7 @@ class Identitiy
         if ($remember === true) {
             CookieManager::set('identity', $model, 7200);
         } else {
-            SesssionManager::set('identity', $model);
+            SessionManager::set('identity', $model);
         }
 
     }

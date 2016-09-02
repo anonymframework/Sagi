@@ -2,7 +2,6 @@
 
 namespace Sagi\Database;
 
-use Sagi\Database\SesssionManager;
 
 trait Authentication
 {
@@ -57,6 +56,14 @@ trait Authentication
 
         } else {
             return false;
+        }
+    }
+
+
+    public function logout()
+    {
+        if (SessionManager::has('identity')) {
+            SessionManager::delete('identity');
         }
     }
 

@@ -55,6 +55,7 @@ class Model extends QueryBuilder
     {
 
         parent::__construct();
+
         $table = static::getTableName();
         $this->setTable($table);
 
@@ -519,9 +520,9 @@ class Model extends QueryBuilder
      */
     public function __sleep()
     {
-        $this->pdo = null;
+        $arr = parent::__sleep();
 
-        return array('attributes');
+        return array_merge($arr, 'attributes');
     }
 
     /**

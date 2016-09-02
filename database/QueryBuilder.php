@@ -261,15 +261,16 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
              throw new \PDOException('your query is failed');
         }
 
-         $data = $first->$name;
 
 
-        if (empty($data)) {
+
+        if (!isset($first->$name)) {
             throw new \Exception(sprintf('%s not found in %s', $name, get_called_class()));
         }
 
-        return $data;
+        return $first->$name;
     }
+
 
     /**
      * @param $name
