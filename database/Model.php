@@ -51,7 +51,7 @@ class Model extends QueryBuilder
     /**
      * @var array
      */
-    protected $json;
+    protected $json = [];
 
     /**
      * Model constructor.
@@ -568,7 +568,7 @@ class Model extends QueryBuilder
     {
         if ($this->isField($name)) {
 
-            if (isset($this->json[$name])) {
+            if (in_array($name, $this->json)) {
                 $value = json_decode($value);
             }
 
