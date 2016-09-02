@@ -12,6 +12,6 @@ return [
     ],
 
     'policies' => [
-        'Models\Users' => 'Policies\UsersPolicy'
+        //
     ]
 ];

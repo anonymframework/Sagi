@@ -7,12 +7,12 @@ trait Validation
     /**
      * @var array
      */
-    protected $rules;
+    protected $rules = [];
 
     /**
      * @var array
      */
-    protected $filters;
+    protected $filters = [];
 
     /**
      * @var array
