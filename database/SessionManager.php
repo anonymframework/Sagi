@@ -3,7 +3,7 @@
 namespace Sagi\Database;
 
 
-class SesssionManager
+class SessionManager
 {
 
     protected static $started = false;
@@ -11,6 +11,10 @@ class SesssionManager
 
     public static function set($name, $value, $time = 2628000)
     {
+        if (!static::$started) {
+            static::sessionStart();
+        }
+
         if (is_array($value) or is_object($value)) {
             $value = serialize($value) . '__serialized';
         }
@@ -35,6 +39,10 @@ class SesssionManager
      */
     public static function has($name)
     {
+        if (!static::$started) {
+            static::sessionStart();
+        }
+
         return isset($_SESSION[$name]);
     }
 
@@ -44,6 +52,10 @@ class SesssionManager
      */
     public static function get($name)
     {
+        if (!static::$started) {
+            static::sessionStart();
+        }
+
         if (!static::has($name)) {
             return false;
         }
@@ -74,6 +86,10 @@ class SesssionManager
      */
     public static function delete($name)
     {
+        if (!static::$started) {
+            static::sessionStart();
+        }
+
         unset($_SESSION[$name]);
 
         return true;
@@ -84,7 +100,21 @@ class SesssionManager
      */
     public static function flush()
     {
+        if (!static::$started) {
+            static::sessionStart();
+        }
+
         $_SESSION = [];
+    }
+
+    /**
+     *
+     */
+    protected static function sessionStart()
+    {
+        session_start();
+
+        static::$started = true;
     }
 
 }

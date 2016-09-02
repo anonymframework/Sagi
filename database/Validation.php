@@ -50,12 +50,6 @@ trait Validation
     ];
 
     /**
-     * @var bool
-     */
-    protected $usingAttributes = false;
-
-
-    /**
      * @param null $datas
      * @return bool
      */

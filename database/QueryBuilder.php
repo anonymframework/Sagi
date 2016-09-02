@@ -262,12 +262,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         }
 
 
-
-
-        if (!isset($first->$name)) {
-            throw new \Exception(sprintf('%s not found in %s', $name, get_called_class()));
-        }
-
         return $first->$name;
     }
 

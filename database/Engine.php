@@ -99,7 +99,7 @@ class Engine
     /**
      * @var Driver
      */
-    private $driver;
+    protected $driver;
 
     /**
      * Engine constructor.
@@ -819,12 +819,13 @@ class Engine
     {
         return $this->order;
     }
+
     /**
-     * @return string
+     * @return array
      */
     public function __sleep()
     {
-
-        return ['driver', 'where', 'orWhere', 'limit', 'order', 'select', 'groupBy', 'having', 'table', 'join'];
+        return ['driver'];
     }
+
 }

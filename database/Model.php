@@ -46,7 +46,7 @@ class Model extends QueryBuilder
     /**
      * @var array
      */
-    private $protected = [];
+    protected $protected = [];
 
     /**
      * Model constructor.
@@ -522,7 +522,7 @@ class Model extends QueryBuilder
     {
         $arr = parent::__sleep();
 
-        return array_merge($arr, 'attributes');
+        return array_merge($arr, ['table', 'attributes', 'primaryKey', 'usedModules', 'policy', 'protected', 'expects', 'fields']);
     }
 
     /**
@@ -531,6 +531,7 @@ class Model extends QueryBuilder
     public function __wakeup()
     {
         $this->pdo = Connector::getConnection();
+        $this->prepareDriver();
     }
 
     /**

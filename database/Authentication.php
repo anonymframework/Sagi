@@ -39,12 +39,15 @@ trait Authentication
 
                 if ($this->validate($datas)) {
                     $datas[$password] = md5(sha1($datas[$password]));
+
                     $find = static::find()
                         ->where($username, $datas[$username])
                         ->where($password, $datas[$password]);
 
                     if ($find->exists()) {
-                        Identitiy::login($find, $remember);
+
+                        Identitiy::login($find->one(), $remember);
+
                         return $find;
                     } else {
                         return false;
@@ -60,12 +63,7 @@ trait Authentication
     }
 
 
-    public function logout()
-    {
-        if (SessionManager::has('identity')) {
-            SessionManager::delete('identity');
-        }
-    }
+
 
 
 }
