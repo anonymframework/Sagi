@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
+use Sagi\Database\MigrationManager;
 
 class CreateModelCommand extends Command
 {
@@ -35,24 +36,22 @@ class CreateModelCommand extends Command
         $timestamps = $this->findTimestamps($fields);
 
         $content = TemplateManager::prepareContent('model', [
-            'table' => $table,
+            'table' => $name,
             'name' => $name = MigrationManager::prepareClassName($table),
             'fields' => $this->prepareFields($fields),
             'primary' => $primary = $this->findPrimaryKey($columns),
             'timestamps' => $timestamps
         ]);
 
-        $class = ucfirst($name);
 
-
-        $path = 'models/' . $class . '.php';
+        $path = 'models/' . $name . '.php';
 
 
         if (!file_exists($path)) {
             if (file_put_contents($path, $content)) {
-                $output->writeln("<info>" . $class . ' created successfully in ' . $path . "</info>");
+                $output->writeln("<info>" . $name . ' created successfully in ' . $path . "</info>");
             } else {
-                $output->writeln("<error>" . $class . ' couldnt create in ' . $path . "</error>");
+                $output->writeln("<error>" . $name . ' couldnt create in ' . $path . "</error>");
 
             }
         } else {
