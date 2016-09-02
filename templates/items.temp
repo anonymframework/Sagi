@@ -1,5 +1,5 @@
 @foreach($datas as $data)
-<div class="col-xs-12 col-md-6 col-lg-2 item">
+<div class="col-xs-12 col-md-6 col-lg-2 item" data-id="{{ $data->id }}">
     <div class="panel panel-default">
         <div class="cover overlay hover cover-image-full">
             <img src="img/snapcode.png" alt="music" width="100%">
@@ -8,7 +8,7 @@
             <h6 class="text-center"><b>{{ $data->username }} </b></h6>
 
             <ul class="list-group">
-                <li class="list-group-item"><i class="glyphicon glyphicon-asterisk"></i>Erkek</li>
+                <li class="list-group-item"><i class="glyphicon glyphicon-asterisk"></i>{{ $data->gender == 0 ? 'Erkek' : 'Kadın' }}</li>
                 <li class="list-group-item"><i class="glyphicon glyphicon-globe"></i>Bilgi Yok</li>
 
                 <li class="list-group-item" style="height:50px !important;"><a href="https://snap-deepseafish.appspot.com/deeplink/add/card/{{ $data->username }}" download="myimage" class="btn btn-primary btn-stroke btn-xs pull-left">İndir</a></li>

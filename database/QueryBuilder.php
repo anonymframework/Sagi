@@ -17,6 +17,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public $attributes;
 
+
     /**
      * @return array
      */
@@ -36,6 +37,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         $prepared = $this->pdo->prepare($query);
 
         $result = $prepared->execute($this->getArgs());
+
         if ($reset === true) {
             $this->setArgs([]);
         }
@@ -133,10 +135,17 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function count()
     {
-
         $handled = $this->returnPreparedResults($this->prepareGetQuery(), false, false)->rowCount();
 
         return $handled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function exists()
+    {
+        return ($this->count() > 0);
     }
 
     /**
@@ -173,13 +182,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         return $this->attributes[$name];
     }
 
-    /**
-     * @return bool
-     */
-    public function exists()
-    {
-        return ($this->count() > 0);
-    }
 
 
     public function rewind()

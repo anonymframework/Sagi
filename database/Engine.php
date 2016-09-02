@@ -102,6 +102,11 @@ class Engine
     protected $driver;
 
     /**
+     * @var string
+     */
+    private $query;
+
+    /**
      * Engine constructor.
      * @param array $configs
      * @param string $table
@@ -219,10 +224,14 @@ class Engine
     }
 
     /**
-     * @return mixeds
+     * @return string
      */
     public function prepareGetQuery()
     {
+        if ($this->query) {
+            return $this->query;
+        }
+
         $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
 
         $handled = $this->handlePattern($pattern, [
@@ -265,15 +274,12 @@ class Engine
         foreach ($where as $column => $item) {
 
 
-
-
             if (isset($item[3]) && $item[3] === true || $this->prepareValues === false) {
                 $query = $item[1];
             } else {
                 $query = '?';
                 $args[] = $item[1];
             }
-
 
 
             if ($s !== '') {
@@ -643,7 +649,6 @@ class Engine
             'args' => $arr,
         ];
     }
-
 
 
     /**
