@@ -16,7 +16,7 @@ class CreateModelsCommand extends Command
 
     protected function configure()
     {
-        $this->setName('create:models')->setDescription('auto create model files');
+        $this->setName('models:all')->setDescription('auto create model files');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
