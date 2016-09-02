@@ -58,4 +58,49 @@ class CreateModelCommand extends Command
             $output->writeln("<error>" . $name . ' already exists in ' . $path . "</error>");
         }
     }
+
+    /**
+     * @param $fields
+     * @return array|bool
+     */
+    private function findTimestamps($fields)
+    {
+        $timestamps = [];
+
+        if (in_array('created_at', $fields)) {
+            $timestamps[] = "'created_at'";
+        }
+
+        if (in_array('updated_at', $fields)) {
+            $timestamps[] = "'updated_at'";
+        }
+
+        return empty($timestamps) ? 'false' : '[' . join(',', $timestamps) . ']';
+    }
+
+    private function prepareFields($fields)
+    {
+        $fields = array_map(function ($value) {
+            return "'$value'";
+        }, $fields);
+
+
+        return join(',', $fields);
+    }
+
+    /**
+     * @param $array
+     * @return mixed
+     */
+    private function findPrimaryKey($array)
+    {
+        foreach ($array as $item) {
+            if ($item['Key'] === 'PRI') {
+                return "'{$item['Field']}'";
+
+            }
+        }
+
+        return "'id'";
+    }
 }
