@@ -32,7 +32,17 @@ trait Authentication
 
                 if ($this->validate($datas)) {
 
+                    $find = static::find($datas);
+
+                    if ($find->exists()) {
+                        return $find;
+                    } else {
+                        return false;
+                    }
+
                 }
+            } else {
+                throw new ModuleException('You need to use Validation module');
             }
 
 
