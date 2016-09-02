@@ -14,8 +14,10 @@ class Connector
     /**
      * @param $configs
      */
-    public static function madeConnection($configs)
+    public static function madeConnection()
     {
+        $configs = ConfigManager::getConfigs();
+
         try {
             $username = isset($configs['username']) ? $configs['username'] : null;
             $password = isset($configs['password']) ? $configs['password'] : null;

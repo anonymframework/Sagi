@@ -113,10 +113,9 @@ class Engine
      */
     public function __construct()
     {
-        $configs = ConfigManager::getConfigs();
 
-        if (isset($configs['driver'])) {
-            $driver = $configs['driver'];
+
+        if ($driver = ConfigManager::get('driver')) {
             if (isset($this->drivers[$driver])) {
                 $driver = $this->drivers[$driver];
 
@@ -130,7 +129,7 @@ class Engine
         }
 
 
-        Connector::madeConnection($configs);
+        Connector::madeConnection();
         $this->pdo = Connector::getConnection();
 
     }
@@ -270,8 +269,6 @@ class Engine
                 $query = '?';
                 $args[] = $item[1];
             }
-
-
 
 
             if ($s !== '') {
