@@ -9,10 +9,10 @@ class SesssionManager
     protected static $started = false;
 
 
-    public static function set($name, $value, $time  = 2628000)
+    public static function set($name, $value, $time = 2628000)
     {
         if (is_array($value) or is_object($value)) {
-            $value =serialize($value) . '__serialized';
+            $value = serialize($value) . '__serialized';
         }
 
         $value = serialize([
@@ -20,7 +20,7 @@ class SesssionManager
             'value' => $value
         ]);
 
-        $value =  base64_encode(CryptManager::encode($value));
+        $value = base64_encode(CryptManager::encode($value));
 
 
         $_SESSION[$name] = $value;
@@ -34,7 +34,7 @@ class SesssionManager
      */
     public static function has($name)
     {
-        return isset($_COOKIE[$name]);
+        return isset($_SESSION[$name]);
     }
 
     /**
@@ -49,7 +49,7 @@ class SesssionManager
 
         $value = unserialize($_SESSION[$name]);
 
-        if($value['expiration'] > time()){
+        if ($value['expiration'] > time()) {
             static::delete($name);
 
             return false;
@@ -62,6 +62,25 @@ class SesssionManager
         }
 
         return $value['value'];
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public static function delete($name)
+    {
+        unset($_SESSION[$name]);
+
+        return true;
+    }
+
+    /**
+     * @return void
+     */
+    public static function flush()
+    {
+        $_SESSION = [];
     }
 
 }
