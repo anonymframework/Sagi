@@ -13,5 +13,11 @@ return [
 
     'policies' => [
         //
+    ],
+
+    'PRIVATE_KEY' => sha1('YOUR KEY'),
+
+    'authentication' => [
+        'login' => ['username', 'password']
     ]
 ];

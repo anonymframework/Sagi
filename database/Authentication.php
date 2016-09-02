@@ -12,7 +12,7 @@ namespace Sagi\Database;
 trait Authentication
 {
 
-    public function login($datas)
+    public function login($datas, $remember = false)
     {
         if ($configs = ConfigManager::get('authentication.login')) {
 
@@ -35,7 +35,11 @@ trait Authentication
 
                     if ($find->exists()) {
 
-
+                        if ($remember === true) {
+                            CookieManager::set('identity', $find, 7200);
+                        }else{
+                            SessionManager::set('identity', $find);
+                        }
 
                         return $find;
                     } else {
