@@ -32,7 +32,7 @@ class Identitiy
      * @param Model $model
      * @param $remember
      */
-    public static function login(Model $model, $remember){
+    public static function login(Model $model, $remember = false){
         if ($remember === true) {
             CookieManager::set('identity', $model, 7200);
         } else {

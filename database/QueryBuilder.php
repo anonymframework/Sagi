@@ -35,7 +35,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         $query = trim($query);
         $prepared = $this->pdo->prepare($query);
 
-
         $result = $prepared->execute($this->getArgs());
         $this->setArgs([]);
         if ($ex) {
@@ -256,11 +255,14 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     {
         $first = $this->first();
 
-        if (!is_object($first)) {
+        if (is_array($first)) {
             $first = (object) $first;
-         }
+         }elseif(false === $first){
+             throw new \PDOException('your query is failed');
+        }
 
          $data = $first->$name;
+
 
         if (empty($data)) {
             throw new \Exception(sprintf('%s not found in %s', $name, get_called_class()));
