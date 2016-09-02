@@ -87,6 +87,8 @@ class View
             $this->with($datas);
         }
 
+        static::$templatePath = ConfigManager::get('root_dir') . static::$templatePath;
+
         $this->content = static::createContentWithFile($file);
     }
 
