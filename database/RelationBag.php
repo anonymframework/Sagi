@@ -112,7 +112,7 @@ class RelationBag
         $model->where($propeties[0], $our->$col);
 
         if ($type === 'one') {
-            $model = $model->limit(1)->one();
+            $model = $model->limit(1);
         } else {
             $model = $model->all();
         }

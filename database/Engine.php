@@ -261,24 +261,29 @@ class Engine
 
         $args = [];
         $s = '';
-        foreach ($where as $item) {
+        foreach ($where as $column => $item) {
 
-            if (isset($item[4]) && $item[4] === true || $this->prepareValues === false) {
+
+            if (isset($item[3]) && $item[3] === true || $this->prepareValues === false) {
                 $query = $item[2];
             } else {
                 $query = '?';
-                $args[] = $item[2];
+                $args[] = $item[1];
             }
 
+
+
+
             if ($s !== '') {
-                $s .= "$item[3] {$item[0]} {$item[1]} $query ";
+                $s .= "$item[2] {$column} {$item[0]} $query ";
             } else {
-                $s .= "{$item[0]} {$item[1]} $query ";
+                $s .= "{$column} {$item[0]} $query ";
             }
+
         }
 
 
-        $s = rtrim($s, $item[3]);
+        $s = rtrim($s, $item[2]);
 
         $this->args = array_merge($this->args, $args);
 
@@ -530,11 +535,15 @@ class Engine
                 $a[] = true;
             }
 
-            $this->where[] = $a;
+            $column = $a[0];
+
+            array_shift($a);
+
+            $this->where[$column] = $a;
         } elseif (is_null($c)) {
-            $this->where[] = [$a, '=', $b, 'AND'];
+            $this->where[$a] = ['=', $b, 'AND'];
         } else {
-            $this->where[] = [$a, $b, $c, 'AND'];
+            $this->where[$a] = [$b, $c, 'AND'];
         }
 
         return $this;
@@ -555,12 +564,15 @@ class Engine
                 $a[] = true;
             }
 
+            $column = $a[0];
 
-            $this->where[] = $a;
+            array_shift($a);
+
+            $this->where[$column] = $a;
         } elseif (is_null($c)) {
-            $this->where[] = [$a, '=', $b, 'OR'];
+            $this->where[$a] = ['=', $b, 'OR'];
         } else {
-            $this->where[] = [$a, $b, $c, 'OR'];
+            $this->where[$a] = [$b, $c, 'OR'];
         }
 
         return $this;

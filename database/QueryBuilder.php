@@ -35,10 +35,8 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         $query = trim($query);
         $prepared = $this->pdo->prepare($query);
 
-        $this->setArgs(array_slice($this->getArgs(), 0, count($this->getArgs())));
-
         $result = $prepared->execute($this->getArgs());
-
+        $this->setArgs([]);
         if ($ex) {
             return $result;
         } else {
@@ -62,7 +60,11 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function first()
     {
-        return $this->attributes;
+        if (!empty($this->attributes)) {
+            return $this->attributes;
+        }
+
+        return $this->one();
     }
 
 
@@ -244,13 +246,26 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     }
 
 
+
     /**
      * @param $name
      * @return mixed
      */
     public function __get($name)
     {
-        return $this->attributes[$name];
+        $first = $this->first();
+
+        if (!is_object($first)) {
+            $first = (object) $first;
+         }
+
+         $data = $first->$name;
+
+        if (empty($data)) {
+            throw new \Exception(sprintf('%s not found in %s', $name, get_called_class()));
+        }
+
+        return $data;
     }
 
     /**
