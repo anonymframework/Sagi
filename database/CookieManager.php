@@ -9,10 +9,15 @@ class CookieManager
      * @param string $name
      * @param mixed $value
      * @param int $time
+     * @return bool
      */
     public static function set($name, $value, $time = 3600)
     {
+        if (is_array($value) or is_object($value)) {
+            $value = serialize($value) . '__serialized';
+        }
 
+        return setcookie($name, $value, time() + 3600);
     }
 
     /**
@@ -21,7 +26,7 @@ class CookieManager
      */
     public static function has($name)
     {
-
+        return isset($_COOKIE[$name]);
     }
 
     /**
@@ -30,7 +35,19 @@ class CookieManager
      */
     public static function get($name)
     {
+        if (!static::has($name)) {
+            return false;
+        }
 
+        $value = $_COOKIE[$name];
+
+        if (strpos($value, $explode = "__serialized") !== false) {
+            $value = explode($explode, $value)[0];
+
+            return unserialize($value);
+        }
+
+        return $value;
     }
 
     /**
