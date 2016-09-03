@@ -269,6 +269,13 @@ class Engine
 
             $this->checkWhereItem($item);
 
+            if (is_callable($item[1]) || is_array($item[1])) {
+                $prepared = $this->prepareInQuery($item[1]);
+
+                $item[1] = $prepared[0];
+                $args = array_merge($args, $prepared[1]);
+            }
+
             if (isset($item[3]) && $item[3] === true || $this->prepareValues === false) {
                 $query = $item[1];
             } else {
@@ -276,21 +283,55 @@ class Engine
                 $args[] = $item[1];
             }
 
-
             if ($s !== '') {
                 $s .= "$item[2] {$column} {$item[0]} $query ";
             } else {
                 $s .= " {$column} {$item[0]} $query ";
             }
-
-
         }
 
         $s = rtrim($s, $item[2]);
 
         $this->args = array_merge($this->args, $args);
 
+
         return $s;
+    }
+
+    /**
+     * @param $callback
+     * @return string
+     */
+    private function prepareSubQuery($callback, $instance)
+    {
+        /**
+         * @var $builder QueryBuilder
+         */
+        $builder = call_user_func_array($callback, [$instance]);
+
+        $query = '(' . $builder->prepareGetQuery() . ')';
+
+
+        if ($builder->hasAs()) {
+            $query .= ' AS ' . $builder->getAs();
+        }
+
+        return [$query, $builder->getArgs()];
+    }
+
+
+    /**
+     * @return mixeds|string
+     */
+    public function prepareInQuery($datas)
+    {
+        if (is_array($datas)) {
+            $inQuery = '[' . implode(',', $datas) . ']';
+        } elseif (is_callable($datas)) {
+            $inQuery = $this->prepareSubQuery($datas, static::createNewInstance());
+        }
+
+        return is_array($inQuery) ? $inQuery : [$inQuery, []];
     }
 
     /**
@@ -471,55 +512,13 @@ class Engine
      */
     public function in($column, $datas, $not = false)
     {
-        $query = $this->prepareInQuery($datas);
-
         $in = ' IN ';
 
         if ($not) {
             $in = ' NOT' . $in;
         }
 
-        return $this->where([$column, $in, $query], null, null, true);
-    }
-
-    /**
-     * @param $callback
-     * @return string
-     */
-    private function prepareSubQuery($callback, $instance)
-    {
-        /**
-         * @var $builder QueryBuilder
-         */
-        $builder = call_user_func_array($callback, [$instance]);
-
-        $query = '(' . $builder->prepareGetQuery() . ')';
-
-
-        if ($builder->hasAs()) {
-            $query .= ' AS ' . $builder->getAs();
-        }
-
-        $this->setArgs(array_merge($this->getArgs(), $builder->getArgs()));
-
-        return $query;
-    }
-
-
-    /**
-     * @return mixeds|string
-     */
-    public function prepareInQuery($datas)
-    {
-        if (is_array($datas)) {
-            $inQuery = '[' . implode(',', $datas) . ']';
-        } elseif (is_callable($datas)) {
-            $inQuery = $this->prepareSubQuery($datas, static::createNewInstance());
-        } else {
-            $inQuery = '[' . $datas . ']';
-        }
-
-        return $inQuery;
+        return $this->where([$column, $in, $datas], null, null, true);
     }
 
 
@@ -551,15 +550,13 @@ class Engine
      */
     public function orIn($column, $datas, $not = false)
     {
-        $query = $this->prepareInQuery($datas);
-
         $in = ' IN ';
 
         if ($not) {
             $in = ' NOT' . $in;
         }
 
-        return $this->orWhere([$column, $in, $query], null, null, true);
+        return $this->orWhere([$column, $in, $datas], null, null, true);
     }
 
 

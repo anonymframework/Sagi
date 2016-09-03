@@ -7,6 +7,8 @@ include "header.php";
 
 </div>
 
+<div class="messages" style="display: none;"></div>
+
 <div id="content" class="col-lg-12 col-md-12 col-xs-12">
 
 </div>
