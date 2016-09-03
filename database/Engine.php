@@ -267,6 +267,7 @@ class Engine
         $s = '';
         foreach ($where as $column => $item) {
 
+            $this->checkWhereItem($item);
 
             if (isset($item[3]) && $item[3] === true || $this->prepareValues === false) {
                 $query = $item[1];
@@ -291,6 +292,17 @@ class Engine
         $this->args = array_merge($this->args, $args);
 
         return $s;
+    }
+
+    /**
+     * @param $item
+     * @throws WhereException
+     */
+    private function checkWhereItem($item)
+    {
+        if (!isset($item[0]) || !isset($item[1]) || !isset($item[2])) {
+            throw new WhereException('Your query need 3 items');
+        }
     }
 
     /**
@@ -655,7 +667,7 @@ class Engine
 
     /**
      * @param select $select
-     * @return QueryBuilder
+     * @return Model
      */
     public function setSelect($select)
     {
@@ -673,7 +685,7 @@ class Engine
 
     /**
      * @param string $table
-     * @return QueryBuilder
+     * @return Model
      */
     public function setTable($table)
     {
@@ -691,7 +703,7 @@ class Engine
 
     /**
      * @param array $limit
-     * @return QueryBuilder
+     * @return Model
      */
     public function setLimit($limit)
     {
@@ -709,7 +721,7 @@ class Engine
 
     /**
      * @param string $groupBy
-     * @return QueryBuilder
+     * @return Model
      */
     public function setGroupBy($groupBy)
     {
@@ -727,7 +739,7 @@ class Engine
 
     /**
      * @param array $where
-     * @return QueryBuilder
+     * @return Model
      */
     public function setWhere($where)
     {
@@ -745,6 +757,7 @@ class Engine
 
     /**
      * @param string $having
+     * @return Model
      */
     public function setHaving($having)
     {
@@ -754,7 +767,7 @@ class Engine
 
     /**
      * @param array $order
-     * @return QueryBuilder
+     * @return Model
      */
     public function setOrder($order)
     {
