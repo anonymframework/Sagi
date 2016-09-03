@@ -286,7 +286,6 @@ class Engine
 
         }
 
-
         $s = rtrim($s, $item[2]);
 
         $this->args = array_merge($this->args, $args);

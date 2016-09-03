@@ -47,8 +47,8 @@ trait Validation
         'alpha_numeric' => '$0 alanına girilen değer a-zA-Z0-9 formatına uygun olmalıdır.',
         'match_with' => '$0 alanına girilen değer $1 alanıyla uygun olmalıdır',
         'same_digit' => '$0 alanına girilen karekter uzunluğu $1 alanıyla eşit olmalıdır',
-        'exists_in_table' => '$0 hatalı',
-        'not_exists_in_table' =>  '$1 Kayıdı Zaten Mevcut'
+        'match_db' => '$0 veri tabanında bulunamadı',
+        'not_match_db' => '$0 Kaydı Zaten Mevcut'
     ];
 
     /**
@@ -212,7 +212,11 @@ trait Validation
                     $args = [];
                 }
 
-                $func = "handleRule" . ucfirst($name);
+                $prepared = array_map(function ($value) {
+                    return ucfirst($value);
+                }, explode("_", $name));
+
+                $func = "handleRule" .  join('', $prepared);
 
                 $return = call_user_func_array(array($this, $func), [$index, $args]);
 
@@ -266,15 +270,52 @@ trait Validation
         return (!empty($this->datas[$index]));
     }
 
-    public function handleRuleExistsInTable($index, $params = [])
+    /**
+     * @param $index
+     * @param array $params
+     * @return bool
+     */
+    public function handleRuleMatchDb($index, $params = [])
     {
+        if ($count = count($params) == 2) {
+            $table = $params[0];
+            $column = $params[1];
+        } elseif ($count === 1) {
+            $table = $params[0];
+            $column = $index;
+        } else {
+            $table = $this->getTable();
+            $column = $index;
+        }
 
+        $builder = QueryBuilder::createNewInstance($table)->where($column, $this->datas[$index]);
+
+        return $builder->exists();
     }
 
-    public function handleRuleNotExistsInTable($index, $params = [])
+    /**
+     * @param $index
+     * @param array $params
+     * @return bool
+     */
+    public function handleRuleNotMatchDb($index, $params = [])
     {
+        if ($count = count($params) == 2) {
+            $table = $params[0];
+            $column = $params[1];
+        } elseif ($count === 1) {
+            $table = $params[0];
+            $column = $index;
+        } else {
+            $table = $this->getTable();
+            $column = $index;
+        }
 
+        $builder = QueryBuilder::createNewInstance($table)->where($column, $this->datas[$index]);
+
+        return !$builder->exists();
     }
+
     /**
      * @param $index
      * @param array $params
@@ -293,7 +334,7 @@ trait Validation
      * @param array $params
      * @return bool
      */
-    protected function handleRuleDigit_min($index, $params = [])
+    protected function handleRuleDigitMin($index, $params = [])
     {
         $min = isset($params[0]) ? $params[0] : false;
 
@@ -323,7 +364,7 @@ trait Validation
      * @param array $params
      * @return bool
      */
-    protected function handleRuleDigit_max($index, $params = [])
+    protected function handleRuleDigitMax($index, $params = [])
     {
         $max = $params[0];
         $data = $this->datas[$index];
@@ -336,7 +377,7 @@ trait Validation
      * @param array $params
      * @return bool
      */
-    protected function handleRuleDigit_between($index, $params = [])
+    protected function handleRuleDigitBetween($index, $params = [])
     {
         $min = $params[0];
         $max = $params[1];
@@ -399,7 +440,7 @@ trait Validation
      * @param $index
      * @return bool
      */
-    public function handleRuleAlpha_numeric($index)
+    public function handleRuleAlphaNumeric($index)
     {
         return (preg_match("#^[a-zA-ZÀ-ÿ0-9]+$#", $this->datas[$index]) === 1);
     }
@@ -409,7 +450,7 @@ trait Validation
      * @param $args
      * @return bool
      */
-    public function handleRuleMatch_with($index, $args)
+    public function handleRuleMatchWith($index, $args)
     {
         $target = $args[0];
 
@@ -421,7 +462,7 @@ trait Validation
      * @param $args
      * @return bool
      */
-    public function handleRuleSame_digit($index, $args)
+    public function handleRuleSameDigit($index, $args)
     {
         $target = $args[0];
 
