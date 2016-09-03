@@ -46,7 +46,9 @@ trait Validation
         'email' => '$0 alanına girilen değer bir email adresine ait olmalıdır.',
         'alpha_numeric' => '$0 alanına girilen değer a-zA-Z0-9 formatına uygun olmalıdır.',
         'match_with' => '$0 alanına girilen değer $1 alanıyla uygun olmalıdır',
-        'same_digit' => '$0 alanına girilen karekter uzunluğu $1 alanıyla eşit olmalıdır'
+        'same_digit' => '$0 alanına girilen karekter uzunluğu $1 alanıyla eşit olmalıdır',
+        'exists_in_table' => '$0 hatalı',
+        'not_exists_in_table' =>  '$1 Kayıdı Zaten Mevcut'
     ];
 
     /**
@@ -264,6 +266,15 @@ trait Validation
         return (!empty($this->datas[$index]));
     }
 
+    public function handleRuleExistsInTable($index, $params = [])
+    {
+
+    }
+
+    public function handleRuleNotExistsInTable($index, $params = [])
+    {
+
+    }
     /**
      * @param $index
      * @param array $params
