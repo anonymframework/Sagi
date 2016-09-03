@@ -35,7 +35,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     {
         $query = trim($query);
         $prepared = $this->pdo->prepare($query);
-
         $result = $prepared->execute($this->getArgs());
 
         if ($reset === true) {
@@ -64,11 +63,11 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function first()
     {
-        if (!empty($this->attributes)) {
-            return $this->attributes;
+        if (empty($this->attributes)) {
+            $this->attributes = $this->one();
         }
 
-        return $this->one();
+        return $this->attributes;
     }
 
 
@@ -135,9 +134,12 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function count()
     {
-        $handled = $this->returnPreparedResults($this->prepareGetQuery(), false, false)->rowCount();
+        $handled = $this->getPdo()->prepare($this->prepareGetQuery());
 
-        return $handled;
+        $handled->execute($this->getArgs());
+        $this->setArgs([]);
+
+        return $handled->rowCount();
     }
 
     /**
@@ -181,7 +183,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     {
         return $this->attributes[$name];
     }
-
 
 
     public function rewind()
@@ -232,7 +233,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     }
 
 
-
     /**
      * @param $name
      * @return mixed
@@ -242,9 +242,9 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         $first = $this->first();
 
         if (is_array($first)) {
-            $first = (object) $first;
-         }elseif(false === $first){
-             throw new \PDOException('your query is failed');
+            $first = (object)$first;
+        } elseif (false === $first) {
+            throw new \PDOException('your query is failed');
         }
 
 

@@ -101,10 +101,6 @@ class Engine
      */
     protected $driver;
 
-    /**
-     * @var string
-     */
-    private $query;
 
     /**
      * Engine constructor.
@@ -228,9 +224,7 @@ class Engine
      */
     public function prepareGetQuery()
     {
-        if ($this->query) {
-            return $this->query;
-        }
+
 
         $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
 
@@ -814,7 +808,7 @@ class Engine
 
     /**
      * @param array $args
-     * @return QueryBuilder
+     * @return Model
      */
     public function setArgs($args)
     {
