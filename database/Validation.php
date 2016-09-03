@@ -240,7 +240,12 @@ trait Validation
     {
 
         if (!$return) {
-            $this->errors[$rule . '.' . $index] = $this->prepareErrorMessage($index, $this->messages[$rule], $args);
+
+            $full = $rule . '.' . $index;
+
+            $message = isset($this->messages[$full]) ? $this->messages[$full] : $this->messages[$rule];
+
+            $this->errors[$full] = $this->prepareErrorMessage($index, $message, $args);
         }
     }
 
@@ -530,8 +535,10 @@ trait Validation
     public function setMessages($messages)
     {
         if (count($messages) !== 0) {
-            $this->messages = $messages;
+            $this->messages = array_merge($this->messages, $messages);
         }
+
+
         return $this;
     }
 
