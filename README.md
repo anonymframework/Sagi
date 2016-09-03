@@ -628,6 +628,10 @@ class Users extends Model
                                  'content' => 'xss',
                                  'title' => 'xss|strip_tags'
                              ]);
+                      
+   $user->setMessages([
+   'required.content' => 'İçerik boş geçilemez'
+   ]);
 ```
 
 #Pagination
