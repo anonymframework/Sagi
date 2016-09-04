@@ -24,11 +24,18 @@ trait Authentication
             $username = $configs[0];
             $password = $configs[1];
 
+            $datas[$password] = md5(sha1($datas[$password]));
+
 
             if ($this->isValidationUsed()) {
+
+
+                $find = static::find()
+                    ->where($username, $datas[$username]);
+
                 $this->setRules([
-                    $username => 'required|digit_min:5',
-                    $password => 'required|digit_min:5'
+                    $username => 'required|digit_min:5|match_db',
+                    $password => 'required|digit_min:5|match_db'
                 ]);
 
                 $this->setFilters([
@@ -36,22 +43,19 @@ trait Authentication
                     $password => 'xss|strip_tags'
                 ]);
 
-
+                $this->setMessages([
+                    'match_db.' . $username => 'Kullanıcı Adınızı Yanlış Girdiniz',
+                    'match_db.' . $password => 'Şifrenizi Yanlış Girdiniz'
+                ]);
                 if ($this->validate($datas)) {
-                    $datas[$password] = md5(sha1($datas[$password]));
-
-                    $find = static::find()
-                        ->where($username, $datas[$username])
-                        ->where($password, $datas[$password]);
-
                     if ($find->exists()) {
-
                         Identitiy::login($find->one(), $remember);
-
                         return $find;
                     } else {
                         return false;
                     }
+                } else {
+                    return false;
                 }
             } else {
                 throw new ModuleException('You need to use Validation module');
@@ -61,9 +65,6 @@ trait Authentication
             return false;
         }
     }
-
-
-
 
 
 }

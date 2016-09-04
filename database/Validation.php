@@ -240,7 +240,6 @@ trait Validation
     {
 
         if (!$return) {
-
             $full = $rule . '.' . $index;
 
             $message = isset($this->messages[$full]) ? $this->messages[$full] : $this->messages[$rule];
