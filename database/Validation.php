@@ -216,7 +216,7 @@ trait Validation
                     return ucfirst($value);
                 }, explode("_", $name));
 
-                $func = "handleRule" .  join('', $prepared);
+                $func = "handleRule" . join('', $prepared);
 
                 $return = call_user_func_array(array($this, $func), [$index, $args]);
 
@@ -295,6 +295,32 @@ trait Validation
         $builder = QueryBuilder::createNewInstance($table)->where($column, $this->datas[$index]);
 
         return $builder->exists();
+    }
+
+    public function handleRuleMatchDbWith($index, $params = [])
+    {
+        if (isset($params[0])) {
+            $other = $params[0];
+        } else {
+            return false;
+        }
+
+        if ($count = count($params) == 3) {
+            $table = $params[1];
+            $column = $params[2];
+        } elseif ($count === 2) {
+            $table = $params[1];
+            $column = $index;
+        } elseif ($count == 1) {
+            $table = $this->getTable();
+            $column = $index;
+        }
+
+        if (!isset($this->errors['match_db.' . $other])) {
+            $builder = QueryBuilder::createNewInstance($table)->where($column, $this->datas[$index])->exists();
+        } else {
+            return false;
+        }
     }
 
     /**

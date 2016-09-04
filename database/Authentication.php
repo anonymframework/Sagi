@@ -35,7 +35,7 @@ trait Authentication
 
                 $this->setRules([
                     $username => 'required|digit_min:5|match_db',
-                    $password => 'required|digit_min:5|match_db'
+                    $password => 'required|digit_min:5|match_db_with:'.$username
                 ]);
 
                 $this->setFilters([
