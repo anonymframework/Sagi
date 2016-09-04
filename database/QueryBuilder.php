@@ -172,6 +172,9 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     }
 
 
+    /**
+     *
+     */
     public function rewind()
     {
         if (empty($this->attributes)) {
