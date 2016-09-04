@@ -1,0 +1,17 @@
+<?php
+namespace Seeds;
+
+use Sagi\Database\SeedManager as Seeder;
+
+/**
+ * Class {{name}}
+ * @package Seeds
+ */
+class SeedExample extends Seeder
+{
+
+    public function seed()
+    {
+
+    }
+}
