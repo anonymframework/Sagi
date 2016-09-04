@@ -560,9 +560,7 @@ class Model extends QueryBuilder
         if ($this->isField($name)) {
 
             if (in_array($name, $this->json)) {
-                if (is_string($value)) {
-                    $value = json_decode($value);
-                }
+                $value = json_encode($value);
             }
 
             $this->attributes[$name] = $value;

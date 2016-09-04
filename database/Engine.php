@@ -198,13 +198,7 @@ class Engine
     {
         $s = '(';
 
-        $json = $this->json;
-
-        $args = array_map(function ($value) use ($json) {
-            if (in_array($value, $json)) {
-                return json_encode($value);
-            }
-        }, array_values($sets));
+        $args = array_values($sets);
 
         $count = count($args);
 
