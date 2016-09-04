@@ -30,7 +30,7 @@ include "header.php";
 
     <script>
         premium();
-        rand();
+        rand(15);
     </script>
 
 <?php endif; ?>

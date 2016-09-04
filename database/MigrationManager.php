@@ -136,13 +136,21 @@ class MigrationManager extends Schema
             $exp = explode("_", $name);
 
             $exp = array_map(function ($value) {
-                return ucfirst($value);
+                return ucfirst(MigrationManager::cleanTurkishChars($value));
             }, $exp);
 
             return join('', $exp);
         }
 
         return ucfirst($name);
+    }
+
+    public static function cleanTurkishChars($value)
+    {
+        $find = array('ç', 'Ç', 'ı', 'İ', 'ğ', 'Ğ', 'ü', 'ö', 'Ş', 'ş', 'Ö', 'Ü', ',', ' ', '(', ')', '[', ']');
+        $replace = array('c', 'C', 'i', 'I', 'g', 'G', 'u', 'o', 'S', 's', 'O', 'U', '', '_', '', '', '', '');
+
+        return str_replace($find, $replace, $value);
     }
 
 
