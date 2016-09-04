@@ -150,7 +150,6 @@ class Model extends QueryBuilder
 
             if ($result = $this->getCache($key = $this->prepareCacheKey())) {
 
-
                 $result = $this->setAttributes(unserialize($result));
 
             } else {
@@ -173,10 +172,7 @@ class Model extends QueryBuilder
      */
     public function one()
     {
-        $class = get_called_class();
-
         if ($this->isCacheUsed()) {
-
             $this->makeCacheConnection();
 
             if ($result = $this->getCache($key = $this->prepareCacheKey())) {
@@ -221,7 +217,7 @@ class Model extends QueryBuilder
                 $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
             }
 
-        } elseif (is_integer($conditions)) {
+        } else {
             $instance->where($instance->primaryKey, $conditions);
         }
 
@@ -376,8 +372,11 @@ class Model extends QueryBuilder
         if (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
 
             if ($this->can('update')) {
-                $this->setUpdatedAt()->update($this->getAttributes());
-
+                if ($this->setUpdatedAt()->update($this->getAttributes())) {
+                    return $this;
+                }else{
+                    return false;
+                }
             } else {
                 $this->throwPolicyException('create');
             }
