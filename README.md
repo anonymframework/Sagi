@@ -7,17 +7,6 @@ Sagi Database Class
  $ composer require sagi/sagi:dev-master
 ```
 
-#Initialize
-
-```php
-
- $db = QueryBuilder::createNewInstance('users');
- 
- // or 
- 
- $db = QueryBuilder::createNewInstance()->setTable('users');
-
-```
 ---------------------------
 #### <i class="icon-file"></i> Create
 
