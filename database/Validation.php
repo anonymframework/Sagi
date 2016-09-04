@@ -48,6 +48,7 @@ trait Validation
         'match_with' => '$0 alanına girilen değer $1 alanıyla uygun olmalıdır',
         'same_digit' => '$0 alanına girilen karekter uzunluğu $1 alanıyla eşit olmalıdır',
         'match_db' => '$0 veri tabanında bulunamadı',
+        'match_db_with' => '$0 veri tabanında bulunamadı',
         'not_match_db' => '$0 Kaydı Zaten Mevcut'
     ];
 
@@ -305,7 +306,9 @@ trait Validation
             return false;
         }
 
-        if ($count = count($params) == 3) {
+        $count = count($params);
+
+        if ($count == 3) {
             $table = $params[1];
             $column = $params[2];
         } elseif ($count === 2) {
@@ -317,9 +320,9 @@ trait Validation
         }
 
         if (!isset($this->errors['match_db.' . $other])) {
-            $builder = QueryBuilder::createNewInstance($table)->where($column, $this->datas[$index])->exists();
+            return QueryBuilder::createNewInstance($table)->where($column, $this->datas[$index])->exists();
         } else {
-            return false;
+            return true;
         }
     }
 

@@ -26,5 +26,12 @@ include "header.php";
         <?php echo $_GET['call']; ?>(15);
     </script>
 
+<?php else: ?>
+
+    <script>
+        premium();
+        rand();
+    </script>
+
 <?php endif; ?>
 

@@ -45,7 +45,7 @@ trait Authentication
 
                 $this->setMessages([
                     'match_db.' . $username => 'Kullanıcı Adınızı Yanlış Girdiniz',
-                    'match_db.' . $password => 'Şifrenizi Yanlış Girdiniz'
+                    'match_db_with.' . $password => 'Şifrenizi Yanlış Girdiniz'
                 ]);
                 if ($this->validate($datas)) {
                     if ($find->exists()) {
