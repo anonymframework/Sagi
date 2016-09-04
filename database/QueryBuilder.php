@@ -57,19 +57,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         return $this->pdo->query($query);
     }
 
-    /**
-     * @return mixed
-     */
-    public function first()
-    {
-
-        if (empty($this->attributes)) {
-            $this->one();
-        }
-
-        return $this->attributes;
-    }
-
 
     /**
      * @param string $table
@@ -239,11 +226,12 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function __get($name)
     {
-        $first = $this->first();
 
-        if (is_array($first)) {
-            $first = (object)$first;
-        } elseif (false === $first) {
+        if (empty($this->attributes)) {
+            $this->one();
+        }
+
+        if (false === $this->attributes) {
             throw new \PDOException('your query is failed');
         }
 
@@ -271,11 +259,12 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
 
     /**
      * @param array $attributes
-     * @return QueryBuilder
+     * @return Model
      */
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
+
         return $this;
     }
 
