@@ -48,20 +48,16 @@ class Model extends QueryBuilder
      */
     protected $protected = [];
 
-
     /**
-     * @var bool
+     * @var array
      */
-    protected $autoStart;
+    protected $json = [];
 
     /**
      * Model constructor.
-     * @param $autoStart = false
      */
-    public function __construct($autoStart = false)
+    public function __construct()
     {
-
-        $this->autoStart = $autoStart;
 
         parent::__construct();
 
@@ -557,11 +553,6 @@ class Model extends QueryBuilder
     function __set($name, $value)
     {
         if ($this->isField($name)) {
-
-            if (in_array($name, $this->json)) {
-                $value = json_encode($value);
-            }
-
             $this->attributes[$name] = $value;
         } else {
             $this->$name = $value;
