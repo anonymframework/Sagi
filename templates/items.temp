@@ -2,7 +2,7 @@
 <div class="col-xs-12 col-md-6 col-lg-2 item" id="{{ $data->id }}">
     <div class="panel panel-default">
         <div class="cover overlay hover cover-image-full">
-            <img src="img/snapcode.png" alt="music" width="100%">
+            <img src="http://localhost/Sagi/img/snapcode.png" alt="music" width="100%">
         </div>
         <div class="panel-body">
             <h6 class="text-center"><b>{{ $data->username }} </b></h6>

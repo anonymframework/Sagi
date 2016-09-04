@@ -194,11 +194,17 @@ class Engine
         return $handled;
     }
 
-    private function prepareInsertQuery($sets)
+    protected function prepareInsertQuery($sets)
     {
         $s = '(';
 
-        $args = array_values($sets);
+        $json = $this->json;
+
+        $args = array_map(function ($value) use ($json) {
+            if (in_array($value, $json)) {
+                return json_encode($value);
+            }
+        }, array_values($sets));
 
         $count = count($args);
 

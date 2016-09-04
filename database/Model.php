@@ -48,16 +48,20 @@ class Model extends QueryBuilder
      */
     protected $protected = [];
 
+
     /**
-     * @var array
+     * @var bool
      */
-    protected $json = [];
+    protected $autoStart;
 
     /**
      * Model constructor.
+     * @param $autoStart = false
      */
-    public function __construct()
+    public function __construct($autoStart = false)
     {
+
+        $this->autoStart = $autoStart;
 
         parent::__construct();
 
@@ -172,26 +176,26 @@ class Model extends QueryBuilder
         $class = get_called_class();
 
         if ($this->isCacheUsed()) {
+
             $this->makeCacheConnection();
 
             if ($result = $this->getCache($key = $this->prepareCacheKey())) {
-                $result = $this->setAttributes(unserialize($result));
+                $this->setAttributes(unserialize($result));
             } else {
                 $this->setCache(
                     $key,
                     serialize($get = $this->get()->fetch(PDO::FETCH_ASSOC))
                 );
 
-                $result = $this->setAttributes($get);
+                $this->setAttributes($get);
             }
-
-
-            return $result;
         } else {
             $get = $this->get();
 
-            return $get->fetchObject($class);
+            $this->setAttributes($get->fetch(PDO::FETCH_ASSOC));
         }
+
+        return $this;
     }
 
 
@@ -556,7 +560,9 @@ class Model extends QueryBuilder
         if ($this->isField($name)) {
 
             if (in_array($name, $this->json)) {
-                $value = json_decode($value);
+                if (is_string($value)) {
+                    $value = json_decode($value);
+                }
             }
 
             $this->attributes[$name] = $value;

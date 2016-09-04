@@ -62,8 +62,9 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function first()
     {
+
         if (empty($this->attributes)) {
-            $this->attributes = $this->one();
+            $this->one();
         }
 
         return $this->attributes;
