@@ -29,7 +29,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     /**
      * @param $query
      * @param bool $ex
-     * @return PDOStatement
+     * @return \PDOStatement|bool
      */
     private function returnPreparedResults($query, $ex = false)
     {
@@ -50,19 +50,11 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     {
         $prepared = $this->pdo->prepare($query);
 
-        $execute = $prepared->execute($args);
+        $exed = $prepared->execute($args);
 
-        return $execute ? $execute : $prepared;
+        return $execute ? $exed : $prepared;
     }
 
-    /**
-     * @param $query
-     * @return \PDOStatement
-     */
-    public function query($query)
-    {
-        return $this->pdo->query($query);
-    }
 
     /**
      * @param $query
