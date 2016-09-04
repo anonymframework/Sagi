@@ -7,11 +7,11 @@ use Sagi\Database\SeedManager as Seeder;
  * Class {{name}}
  * @package Seeds
  */
-class SeedExample extends Seeder
+class {{name}} extends Seeder
 {
 
     public function seed()
     {
-
+        // do something
     }
 }
