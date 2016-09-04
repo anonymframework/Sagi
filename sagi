@@ -10,7 +10,7 @@ use Sagi\Database\Console\CreateModelsCommand;
 use Sagi\Database\Console\MigrationResetCommand;
 use Sagi\Database\Console\CreatePolicyCommand;
 use Sagi\Database\Console\CreateModelCommand;
-
+use Sagi\Database\Console\CreateSeedCommand;
 $application = new Application();
 
 $application->addCommands([
@@ -20,7 +20,8 @@ $application->addCommands([
     new MigrationResetCommand(),
     new CreateModelsCommand(),
     new CreatePolicyCommand(),
-    new CreateModelCommand()
+    new CreateModelCommand(),
+    new CreateSeedCommand()
 ]);
 
 $application->run();

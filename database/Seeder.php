@@ -10,7 +10,7 @@ class Seeder
     /**
      * @var string
      */
-    protected $seedPath = 'database/seeds';
+    protected $seedPath = 'seeds';
 
     /**
      * @var Application
@@ -23,7 +23,7 @@ class Seeder
      */
     public function __construct(Application $application)
     {
-        $this->seedPath = ConfigManager::get('root_path');
+        $this->seedPath = ConfigManager::get('root_path') . $this->seedPath;
         $this->application = $application;
     }
 
