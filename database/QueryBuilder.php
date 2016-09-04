@@ -235,8 +235,19 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
             throw new \PDOException('your query is failed');
         }
 
+        if ($this->hasAttribute($name)) {
+            $value = $this->attribute($name);
 
-        return $first->$name;
+            if (in_array($name, $this->json)) {
+                $value = json_decode($value);
+            }
+
+            return $value;
+        } else {
+            throw new \Exception(sprintf('%s attribute could not found', $name));
+        }
+
+
     }
 
 
