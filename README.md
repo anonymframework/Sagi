@@ -596,6 +596,80 @@ class Users extends Model
 
 ------------
 
+#Seeds
+
+seed will be created in `seeds` file
+
+###create
+
+```
+
+ $ php sagi seed:create yourtablename
+
+```
+
+A created seed file will be like this;
+
+```php
+
+<?php
+namespace Seeds;
+
+use Sagi\Database\SeedManager as Seeder;
+
+/**
+ * Class SeedFileSnapchat
+ * @package Seeds
+ */
+class SeedFileUser extends Seeder
+{
+
+    public function seed()
+    {
+        //  do something
+    }
+}
+
+```
+
+###run one file
+
+```
+ 
+  $ php sagi seed:file user 
+
+```
+
+this will be work on SeedFileUser
+
+-----
+
+###run all seeds
+
+```
+
+ $ php sagi seed:all
+
+```
+
+### make output
+
+```php
+
+  public function seed()
+    {
+        $this->getOutput()->write("<info>Worked successfully</info>");
+    }
+```
+
+output will be like this;
+
+```php
+
+Worked successfully
+
+```
+
 #Validation
 
 ```php
