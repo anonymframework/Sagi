@@ -44,6 +44,7 @@ class CreateModelCommand extends Command
         ]);
 
 
+
         $path = 'models/' . $name . '.php';
 
 

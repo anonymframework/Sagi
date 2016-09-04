@@ -3,6 +3,7 @@ namespace Sagi\Database;
 
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Seeder
 {
@@ -13,18 +14,18 @@ class Seeder
     protected $seedPath = 'seeds';
 
     /**
-     * @var Application
+     * @var OutputInterface
      */
-    protected $application;
+    protected $output;
 
     /**
      * Seeder constructor.
-     * @param Application $application
+     * @param OutputInterface $output
      */
-    public function __construct(Application $application)
+    public function __construct(OutputInterface $output)
     {
         $this->seedPath = ConfigManager::get('root_path') . $this->seedPath;
-        $this->application = $application;
+        $this->output = $output;
     }
 
     /**
@@ -36,14 +37,20 @@ class Seeder
         if (is_string($name)) {
             $file = $this->prepareSeedFile($name);
 
+            if (file_exists($file) == false) {
+                throw new SeederException(sprintf('%s file could not found', $file));
+            }
+
             include $file;
 
             $className = MigrationManager::prepareClassName($this->prepareSeedName($name));
 
+            $className = "Seeds\\".$className;
+
             $class = new $className;
 
             if ($class instanceof SeedManager) {
-                $class->setApplication($this->application);
+                $class->setOutput($this->output);
             } else {
                 throw new SeederException(sprintf('%s class must have SeedManager parent', $className));
             }
@@ -69,7 +76,7 @@ class Seeder
      */
     public function prepareSeedName($name)
     {
-        return "seed_file_" . $name . ".php";
+        return "seed_file_" . $name;
     }
 
     /**
@@ -78,7 +85,7 @@ class Seeder
      */
     public function prepareSeedFile($name)
     {
-        return $this->seedPath . DIRECTORY_SEPARATOR . $this->prepareSeedName($name);
+        return $this->seedPath . DIRECTORY_SEPARATOR . $this->prepareSeedName($name).'.php';
     }
 
 }

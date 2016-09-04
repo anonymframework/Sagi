@@ -139,6 +139,7 @@ class MigrationManager extends Schema
                 return ucfirst(MigrationManager::cleanTurkishChars($value));
             }, $exp);
 
+
             return join('', $exp);
         }
 

@@ -27,14 +27,14 @@ class CreateSeedCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $seeder = new Seeder($this->getApplication());
+        $seeder = new Seeder($output);
         $name = $input->getArgument('name');
 
 
         $path = $seeder->prepareSeedFile($name);
 
         $content = TemplateManager::prepareContent('seed', [
-            'name' => MigrationManager::prepareClassName($name)
+            'name' => MigrationManager::prepareClassName($seeder->prepareSeedName($name))
         ]);
 
         if (!file_exists($path)) {

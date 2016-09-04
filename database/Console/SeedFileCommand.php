@@ -18,7 +18,7 @@ class SeedFileCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $seeder = new Seeder($this->getApplication());
+        $seeder = new Seeder($output);
 
         $name = $input->getArgument('name');
         $seeder->seed($name);

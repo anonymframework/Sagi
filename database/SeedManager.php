@@ -4,31 +4,34 @@ namespace Sagi\Database;
 
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class SeedManager
 {
 
     /**
-     * @var Application
+     * @var OutputInterface
      */
-    protected $application;
+    protected $output;
 
     /**
-     * @return Application
+     * @return OutputInterface
      */
-    public function getApplication()
+    public function getOutput()
     {
-        return $this->application;
+        return $this->output;
     }
 
     /**
-     * @param Application $application
+     * @param OutputInterface $output
      * @return SeedManager
      */
-    public function setApplication($application)
+    public function setOutput($output)
     {
-        $this->application = $application;
+        $this->output = $output;
         return $this;
     }
+
+
 
 }
