@@ -2,6 +2,7 @@
 
 namespace Sagi\Database\Console;
 
+use Sagi\Database\Seeder;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,6 +17,21 @@ class SeedAllFileCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $seeder = new Seeder($output);
+
+        $glob = glob($seeder->getSeedPath() . '/*.php');
+
+
+        foreach ($glob as $file) {
+
+            $explode = explode("/", $file);
+
+            $nameExplode = explode(".php", $file);
+
+            $name = explode("__", $file)[1];
+
+            $seeder->seed($name);
+        }
 
     }
 }

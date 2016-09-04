@@ -76,7 +76,7 @@ class Seeder
      */
     public function prepareSeedName($name)
     {
-        return "seed_file_" . $name;
+        return "seed_file__" . $name;
     }
 
     /**

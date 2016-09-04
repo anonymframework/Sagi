@@ -12,6 +12,7 @@ use Sagi\Database\Console\CreatePolicyCommand;
 use Sagi\Database\Console\CreateModelCommand;
 use Sagi\Database\Console\CreateSeedCommand;
 use Sagi\Database\Console\SeedFileCommand;
+use Sagi\Database\Console\SeedAllFileCommand;
 
 $application = new Application();
 
@@ -25,6 +26,7 @@ $application->addCommands([
     new CreateModelCommand(),
     new CreateSeedCommand(),
     new SeedFileCommand(),
+    new SeedAllFileCommand()
 ]);
 
 $application->run();
