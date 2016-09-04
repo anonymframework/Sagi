@@ -88,4 +88,22 @@ class Seeder
         return $this->seedPath . DIRECTORY_SEPARATOR . $this->prepareSeedName($name).'.php';
     }
 
+    /**
+     * @return string
+     */
+    public function getSeedPath()
+    {
+        return $this->seedPath;
+    }
+
+    /**
+     * @param string $seedPath
+     * @return Seeder
+     */
+    public function setSeedPath($seedPath)
+    {
+        $this->seedPath = $seedPath;
+        return $this;
+    }
+
 }
