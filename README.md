@@ -357,6 +357,34 @@ $datas = $data->jsonColumn;
 
 `json_decode` will be done auto. 
  
+ 
+  
+ ####array
+ 
+ ```php
+ 
+ protected $array = ['datas'];
+ 
+ ```
+  
+> before `$array`
+ 
+ ```php
+ 
+  $datas = unserialize($data->arrayColumn);
+ 
+ ```
+ 
+> after `$array`
+
+```php
+
+$datas = $data->arrayColumn;
+
+```
+
+`json_decode` will be done auto. 
+ 
  ####create
  
  
