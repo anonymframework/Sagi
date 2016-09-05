@@ -277,14 +277,13 @@ class Engine
             $this->checkWhereItem($item);
 
             if (is_callable($item->query) || is_array($item->query)) {
-                $prepared = $this->prepareInQuery($item[1]);
+                $prepared = $this->prepareInQuery($item->query);
 
                 $item->query = $prepared[0];
                 $args = array_merge($args, $prepared[1]);
             }
 
-
-            if ($item->clean === true || $this->prepareValues === true) {
+            if ($item->clean === true) {
                 $query = '?';
                 $args[] = $item->query;
             } else {
@@ -337,7 +336,7 @@ class Engine
     /**
      * @return mixeds|string
      */
-    public function prepareInQuery($datas)
+    private function prepareInQuery($datas)
     {
         if (is_array($datas)) {
             $inQuery = '[' . implode(',', $datas) . ']';
@@ -533,7 +532,7 @@ class Engine
             $in = ' NOT' . $in;
         }
 
-        return $this->where([$column, $in, $datas], null, null, true);
+        return $this->where([$column, $in, $datas], null, null, 'AND', false);
     }
 
 
@@ -571,7 +570,7 @@ class Engine
             $in = ' NOT' . $in;
         }
 
-        return $this->orWhere([$column, $in, $datas], null, null, true);
+        return $this->orWhere([$column, $in, $datas], null, null, 'OR', false);
     }
 
 
