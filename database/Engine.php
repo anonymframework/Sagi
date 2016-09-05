@@ -6,6 +6,7 @@ use Exception;
 use PDO;
 use Sagi\Database\Drivers\Driver;
 use Sagi\Database\Drivers\MysqlDriver;
+use Sagi\Database\Mapping\Entity;
 use Sagi\Database\Mapping\Where;
 
 /**
@@ -176,14 +177,15 @@ class Engine
     }
 
     /**
-     * @param array $sets
+     * @param Entity $entity
      * @return PDOStatement
      */
-    protected function prepareCreate($sets = [])
+    protected function prepareCreate($entity)
     {
         $pattern = 'INSERT INTO :from :insert';
 
-        $setted = $this->prepareInsertQuery($sets);
+        $setted = $this->prepareInsertQuery($entity);
+
         $this->args = array_merge($this->args, $setted['args']);
 
         $handled = $this->handlePattern($pattern, [
@@ -195,21 +197,47 @@ class Engine
         return $handled;
     }
 
-    protected function prepareInsertQuery($sets)
+    protected function prepareInsertQuery(Entity $entity)
     {
         $s = '(';
 
-        $args = array_values($sets);
 
-        $count = count($args);
+        $count = count($entity->datas);
 
-        foreach ($sets as $key => $value) {
+        foreach (array_keys($entity->datas[0]) as $key => $value) {
             $s .= $key . ",";
         }
 
         $s = rtrim($s, ",");
 
-        $s .= ") VALUES  (";
+        $s .= ") VALUES  ";
+
+
+        if ($entity->multipile === false) {
+            $s .= $this->handleInsertValue($count);
+            $args = array_values($entity->datas);
+        } else {
+            foreach ($entity->datas as $data) {
+                $values = array_values($data);
+
+                $s .= $this->handleInsertValue(count($values)) . ",";
+                $args = array_merge($args, $values);
+            }
+
+            $s = rtrim($s, ",");
+        }
+
+
+        return ['args' => $args, 'content' => $s];
+    }
+
+    /**
+     * @param string $count
+     * @return string
+     */
+    private function handleInsertValue($count)
+    {
+        $s = "(";
 
         $s .= join(",", array_fill(0, $count, '?'));
 
@@ -217,7 +245,7 @@ class Engine
 
         $s .= ")";
 
-        return ['args' => $args, 'content' => $s];
+        return $s;
     }
 
     /**
