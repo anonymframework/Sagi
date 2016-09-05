@@ -9,8 +9,15 @@ namespace Sagi\Database;
 
 use Sagi\Database\Mapping\Table;
 
-class TableMapper
+/**
+ * Class TableMapper
+ * @package Sagi\Database
+ */
+class TableMapper implements MapperInterface
 {
+    /**
+     * @return array
+     */
     public function map()
     {
         $tables = QueryBuilder::createNewInstance()->query('SHOW TABLES')->fetchAll();

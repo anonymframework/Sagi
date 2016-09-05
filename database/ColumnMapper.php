@@ -9,8 +9,17 @@ namespace Sagi\Database;
 
 use Sagi\Database\Mapping\Column;
 
+/**
+ * Class ColumnMapper
+ * @package Sagi\Database
+ */
 class ColumnMapper
 {
+
+    /**
+     * @param $table
+     * @return array
+     */
     public function map($table)
     {
         $table = QueryBuilder::createNewInstance()->query('SHOW COLUMNS FROM ' . $table);
