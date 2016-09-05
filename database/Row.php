@@ -25,6 +25,8 @@ class Row
         'time' => '`%s` TIME',
         'datetime' => '`%s` DATETIME',
         'text' => '`%s` TEXT',
+        'float' => '`%s` FLOAT(%d)',
+        'decimal' => '`%s` DECIMAL(%d,%d)'
     ];
 
     /**
@@ -175,6 +177,26 @@ class Row
     public function auth()
     {
         return $this->string('role')->defaultValue('user');
+    }
+
+    /**
+     * @param string $name
+     * @param int $precision
+     * @param int $scale
+     * @return Command
+     */
+    public function decimal($name, $precision, $scale)
+    {
+        return $this->addCommand('decimal', [$name, $precision, $scale]);
+    }
+    /**
+     * @param string $name
+     * @param int $precision
+     * @return Command
+     */
+    public function float($name, $precision)
+    {
+        return $this->addCommand('float', [$name, $precision]);
     }
 
 
