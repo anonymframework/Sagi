@@ -36,8 +36,18 @@ class ColumnMapper
                 $instance->default = $column['Default'] !== '' ? $column['Default'] : null;
                 $tl = $this->findTypeLength($column['Type']);
 
+
                 $instance->length = is_array($tl) ? $tl[1] : null;
                 $instance->type = is_array($tl) ? $tl[0] : $tl;
+
+                if ($instance->type === "float") {
+                    $instance->precision = $instance->length;
+                } elseif ($instance->type === "decimal") {
+                    $decimal = $this->handleDecimal($instance->length);
+
+                    $instance->precision = $decimal[0];
+                    $instance->scale = $decimal[1];
+                }
 
                 $columns[] = $instance;
             }
@@ -45,6 +55,16 @@ class ColumnMapper
 
         return $columns;
     }
+
+    /**
+     * @param string $decimal
+     * @return array
+     */
+    private function handleDecimal($decimal)
+    {
+        return explode(',', $decimal);
+    }
+
 
     /**
      * @param $type
