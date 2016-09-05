@@ -11,7 +11,9 @@
                 <li class="list-group-item"><i class="glyphicon glyphicon-asterisk"></i>{{ $data->user->gender == 0 ? 'Erkek' : 'Kadın' }}</li>
                 <li class="list-group-item"><i class="glyphicon glyphicon-globe"></i>Bilgi Yok</li>
 
-                <li class="list-group-item" style="height:50px !important;"><a href="https://snap-deepseafish.appspot.com/deeplink/add/card/{{ $data->username }}" download="myimage" class="btn btn-primary btn-stroke btn-xs pull-left">İndir</a></li>
+                <li class="list-group-item" style="height:50px !important;">
+                   <a href="https://snap-deepseafish.appspot.com/deeplink/add/card/{{ $data->username }}" download="image" class="btn btn-primary btn-xs pull-left">İndir</a>
+                </li>
 
             </ul>
         </div>

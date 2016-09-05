@@ -29,7 +29,6 @@ include "header.php";
 <?php else: ?>
 
     <script>
-        premium();
         rand(15);
     </script>
 
