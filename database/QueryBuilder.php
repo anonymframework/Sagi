@@ -271,7 +271,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function hasAttribute($name)
     {
-        return isset($this->attributes[$name]);
+        return !empty($this->attributes[$name]);
     }
 
     /**

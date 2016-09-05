@@ -568,7 +568,7 @@ class Model extends QueryBuilder
     {
         if ($this->isField($name)) {
 
-            if ($this->isJson($name) && is_array($name) || is_object($name)) {
+            if ($this->isJson($name) && !$this->hasAttribute($name)) {
                 $value = json_encode($value);
             }
 
