@@ -371,7 +371,7 @@ $datas = $data->jsonColumn;
  
  ```php
  
-  $datas = unserialize($data->arrayColumn);
+  $datas = unserialize($data->datas);
  
  ```
  
@@ -379,11 +379,11 @@ $datas = $data->jsonColumn;
 
 ```php
 
-$datas = $data->arrayColumn;
+$datas = $data->datas;
 
 ```
 
-`json_decode` will be done auto. 
+`unserialize` will be done auto. 
  
  ####create
  
