@@ -273,21 +273,22 @@ class Engine
             /**
              * @var Where $item
              */
-
             $this->checkWhereItem($item);
 
             if (is_callable($item->query) || is_array($item->query)) {
                 $prepared = $this->prepareInQuery($item->query);
 
-                $item->query = $prepared[0];
+                $preparedQuery = $prepared[0];
+
                 $args = array_merge($args, $prepared[1]);
             }
+
 
             if ($item->clean === true) {
                 $query = '?';
                 $args[] = $item->query;
             } else {
-                $query = $item->query;
+                $query = isset($preparedQuery) ? $preparedQuery : $item->query;
             }
 
             $field = $item->field;
@@ -635,7 +636,7 @@ class Engine
      */
     public function orWhere($a, $b = null, $c = null, $clean = false)
     {
-        return $this->where($ab, $b, $c, 'OR', $clean);
+        return $this->where($a, $b, $c, 'OR', $clean);
     }
 
 
