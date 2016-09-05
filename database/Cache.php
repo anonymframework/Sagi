@@ -107,8 +107,11 @@ trait Cache
     /**
      * @return mixed
      */
-    protected function cacheAll(){
+    protected function cacheAll()
+    {
         $this->makeCacheConnection();
+
+        $class = get_called_class();
 
         if ($result = $this->getCache($key = $this->prepareCacheKey())) {
 
@@ -125,6 +128,7 @@ trait Cache
 
         return $result;
     }
+
     /**
      * @return int
      */
