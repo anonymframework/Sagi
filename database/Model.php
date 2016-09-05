@@ -321,6 +321,15 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @param string $json
+     * @return bool
+     */
+    public function isJson($json)
+    {
+        return in_array($json, $this->json);
+    }
+
+    /**
      * @param $name
      * @return mixed
      */
@@ -329,6 +338,7 @@ class Model extends QueryBuilder
         if (method_exists($this, $n = "get" . ucfirst($name))) {
             return call_user_func_array([$this, $n], []);
         }
+
 
         return parent::__get($name);
     }
@@ -557,6 +567,11 @@ class Model extends QueryBuilder
     function __set($name, $value)
     {
         if ($this->isField($name)) {
+
+            if ($this->isJson($name) && is_array($name) || is_object($name)) {
+                $value = json_encode($value);
+            }
+
             $this->attributes[$name] = $value;
         } else {
             $this->$name = $value;
