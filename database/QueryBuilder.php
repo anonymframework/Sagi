@@ -13,6 +13,11 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
 
 
     /**
+     * @var string
+     */
+    private $lastQueryString;
+
+    /**
      * @var array
      */
     public $attributes;
@@ -35,7 +40,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     {
         $prepared = $this->prepare($query, $this->getArgs(), $ex);
 
-        $this->setArgs([]);
+        $this->setArgs([])->setLastQueryString($query);
 
         return $prepared;
     }
@@ -307,6 +312,25 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         $this->pdo = $pdo;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getLastQueryString()
+    {
+        return $this->lastQueryString;
+    }
+
+    /**
+     * @param string $lastQueryString
+     * @return QueryBuilder
+     */
+    public function setLastQueryString($lastQueryString)
+    {
+        $this->lastQueryString = $lastQueryString;
+        return $this;
+    }
+
 
     /**
      * Whether a offset exists
