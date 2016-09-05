@@ -2,6 +2,7 @@
 namespace Sagi\Database;
 
 use ArrayAccess;
+use Sagi\Database\Mapping\Entity;
 use Iterator;
 use PDO;
 
@@ -116,12 +117,17 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     }
 
     /**
-     * @param array $datas
+     * @param array|Entity $data
      * @return PDOStatement
      */
-    public function create($datas = [])
+    public function create($data)
     {
-        $create = $this->returnPreparedResults($this->prepareCreate($datas), true);
+
+
+        $create = $this->returnPreparedResults(
+            $this->prepareCreate($data),
+            true
+        );
 
         $this->setArgs([]);
 

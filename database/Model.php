@@ -3,6 +3,7 @@
 namespace Sagi\Database;
 
 use PDO;
+use Sagi\Database\Mapping\Entity;
 
 /**
  * Created by PhpStorm.
@@ -383,19 +384,32 @@ class Model extends QueryBuilder
     }
 
     /**
-     * @param array $datas
+     * @param Entity $data
      * @return Model|bool
      */
-    public function create($datas = [])
+    public function create($data)
     {
-        if (empty($datas)) {
-            $datas = $this->getAttributes();
+        if (empty($data)) {
+            $data = $this->getAttributes();
         }
 
-        if (parent::create($datas)) {
-            if (!empty($this->primaryKey)) {
+
+        if (!$data instanceof Entity) {
+            $entity = new Entity();
+
+            $entity->datas = $data;
+
+            if (isset($data[0]) && is_array($data[0])) {
+                $entity->multipile = true;
+            }
+        } else {
+            $entity = $data;
+        }
+
+        if ($created = parent::create($data)) {
+            if (!empty($this->primaryKey) && $entity->multipile === false) {
                 $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
-            } else {
+            } elseif (empty($this->primaryKey)) {
                 $created = static::set($this->getAttributes());
             }
 
