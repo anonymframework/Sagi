@@ -44,6 +44,10 @@ class CreateMigrationsCommand extends Command
                     $type = "string";
                 } elseif ($column->primaryKey == true) {
                     $type = "pk";
+                } elseif ($column->type === "float") {
+                    $column->length = $column->precision;
+                } elseif ($column->type === "decimal") {
+                    $column->length = $column->precision . "," . $column->scale;
                 }
 
                 $create .= "\t\t" . '$table->' . $type . '("' . $column->name . '"';
