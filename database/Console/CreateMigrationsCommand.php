@@ -32,7 +32,7 @@ class CreateMigrationsCommand extends Command
 
         foreach ($mapped as $table) {
 
-            $create = '$this->createTable("' . $table->name . '", function(Table $table){' . "\n";
+            $create = '$this->createTable("' . $table->name . '", function(Table $table){' . "\n\r";
 
             foreach ($table->columns as $column) {
 
@@ -46,7 +46,7 @@ class CreateMigrationsCommand extends Command
                     $type = "pk";
                 }
 
-                $create .= "\t" . '$table->' . $type . '("' . $column->name . '"';
+                $create .= "\t\t\t\t" . '$table->' . $type . '("' . $column->name . '"';
 
                 if ($column->length) {
                     $create .= ',' . $column->length;
