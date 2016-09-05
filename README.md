@@ -354,7 +354,8 @@ $datas = $data->jsonColumn;
  >You shouldn't call any where query before `save` method for create
  >new data otherwise save method will update your datas.
  
- >You can also use QueryBuilder `create` method for this process.
+ >You can also use  `create` method for this process.
+ >After saving data we will run a `select` query for get your last added data. If you don't have a primary key you can see just datas you set in attributes
  
  ```php
  
@@ -375,7 +376,7 @@ $datas = $data->jsonColumn;
 
 
   >You can also use QueryBuilder `update` method for this process.
-  >you may want to add `updateKey` variable on your class,  default is `id`
+  >you may want to add `primaryKey` variable on your class,  default is `id`
  
  
  -----------------
