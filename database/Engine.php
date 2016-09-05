@@ -201,11 +201,10 @@ class Engine
     {
         $s = '(';
 
-
         $count = count($entity->datas);
 
         foreach (array_keys($entity->datas[0]) as $key => $value) {
-            $s .= $key . ",";
+            $s .= $value . ",";
         }
 
         $s = rtrim($s, ",");

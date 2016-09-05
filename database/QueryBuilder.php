@@ -120,10 +120,8 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      * @param array|Entity $data
      * @return PDOStatement
      */
-    public function create($data)
+    public function create($data = null)
     {
-
-
         $create = $this->returnPreparedResults(
             $this->prepareCreate($data),
             true
@@ -255,6 +253,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
             throw new \PDOException('your query is failed');
         }
 
+
         if ($this->hasAttribute($name)) {
             $value = $this->attribute($name);
 
@@ -273,7 +272,8 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function hasAttribute($name)
     {
-        return !empty($this->attributes[$name]);
+
+        return isset($this->attributes[$name]);
     }
 
     /**

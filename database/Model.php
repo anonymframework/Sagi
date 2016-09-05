@@ -387,7 +387,7 @@ class Model extends QueryBuilder
      * @param Entity $data
      * @return Model|bool
      */
-    public function create($data)
+    public function create($data = null)
     {
         if (empty($data)) {
             $data = $this->getAttributes();
@@ -406,7 +406,8 @@ class Model extends QueryBuilder
             $entity = $data;
         }
 
-        if ($created = parent::create($data)) {
+
+        if ($created = parent::create($entity)) {
             if (!empty($this->primaryKey) && $entity->multipile === false) {
                 $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
             } elseif (empty($this->primaryKey)) {
@@ -456,7 +457,7 @@ class Model extends QueryBuilder
 
     /**
      * @param $datas
-     * @return QueryBuilder
+     * @return Model
      */
     public static function set($datas)
     {
