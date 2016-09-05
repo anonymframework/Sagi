@@ -40,9 +40,11 @@ class CreateMigrationsCommand extends Command
                  * @var Column $column
                  */
 
-                $type = $column->type === 'varchar' ?
-                    'string' : $column->primaryKey === true ?
-                        'pk' : $column->type;
+                if($column->type === "varchar"){
+                    $type = "string";
+                }elseif($column->primaryKey == true){
+                    $type = "pk";
+                }
 
                 $create .= '$table->' . $type . '("' . $column->name . '"';
 
