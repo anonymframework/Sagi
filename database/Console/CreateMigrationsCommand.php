@@ -80,7 +80,7 @@ class CreateMigrationsCommand extends Command
             $manager = TemplateManager::prepareContent('migration', [
                 'name' => MigrationManager::prepareClassName('create_' . $table->name . '_table'),
                 'up' => $create,
-                'drop' => $drop
+                'down' => $drop
             ]);
 
             $fileName = MigrationManager::migrationPath($table->name);

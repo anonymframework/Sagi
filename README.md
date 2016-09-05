@@ -487,6 +487,12 @@ $datas = $data->jsonColumn;
  #Migrations
  ----------------
  
+ create all migrations already exists in sql
+ 
+ ```
+    php sagi migration:all 
+ ```
+ create one file with specific name
  ```
   php sagi migration:create create_user_table
   
