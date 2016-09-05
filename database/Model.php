@@ -244,14 +244,15 @@ class Model extends QueryBuilder
      * @param $a
      * @param null $b
      * @param null $c
-     * @param bool $prepare
+     * @param string $type
+     * @param bool $clean
      * @return $this
      */
-    public function where($a, $b = null, $c = null, $prepare = false)
+    public function where($a, $b = null, $c = null, $type = 'AND', $clean = true)
     {
         $name = is_array($a) ? $a[0] : $a;
 
-        $value = is_array($a) ? $a[2] : $b;
+        $value = is_array($a) ? $a[2] : $c;
 
         if (
 
@@ -261,7 +262,7 @@ class Model extends QueryBuilder
                 $value
             ))
         ) {
-            parent::where($a, $b, $c, $prepare);
+            parent::where($a, $b, $c, $type, $clean);
 
             return $this;
         } else {
@@ -273,13 +274,13 @@ class Model extends QueryBuilder
      * @param $a
      * @param null $b
      * @param null $c
-     * @param bool $prepare
+     * @param bool $clean
      * @return $this
      */
-    public function orWhere($a, $b = null, $c = null, $prepare = false)
+    public function orWhere($a, $b = null, $c = null, $clean = true)
     {
         if ($this->can('orWhere')) {
-            parent::orWhere($a, $b, $c, $prepare);
+            parent::orWhere($a, $b, $c, $clean);
 
             return $this;
         } else {

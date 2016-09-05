@@ -6,6 +6,7 @@ use Exception;
 use PDO;
 use Sagi\Database\Drivers\Driver;
 use Sagi\Database\Drivers\MysqlDriver;
+use Sagi\Database\Mapping\Where;
 
 /**
  * Class Engine
@@ -245,8 +246,9 @@ class Engine
     protected function prepareWhereQuery($where)
     {
         $string = '';
+
         if (!empty($where)) {
-            $string .= $this->prepareAllWhereQueries($where);
+            $string .= $this->handleWhereQuery($where);
         }
 
 
@@ -260,37 +262,49 @@ class Engine
     /**
      * @return string
      */
-    private function prepareAllWhereQueries($where)
+    private function handleWhereQuery($where)
     {
 
         $args = [];
         $s = '';
-        foreach ($where as $column => $item) {
+
+        foreach ($where as $item) {
+
+            /**
+             * @var Where $item
+             */
 
             $this->checkWhereItem($item);
 
-            if (is_callable($item[1]) || is_array($item[1])) {
+            if (is_callable($item->query) || is_array($item->query)) {
                 $prepared = $this->prepareInQuery($item[1]);
 
-                $item[1] = $prepared[0];
+                $item->query = $prepared[0];
                 $args = array_merge($args, $prepared[1]);
             }
 
-            if (isset($item[3]) && $item[3] === true || $this->prepareValues === false) {
-                $query = $item[1];
-            } else {
+
+            if ($item->clean === true || $this->prepareValues === true) {
                 $query = '?';
-                $args[] = $item[1];
+                $args[] = $item->query;
+            } else {
+                $query = $item->query;
             }
 
+            $field = $item->field;
+
+            $type = $item->type;
+
+            $backed = $item->backet;
+
             if ($s !== '') {
-                $s .= "$item[2] {$column} {$item[0]} $query ";
+                $s .= "$type {$field} $backed $query ";
             } else {
-                $s .= " {$column} {$item[0]} $query ";
+                $s .= "$field $backed $query ";
             }
         }
 
-        $s = rtrim($s, $item[2]);
+        $s = rtrim($s, $type);
 
         $this->args = array_merge($this->args, $args);
 
@@ -340,8 +354,8 @@ class Engine
      */
     private function checkWhereItem($item)
     {
-        if (!isset($item[0]) || !isset($item[1]) || !isset($item[2])) {
-            throw new WhereException('Your query need 3 items');
+        if (!$item instanceof Where) {
+            throw new WhereException(sprintf('Wrong where query'));
         }
     }
 
@@ -444,6 +458,7 @@ class Engine
         if ($not) {
             $like = ' NOT' . $like;
         }
+
 
         return $this->where([$column, $like, $type]);
     }
@@ -576,28 +591,38 @@ class Engine
      * @param $a
      * @param null $b
      * @param null $c
-     * @param bool $prepare
+     * @param string $type
+     * @param bool $clean
      * @return Model
      */
-    public function where($a, $b = null, $c = null, $prepare = false)
+    public function where($a, $b = null, $c = null, $type = 'AND', $clean = true)
     {
+
         if (is_null($b) && is_null($c)) {
-            $a[] = 'AND';
 
-            if ($prepare) {
-                $a[] = true;
-            }
+            $field = $a[0];
+            $backet = $a[1];
+            $query = $a[2];
 
-            $column = $a[0];
-
-            array_shift($a);
-
-            $this->where[$column] = $a;
         } elseif (is_null($c)) {
-            $this->where[$a] = ['=', $b, 'AND'];
+            $field = $a;
+            $backet = '=';
+            $query = $b;
         } else {
-            $this->where[$a] = [$b, $c, 'AND'];
+            $field = $a;
+            $backet = $b;
+            $query = $c;
         }
+
+        $where = new Where();
+
+        $where->field = $field;
+        $where->backet = $backet;
+        $where->clean = $clean;
+        $where->query = $query;
+        $where->type = $type;
+
+        $this->where[] = $where;
 
         return $this;
     }
@@ -606,29 +631,12 @@ class Engine
      * @param $a
      * @param null $b
      * @param null $c
+     * @param bool $clean
      * @return Model
      */
-    public function orWhere($a, $b = null, $c = null, $prepare = false)
+    public function orWhere($a, $b = null, $c = null, $clean = false)
     {
-        if (is_null($b) && is_null($c)) {
-            $a[] = 'OR';
-
-            if ($prepare) {
-                $a[] = true;
-            }
-
-            $column = $a[0];
-
-            array_shift($a);
-
-            $this->where[$column] = $a;
-        } elseif (is_null($c)) {
-            $this->where[$a] = ['=', $b, 'OR'];
-        } else {
-            $this->where[$a] = [$b, $c, 'OR'];
-        }
-
-        return $this;
+        return $this->where($ab, $b, $c, 'OR', $clean);
     }
 
 
