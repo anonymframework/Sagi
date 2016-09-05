@@ -40,13 +40,13 @@ class CreateMigrationsCommand extends Command
                  * @var Column $column
                  */
 
-                if($column->type === "varchar"){
+                if ($column->type === "varchar") {
                     $type = "string";
-                }elseif($column->primaryKey == true){
+                } elseif ($column->primaryKey == true) {
                     $type = "pk";
                 }
 
-                $create .= '$table->' . $type . '("' . $column->name . '"';
+                $create .= "\t" . '$table->' . $type . '("' . $column->name . '"';
 
                 if ($column->length) {
                     $create .= ',' . $column->length;
