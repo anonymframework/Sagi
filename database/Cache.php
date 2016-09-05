@@ -105,6 +105,27 @@ trait Cache
     }
 
     /**
+     * @return mixed
+     */
+    protected function cacheAll(){
+        $this->makeCacheConnection();
+
+        if ($result = $this->getCache($key = $this->prepareCacheKey())) {
+
+            $result = $this->setAttributes(unserialize($result));
+
+        } else {
+            $this->setCache(
+                $key, serialize(
+                $get = $this->get()->fetchAll(PDO::FETCH_CLASS, $class)
+            ));
+
+            $result = $this->setAttributes($get);
+        }
+
+        return $result;
+    }
+    /**
      * @return int
      */
     public function getExpiration()
