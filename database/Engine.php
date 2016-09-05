@@ -212,6 +212,8 @@ class Engine
 
         $s .= ") VALUES  ";
 
+        $args = [];
+
 
         if ($entity->multipile === false) {
             $s .= $this->handleInsertValue($count);
