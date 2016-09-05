@@ -56,7 +56,7 @@ Sagi Database Class
  
  // or you can use subqueries
  
- $db->select(['title', 'id', function(QueryBuilder $builder){
+ $db->select(['title', 'id', function(Model $builder){
         return $builder->setTable('categories')->select('category_name')->where('id', 'posts.category_id')->setAs('category_name');
  })]);
  
@@ -146,7 +146,7 @@ $db->in('id', '1,2,3,4,5');
 
 //or you can use subqueries
 
-$db->in('username', function(QueryBuilder $builder){
+$db->in('username', function(Model $builder){
    return $builder->select('username')->where('id', 1); 
 });
 
@@ -164,7 +164,7 @@ $db->OrIn('id', '1,2,3,4,5');
 
 //or you can use subqueries
 
-$db->OrIn('username', function(QueryBuilder $builder){
+$db->OrIn('username', function(Model $builder){
    return $builder->select('username')->where('id', 1); 
 });
 ```
@@ -327,6 +327,26 @@ class User extends Model{
  protected $json = ['datas'];
  
  ```
+ 
+ you should set datas with `json_encode`
+ 
+> before `$json`
+ 
+ ```php
+ 
+  $datas = json_decode($data->jsonColumn);
+ 
+ ```
+ 
+> after `$json`
+
+```php
+
+$datas = $data->jsonColumn;
+
+```
+
+`json_decode` will be done auto. 
  
  ####create
  
