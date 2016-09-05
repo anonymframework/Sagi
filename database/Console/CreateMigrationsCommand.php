@@ -85,7 +85,7 @@ class CreateMigrationsCommand extends Command
             if (!file_exists($fileName)) {
 
                 if (touch($fileName)) {
-                    $put = file_put_contents($fileName, $mapped);
+                    $put = file_put_contents($fileName, $manager);
 
                     if ($put) {
                         $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');
