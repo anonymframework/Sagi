@@ -54,6 +54,11 @@ class Model extends QueryBuilder
     protected $json = [];
 
     /**
+     * @var array
+     */
+    protected $array = [];
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -331,6 +336,15 @@ class Model extends QueryBuilder
 
     /**
      * @param $name
+     * @return bool
+     */
+    public function isArray($name)
+    {
+        return in_array($name, $this->array);
+    }
+
+    /**
+     * @param string $name
      * @return mixed
      */
     public function __get($name)
@@ -340,7 +354,15 @@ class Model extends QueryBuilder
         }
 
 
-        return parent::__get($name);
+        $value = parent::__get($name);
+
+        if ($this->isJson($name)) {
+            $value = json_decode($value);
+        } elseif ($this->isArray($name)) {
+            $value = unserialize($value);
+        }
+
+        return $value;
     }
 
     /**
@@ -570,6 +592,8 @@ class Model extends QueryBuilder
 
             if ($this->isJson($name) && !$this->hasAttribute($name)) {
                 $value = json_encode($value);
+            } elseif ($this->isArray($name) && !$this->hasAttribute($name)) {
+                $value = serialize($value);
             }
 
             $this->attributes[$name] = $value;

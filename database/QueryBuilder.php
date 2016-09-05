@@ -252,10 +252,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         if ($this->hasAttribute($name)) {
             $value = $this->attribute($name);
 
-            if (in_array($name, $this->json)) {
-                $value = json_decode($value);
-            }
-
             return $value;
         } else {
             throw new \Exception(sprintf('%s attribute could not found', $name));
