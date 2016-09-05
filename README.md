@@ -147,7 +147,7 @@ $db->in('id', '1,2,3,4,5');
 //or you can use subqueries
 
 $db->in('username', function(Model $builder){
-   return $builder->select('username')->where('id', 1); 
+   return $builder->setTable('user')->select('username')->where('id', 1); 
 });
 
 ```
@@ -165,7 +165,7 @@ $db->OrIn('id', '1,2,3,4,5');
 //or you can use subqueries
 
 $db->OrIn('username', function(Model $builder){
-   return $builder->select('username')->where('id', 1); 
+   return $builder->setTable('user')->select('username')->where('id', 1); 
 });
 ```
 
