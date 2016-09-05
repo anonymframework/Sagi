@@ -52,19 +52,20 @@ class CreateMigrationsCommand extends Command
 
                 $create .= ')';
 
-                if ($column->nullable == true) {
-                    $create .= "->null()";
-                } else {
-                    $create .= "->notNull()";
-                }
-
                 if ($column->default !== null) {
                     if ($column->default === 'CURRENT_TIMESTAMP') {
                         $create .= '->defaultExpression("CURRENT_TIMESTAMP")';
                     } else {
                         $create .= '->defaultValue("' . $column->default . '")';
                     }
+                } else {
+                    if ($column->nullable == true) {
+                        $create .= "->null()";
+                    } else {
+                        $create .= "->notNull()";
+                    }
                 }
+
 
                 $create .= "; \n";
 
