@@ -169,18 +169,7 @@ class Model extends QueryBuilder
     public function one()
     {
         if ($this->isCacheUsed()) {
-            $this->makeCacheConnection();
-
-            if ($result = $this->getCache($key = $this->prepareCacheKey())) {
-                $this->setAttributes(unserialize($result));
-            } else {
-                $this->setCache(
-                    $key,
-                    serialize($get = $this->get()->fetch(PDO::FETCH_ASSOC))
-                );
-
-                $this->setAttributes($get);
-            }
+            $this->cacheOne();
         } else {
             $get = $this->get();
 
