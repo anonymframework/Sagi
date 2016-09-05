@@ -419,6 +419,7 @@ class Model extends QueryBuilder
         }
     }
 
+
     /**
      * @param array $datas
      * @return PDOStatement
