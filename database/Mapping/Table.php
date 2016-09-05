@@ -15,4 +15,9 @@ class Table
      * @var string
      */
     public $name;
+
+    /**
+     * @var array
+     */
+    public $columns;
 }

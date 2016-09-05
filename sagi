@@ -13,6 +13,7 @@ use Sagi\Database\Console\CreateModelCommand;
 use Sagi\Database\Console\CreateSeedCommand;
 use Sagi\Database\Console\SeedFileCommand;
 use Sagi\Database\Console\SeedAllFileCommand;
+use Sagi\Database\Console\CreateMigrationsCommand;
 
 $application = new Application();
 
@@ -26,7 +27,8 @@ $application->addCommands([
     new CreateModelCommand(),
     new CreateSeedCommand(),
     new SeedFileCommand(),
-    new SeedAllFileCommand()
+    new SeedAllFileCommand(),
+    new CreateMigrationsCommand()
 ]);
 
 $application->run();

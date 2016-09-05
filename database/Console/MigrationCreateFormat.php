@@ -34,12 +34,16 @@ class MigrationCreateFormat extends Command
     {
         $file = $input->getArgument('file');
 
-        $fileName = MigrationManager::$migrationDir . '/migration_file' . date('y_m_d_h_m') . '__' . $file . '.php';
+        $fileName = MigrationManager::migrationPath($file);
 
         if (!file_exists($fileName)) {
 
             if (touch($fileName)) {
-                $put = file_put_contents($fileName, $content = TemplateManager::prepareContent('migration', ['name' => MigrationManager::prepareClassName($file)]));
+                $put = file_put_contents($fileName, $content = TemplateManager::prepareContent('migration', [
+                    'name' => MigrationManager::prepareClassName($file),
+                    'up' => '',
+                    'down' => ''
+                ]));
 
                 if ($put) {
                     $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');

@@ -33,6 +33,16 @@ class Column
     public $nullable;
 
     /**
+     * @var bool
+     */
+    public $primaryKey = false;
+
+    /**
+     * @var mixed
+     */
+    public $default;
+
+    /**
      * The precision for a decimal (exact numeric) column (Applies only for decimal column).
      *
      * @var integer

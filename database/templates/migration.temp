@@ -19,8 +19,7 @@ class {{name}} extends Schema implements MigrationInterface{
      *
      */
     public function up(){
-
-
+         {{up}}
     }
 
     /**
@@ -28,7 +27,6 @@ class {{name}} extends Schema implements MigrationInterface{
      *
      */
     public function down(){
-
-
+         {{down}}
     }
 }

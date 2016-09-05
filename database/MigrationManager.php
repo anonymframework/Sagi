@@ -179,4 +179,14 @@ class MigrationManager extends Schema
     {
         $this->dropTable($this->migrationTable);
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public static function migrationPath($name)
+    {
+        return static::$migrationDir . '/migration_file' . date('y_m_d_h_m') . '__' . $name . '.php';
+
+    }
 }
