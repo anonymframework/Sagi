@@ -383,7 +383,7 @@ $datas = $data->datas;
 
 ```
 
-`unserialize` will be done auto. 
+`unserialize` will be done by model class. 
  
  ####create
  
