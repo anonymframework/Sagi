@@ -229,15 +229,17 @@ $db->join('targetTable', ['targetColumn' => 'ourColumn']);
 
 ```
 
-####first
+####one
 
-gets only first data
+gets only one data
 
 ```php
 
- $data = $db->first();
+ $data = $db->one();
 
 ```
+
+
 
 #### all
 
@@ -249,6 +251,13 @@ gets all datas with fetchAll method
  
 ```
 
+#### getLastQueryString
+
+you can get last called query string
+
+```php
+   $lastQuery = $db->getLastQueryString();
+```
 
 ```php
  
