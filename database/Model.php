@@ -343,27 +343,6 @@ class Model extends QueryBuilder
         return in_array($name, $this->array);
     }
 
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        if (method_exists($this, $n = "get" . ucfirst($name))) {
-            return call_user_func_array([$this, $n], []);
-        }
-
-
-        $value = parent::__get($name);
-
-        if ($this->isJson($name)) {
-            $value = json_decode($value);
-        } elseif ($this->isArray($name)) {
-            $value = unserialize($value);
-        }
-
-        return $value;
-    }
 
     /**
      * @return Model|false
@@ -601,4 +580,33 @@ class Model extends QueryBuilder
             $this->$name = $value;
         }
     }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        if (method_exists($this, $n = "get" . ucfirst($name))) {
+            return call_user_func_array([$this, $n], []);
+        }
+
+
+        $value = parent::__get($name);
+
+        if ($this->isJson($name)) {
+
+            if (is_array($value) || is_object($value)) {
+                $value = json_decode($value);
+            }
+
+        } elseif ($this->isArray($name)) {
+            if (is_array($value) || is_object($value)) {
+                $value = unserialize($value);
+            }
+        }
+
+        return $value;
+    }
+
 }
