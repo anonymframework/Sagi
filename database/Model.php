@@ -78,7 +78,11 @@ class Model extends QueryBuilder
         $this->usedModules = class_uses(static::className());
 
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
-            $this->policy(new $policy);
+            if(is_string($policy)){
+                $this->policy(new $policy);
+            }else{
+                throw new \Exception('Policy names must be an string');
+            }
         }
     }
 
