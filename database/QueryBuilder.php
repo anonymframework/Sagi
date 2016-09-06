@@ -19,7 +19,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     private $lastQueryString;
 
 
-
     /**
      * @return array
      */
