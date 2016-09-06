@@ -364,7 +364,7 @@ class Model extends QueryBuilder
         if (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
 
             if ($this->can('update')) {
-                if ($this->setUpdatedAt()->update()) {
+                if ($this->update()) {
                     return $this;
                 } else {
                     return false;
@@ -439,6 +439,8 @@ class Model extends QueryBuilder
         if (empty($datas)) {
             $datas = $this->getAttributes();
         }
+
+        $this->setUpdatedAt();
 
         return parent::update($datas);
     }
