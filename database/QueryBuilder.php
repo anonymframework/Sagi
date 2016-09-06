@@ -18,10 +18,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     private $lastQueryString;
 
-    /**
-     * @var array
-     */
-    public $attributes;
 
 
     /**
@@ -238,62 +234,8 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     }
 
 
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public function __get($name)
-    {
-
-        if (empty($this->attributes)) {
-            $this->one();
-        }
-
-        if (false === $this->attributes) {
-            throw new \PDOException('your query is failed');
-        }
 
 
-        if ($this->hasAttribute($name)) {
-            $value = $this->attribute($name);
-
-            return $value;
-        } else {
-            throw new \Exception(sprintf('%s attribute could not found', $name));
-        }
-
-
-    }
-
-
-    /**
-     * @param $name
-     * @return bool
-     */
-    public function hasAttribute($name)
-    {
-
-        return isset($this->attributes[$name]);
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttributes()
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * @param array $attributes
-     * @return Model
-     */
-    public function setAttributes($attributes)
-    {
-        $this->attributes = $attributes;
-
-        return $this;
-    }
 
     /**
      * @return PDO

@@ -60,6 +60,11 @@ class Model extends QueryBuilder
     protected $array = [];
 
     /**
+     * @var mixed
+     */
+    protected $attributes;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -597,8 +602,39 @@ class Model extends QueryBuilder
     }
 
     /**
-     * @param string $name
+     * @param $name
+     * @return bool
+     */
+    public function hasAttribute($name)
+    {
+
+        return isset($this->attributes[$name]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * @param array $attributes
+     * @return Model
+     */
+    public function setAttributes($attributes)
+    {
+        $this->attributes = $attributes;
+
+        return $this;
+    }
+
+
+    /**
+     * @param $name
      * @return mixed
+     * @throws \Exception
      */
     public function __get($name)
     {
@@ -606,8 +642,21 @@ class Model extends QueryBuilder
             return call_user_func_array([$this, $n], []);
         }
 
+        if (empty($this->attributes)) {
+            $this->one();
+        }
 
-        $value = parent::__get($name);
+        if (false === $this->attributes) {
+            throw new \PDOException('your query is failed');
+        }
+
+
+        if ($this->hasAttribute($name)) {
+            $value = $this->attribute($name);
+        } else {
+            throw new \Exception(sprintf('%s attribute could not found', $name));
+        }
+
 
         if ($this->isJson($name)) {
 
