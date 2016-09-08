@@ -55,7 +55,7 @@ class RelationBag
      * @param string $name
      * @param Model $our
      * @param $type
-     * @return Model
+     * @return RelationShip
      */
     public static function getRelation($name, Model $our, $type)
     {
@@ -120,8 +120,6 @@ class RelationBag
         $relationShip = new RelationShip();
 
         $relationShip->relatedWith = $model;
-
-        $relationShip->primaryTable = $our;
 
         static::$preparedRelatives[static::getPreparedName($name, $type)] = $relationShip;
     }

@@ -290,7 +290,7 @@ class Model extends QueryBuilder
     /**
      * @param string|Model $class
      * @param array $link
-     * @return Model
+     * @return RelationShip
      */
     public function hasMany($class, $link)
     {
@@ -314,7 +314,7 @@ class Model extends QueryBuilder
     /**
      * @param string|Model $class
      * @param array $link
-     * @return Model
+     * @return RelationShip
      */
     public function hasOne($class, $link)
     {
