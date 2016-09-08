@@ -117,7 +117,13 @@ class RelationBag
             $model = $model->all();
         }
 
-        static::$preparedRelatives[static::getPreparedName($name, $type)] = $model;
+        $relationShip = new RelationShip();
+
+        $relationShip->relatedWith = $model;
+
+        $relationShip->primaryTable = $our;
+
+        static::$preparedRelatives[static::getPreparedName($name, $type)] = $relationShip;
     }
 
 }
