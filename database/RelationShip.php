@@ -19,11 +19,6 @@ class RelationShip
     public $relatedWith;
 
     /**
-     * @var Model
-     */
-    public $primaryTable;
-
-    /**
      * @param string $name
      * @return mixed
      */
