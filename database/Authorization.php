@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: sagi
- * Date: 30.08.2016
- * Time: 17:12
- */
 
 namespace Sagi\Database;
 

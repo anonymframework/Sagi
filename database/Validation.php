@@ -45,7 +45,7 @@ trait Validation
         'url' => '$0 alanına girilen değer bir url adresine ait olmalıdır.',
         'email' => '$0 alanına girilen değer bir email adresine ait olmalıdır.',
         'alpha_numeric' => '$0 alanına girilen değer a-zA-Z0-9 formatına uygun olmalıdır.',
-        'match_with' => '$0 alanına girilen değer $1 alanıyla uygun olmalıdır',
+        'match_with' => '$0 alanına girilen değer $1 alanıyla aynı olmalıdır',
         'same_digit' => '$0 alanına girilen karekter uzunluğu $1 alanıyla eşit olmalıdır',
         'match_db' => '$0 veri tabanında bulunamadı',
         'match_db_with' => '$0 veri tabanında bulunamadı',
