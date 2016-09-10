@@ -635,7 +635,6 @@ class Engine
     {
 
         if (is_null($b) && is_null($c)) {
-
             $field = $a[0];
             $backet = $a[1];
             $query = $a[2];

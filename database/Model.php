@@ -264,12 +264,12 @@ class Model extends QueryBuilder
     {
         $instance = static::createNewInstance();
 
-        if (is_array($conditions)) {
+        if (is_array($conditions) && !empty($conditions)) {
             foreach ($conditions as $item) {
                 $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
             }
 
-        } else {
+        } elseif (is_string($conditions) || is_integer($conditions)) {
             $instance->where($instance->primaryKey, $conditions);
         }
 
@@ -291,9 +291,7 @@ class Model extends QueryBuilder
      */
     public static function findOne($id)
     {
-        $instance = static::createNewInstance();
-
-        return $instance->where($instance->primaryKey, $id)->one();
+        return static::find($id)->one();
     }
 
     /**
