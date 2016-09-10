@@ -95,7 +95,7 @@ class Schema
         if ($prepare) {
             return true;
         } else {
-            throw new SchemaException(json_encode(Connector::getConnection()));
+            throw new SchemaException(json_encode(Connector::getConnection()->errorInfo()));
         }
     }
 
