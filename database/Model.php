@@ -71,15 +71,12 @@ class Model extends QueryBuilder
 
     /**
      * Model constructor.
+     * @param array $attributes
      */
     public function __construct(array $attributes = [])
     {
 
         parent::__construct();
-
-        $table = static::getTableName();
-        $this->setTable($table);
-
         $this->usedModules = $traits = class_uses(static::className());
 
         $this->bootTraits($traits);
