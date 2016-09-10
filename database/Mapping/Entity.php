@@ -20,4 +20,15 @@ class Entity
      */
     public $multipile = false;
 
+    /**
+     * Entity constructor.
+     * @param array $datas
+     */
+    public function __construct($datas = [])
+    {
+        if (is_array($datas)) {
+            $this->datas = $datas;
+        }
+    }
+
 }
