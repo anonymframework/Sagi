@@ -633,7 +633,6 @@ class Engine
             $field = $a[0];
             $backet = $a[1];
             $query = $a[2];
-
         } elseif (is_null($c)) {
             $field = $a;
             $backet = '=';
