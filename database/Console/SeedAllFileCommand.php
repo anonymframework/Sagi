@@ -28,7 +28,7 @@ class SeedAllFileCommand extends Command
 
             $nameExplode = explode(".php", $explode[1]);
 
-            $name = explode("__", $nameExplode)[1];
+            $name = explode("__", $nameExplode[0])[1];
 
             $seeder->seed($name);
         }
