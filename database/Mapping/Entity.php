@@ -28,6 +28,9 @@ class Entity
     {
         $this->datas = $datas;
 
+        if (is_array($datas[0])) {
+            $this->multipile = true;
+        }
     }
 
 }
