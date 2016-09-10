@@ -33,6 +33,9 @@ trait Cache
         $this->memcache->addServer($configs['host'], $configs['port']);
     }
 
+    public static function bootCache(){
+        $this->makeCacheConnection();
+    }
     /**
      * @return Memcached
      */
@@ -90,7 +93,6 @@ trait Cache
      */
     protected function cacheOne()
     {
-        $this->makeCacheConnection();
 
         if ($result = $this->getCache($key = $this->prepareCacheKey())) {
             $this->setAttributes(unserialize($result));
@@ -109,8 +111,6 @@ trait Cache
      */
     protected function cacheAll()
     {
-        $this->makeCacheConnection();
-
         $class = get_called_class();
 
         if ($result = $this->getCache($key = $this->prepareCacheKey())) {

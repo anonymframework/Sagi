@@ -75,7 +75,9 @@ class Model extends QueryBuilder
         $table = static::getTableName();
         $this->setTable($table);
 
-        $this->usedModules = class_uses(static::className());
+        $this->usedModules = $traits = class_uses(static::className());
+
+        $this->bootTraits($traits);
 
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
             if (is_string($policy)) {
@@ -90,6 +92,30 @@ class Model extends QueryBuilder
         }
     }
 
+
+    /**
+     * @param $traits
+     */
+    private function bootTraits($traits)
+    {
+
+
+        foreach ($traits as $trait) {
+            if (method_exists($this, $method = 'boot' . $this->classBaseName($trait))) {
+                forward_static_call($method);
+            }
+        }
+    }
+
+    /**
+     * @param string $class
+     * @return string
+     */
+    private function classBaseName($class)
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+        return basename(str_replace('\\', '/', $class));
+    }
 
     /**
      * @return mixed
