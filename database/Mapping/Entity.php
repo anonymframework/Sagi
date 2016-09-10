@@ -24,11 +24,10 @@ class Entity
      * Entity constructor.
      * @param array $datas
      */
-    public function __construct($datas = [])
+    public function __construct(array $datas = [])
     {
-        if (is_array($datas)) {
-            $this->datas = $datas;
-        }
+        $this->datas = $datas;
+
     }
 
 }
