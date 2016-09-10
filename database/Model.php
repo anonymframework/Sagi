@@ -70,6 +70,11 @@ class Model extends QueryBuilder
     protected $attributes;
 
     /**
+     * @var string
+     */
+    protected $alias;
+
+    /**
      * Model constructor.
      * @param array $attributes
      */
@@ -352,20 +357,21 @@ class Model extends QueryBuilder
     /**
      * @param string|Model $class
      * @param array $link
+     * @param string $alias
      * @return RelationShip
      */
-    public function hasMany($class, $link)
+    public function hasMany($class, $link, $alias = null)
     {
-        $table = $class::getTableName();
+        $class = $class::createNewInstance();
 
-        if (is_array($table)) {
-            $name = $table[1];
+        if ($alias !== null) {
+            $name = $alias;
         } else {
-            $name = $table;
+            $name = $class->getTable();
         }
 
+
         if (!RelationBag::isPreparedBefore($name, 'many')) {
-            $class = $class::createNewInstance();
 
             RelationBag::addRelative($name, $class, $link, 'many');
         }
@@ -376,20 +382,20 @@ class Model extends QueryBuilder
     /**
      * @param string|Model $class
      * @param array $link
+     * @param array $alias
      * @return RelationShip
      */
-    public function hasOne($class, $link)
+    public function hasOne($class, $link, $alias = null)
     {
-        $table = $class::getTableName();
+        $class = $class::createNewInstance();
 
-        if (is_array($table)) {
-            $name = $table[1];
+        if ($alias !== null) {
+            $name = $alias;
         } else {
-            $name = $table;
+            $name = $class->getTable();
         }
 
         if (!RelationBag::isPreparedBefore($name, 'one')) {
-            $class = $class::createNewInstance();
 
             RelationBag::addRelative($name, $class, $link, 'one');
         }
