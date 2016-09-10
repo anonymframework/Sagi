@@ -59,6 +59,11 @@ class Model extends QueryBuilder
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * @var bool
+     */
+    protected $totallyGuarded = false;
     /**
      * @var mixed
      */
@@ -67,7 +72,7 @@ class Model extends QueryBuilder
     /**
      * Model constructor.
      */
-    public function __construct()
+    public function __construct(array $attributes = [])
     {
 
         parent::__construct();
@@ -90,16 +95,46 @@ class Model extends QueryBuilder
         if (!empty($this->fields)) {
             $this->select($this->fields);
         }
+
+        if (!empty($attributes)) {
+            $this->fill($attributes);
+        }
     }
 
+
+    /**
+     * @param array $attributes
+     * @return $this
+     * @throws \Exception
+     */
+    public function fill($attributes)
+    {
+        foreach ($attributes as $key => $value) {
+            if ($this->isFillable($key)) {
+                $this->setAttribute($key, $value);
+            } else {
+                throw new \Exception(sprintf('You cannot set any value on %s attributes', $key));
+            }
+        }
+
+
+        return $this;
+    }
+
+    /**
+     * @param $key
+     * @return bool
+     */
+    public function isFillable($key)
+    {
+        return !isset($this->guarded[$key]) or !$this->totallyGuarded;
+    }
 
     /**
      * @param $traits
      */
     private function bootTraits($traits)
     {
-
-
         foreach ($traits as $trait) {
             if (method_exists($this, $method = 'boot' . $this->classBaseName($trait))) {
                 forward_static_call($method);
@@ -692,4 +727,30 @@ class Model extends QueryBuilder
         return $value;
     }
 
+    /**
+     * @return boolean
+     */
+    public function isTotallyGuarded()
+    {
+        return $this->totallyGuarded;
+    }
+
+    /**
+     * @param boolean $totallyGuarded
+     * @return Model
+     */
+    public function setTotallyGuarded($totallyGuarded)
+    {
+        $this->totallyGuarded = $totallyGuarded;
+        return $this;
+    }
+
+
+    /**
+     * @return Model
+     */
+    public function totallyGuarded()
+    {
+        return $this->setTotallyGuarded(true);
+    }
 }
