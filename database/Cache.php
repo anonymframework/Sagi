@@ -18,7 +18,7 @@ trait Cache
     /**
      * @var \Memcached
      */
-    private $memcache;
+    private static $memcache;
 
     /**
      *  makes memcache connection
@@ -27,15 +27,15 @@ trait Cache
     {
         $configs = ConfigManager::get('cache');
 
-        $this->memcache = new Memcached();
+        static::$memcache = new Memcached();
 
 
-        $this->memcache->addServer($configs['host'], $configs['port']);
+        static::$memcache->addServer($configs['host'], $configs['port']);
     }
 
     public static function bootCache()
     {
-        static::makeCacheConnection();
+        static::makeCacheConnection( );
     }
 
     /**
@@ -43,7 +43,7 @@ trait Cache
      */
     public function getMemcache()
     {
-        return $this->memcache;
+        return static::$memcache;
     }
 
     /**
@@ -52,7 +52,7 @@ trait Cache
      */
     public function setMemcache($memcache)
     {
-        $this->memcache = $memcache;
+        static::$memcache = $memcache;
         return $this;
     }
 
@@ -77,7 +77,7 @@ trait Cache
      */
     public function getCache($key)
     {
-        return $this->memcache->get($key);
+        return static::$memcache->get($key);
     }
 
     /**
@@ -87,7 +87,7 @@ trait Cache
      */
     public function setCache($key, $value)
     {
-        return $this->memcache->set($key, $value, $this->expiration);
+        return static::$memcache->set($key, $value, $this->expiration);
     }
 
     /**
