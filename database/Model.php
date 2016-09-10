@@ -56,6 +56,10 @@ class Model extends QueryBuilder
     protected $array = [];
 
     /**
+     * @var array
+     */
+    protected $guarded = [];
+    /**
      * @var mixed
      */
     protected $attributes;
