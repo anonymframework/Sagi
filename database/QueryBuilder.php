@@ -117,6 +117,13 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function create($data = null)
     {
+        if (is_array($data)) {
+            $datas = $data;
+            $data =  new Entity();
+
+            $data->datas = $datas;
+        }
+
         $create = $this->returnPreparedResults(
             $this->prepareCreate($data),
             true

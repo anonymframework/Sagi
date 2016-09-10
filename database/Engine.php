@@ -199,6 +199,7 @@ class Engine
 
     protected function prepareInsertQuery(Entity $entity)
     {
+
         $s = '(';
 
         $count = count($entity->datas);
