@@ -104,10 +104,18 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
 
     /**
      * @param array $datas
-     * @return PDOStatement
+     * @return bool|PDOStatement
      */
     public function update($datas = [])
     {
+        if (is_array($data)) {
+            $data = $datas;
+            $datas = new Entity();
+
+            $data->datas = $data;
+        }
+
+
         return $this->returnPreparedResults($this->prepareUpdate($datas), true);
     }
 
@@ -119,7 +127,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     {
         if (is_array($data)) {
             $datas = $data;
-            $data =  new Entity();
+            $data = new Entity();
 
             $data->datas = $datas;
         }
@@ -238,9 +246,6 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         $var = ($key !== NULL && $key !== FALSE);
         return $var;
     }
-
-
-
 
 
     /**

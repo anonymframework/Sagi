@@ -156,10 +156,10 @@ class Engine
     }
 
     /**
-     * @param array $sets
+     * @param Entity $sets
      * @return PDOStatement
      */
-    protected function prepareUpdate($sets = [])
+    protected function prepareUpdate(Entity $sets)
     {
         $pattern = 'UPDATE :from SET :update :where';
 
@@ -676,11 +676,11 @@ class Engine
      * @param mixed $set
      * @return array
      */
-    private function databaseSetBuilder($set)
+    private function databaseSetBuilder(Entity $set)
     {
         $s = '';
         $arr = [];
-        foreach ($set as $key => $value) {
+        foreach ($set->datas as $key => $value) {
             $s .= "$key = ?,";
             $arr[] = $value;
         }
