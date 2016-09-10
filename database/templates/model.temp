@@ -28,9 +28,10 @@ class {{name}} extends Model
      */
     protected $timestamps = {{timestamps}};
 
-    public static function getTableName()
-    {
-        return  '{{table}}';
-    }
+     /**
+      * @var string
+      */
+    protected $table = '{{table}}';
+
 
 }
