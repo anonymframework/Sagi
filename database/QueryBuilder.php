@@ -109,10 +109,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     public function update($datas = [])
     {
         if (is_array($datas)) {
-            $data = $datas;
-            $datas = new Entity();
-
-            $data->datas = $data;
+            $datas = new Entity($datas);
         }
 
 
@@ -126,10 +123,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
     public function create($data = null)
     {
         if (is_array($data)) {
-            $datas = $data;
-            $data = new Entity();
-
-            $data->datas = $datas;
+            $data = new Entity($data);
         }
 
         $create = $this->returnPreparedResults(
