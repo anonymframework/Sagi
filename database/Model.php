@@ -34,10 +34,6 @@ class Model extends QueryBuilder
      */
     protected $fields = [];
 
-    /**
-     * @var array
-     */
-    protected $expects = [];
 
     /**
      * @var mixed
@@ -78,11 +74,15 @@ class Model extends QueryBuilder
         $this->usedModules = class_uses(static::className());
 
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
-            if(is_string($policy)){
+            if (is_string($policy)) {
                 $this->policy(new $policy);
-            }else{
+            } else {
                 throw new \Exception('Policy names must be an string');
             }
+        }
+
+        if (!empty($this->fields)) {
+            $this->setSelect($this->fields);
         }
     }
 
@@ -497,14 +497,6 @@ class Model extends QueryBuilder
         return 'Y-m-d H:i:s';
     }
 
-    /**
-     * @param string $field
-     * @return bool
-     */
-    private function isField($field)
-    {
-        return in_array($field, $this->fields) && !$this->isProtected($field);
-    }
 
     /**
      * @param $name
@@ -542,9 +534,7 @@ class Model extends QueryBuilder
 
     public function json()
     {
-        $fields = array_diff($this->fields, $this->expects);
-
-        return json_encode($this->getAttributesByFields($fields));
+        return json_encode($this->getAttributesByFields($this->fields));
     }
 
     /**
@@ -580,8 +570,7 @@ class Model extends QueryBuilder
     /**
      * @return string|array
      */
-    public
-    static function getTableName()
+    public static function getTableName()
     {
         return '';
     }
@@ -590,21 +579,15 @@ class Model extends QueryBuilder
      * @param $name
      * @param $value
      */
-    public
-    function __set($name, $value)
+    public function __set($name, $value)
     {
-        if ($this->isField($name)) {
-
-            if ($this->isJson($name) && !$this->hasAttribute($name)) {
-                $value = json_encode($value);
-            } elseif ($this->isArray($name) && !$this->hasAttribute($name)) {
-                $value = serialize($value);
-            }
-
-            $this->attributes[$name] = $value;
-        } else {
-            $this->$name = $value;
+        if ($this->isJson($name) && !$this->hasAttribute($name)) {
+            $value = json_encode($value);
+        } elseif ($this->isArray($name) && !$this->hasAttribute($name)) {
+            $value = serialize($value);
         }
+
+        $this->attributes[$name] = $value;
     }
 
     /**
