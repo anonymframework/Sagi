@@ -23,7 +23,7 @@ trait Cache
     /**
      *  makes memcache connection
      */
-    protected function makeCacheConnection()
+    private static function makeCacheConnection()
     {
         $configs = ConfigManager::get('cache');
 
@@ -33,9 +33,11 @@ trait Cache
         $this->memcache->addServer($configs['host'], $configs['port']);
     }
 
-    public static function bootCache(){
-        $this->makeCacheConnection();
+    public static function bootCache()
+    {
+        static::makeCacheConnection();
     }
+
     /**
      * @return Memcached
      */
