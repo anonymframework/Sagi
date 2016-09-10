@@ -646,13 +646,7 @@ class Model extends QueryBuilder
      */
     public function __set($name, $value)
     {
-        if ($this->isJson($name) && !$this->hasAttribute($name)) {
-            $value = json_encode($value);
-        } elseif ($this->isArray($name) && !$this->hasAttribute($name)) {
-            $value = serialize($value);
-        }
-
-        $this->attributes[$name] = $value;
+        $this->setAttribute($name, $value);
     }
 
     /**
@@ -686,6 +680,22 @@ class Model extends QueryBuilder
 
 
     /**
+     * @param $key
+     * @param $value
+     */
+    public function setAttribute($key, $value)
+    {
+        if ($this->isJson($key) && !$this->hasAttribute($key)) {
+            $value = json_encode($value);
+        } elseif ($this->isArray($key) && !$this->hasAttribute($key)) {
+            $value = serialize($value);
+        }
+
+        $this->attributes[$key] = $value;
+    }
+
+
+    /**
      * @param $name
      * @return mixed
      * @throws \Exception
@@ -696,9 +706,6 @@ class Model extends QueryBuilder
             return call_user_func_array([$this, $n], []);
         }
 
-        if (empty($this->attributes)) {
-            $this->one();
-        }
 
         if (false === $this->attributes) {
             throw new \PDOException('your query is failed');
