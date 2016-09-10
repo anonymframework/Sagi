@@ -2,6 +2,7 @@
 
 
 namespace Sagi\Database;
+use Sagi\Database\Mapping\Entity;
 
 /**
  * Class MigrationManager
@@ -67,10 +68,10 @@ class MigrationManager extends Schema
                 throw new \Exception(get_class($migration) . 'is not a instance of MigrationInterface');
             }
 
-            QueryBuilder::createNewInstance()->setTable('migrations')->create([
+            QueryBuilder::createNewInstance()->setTable('migrations')->create(new Entity([
                 'filename' => $prepared,
                 'path' => $file
-            ]);
+            ]));
 
             $files[] = $file;
         }

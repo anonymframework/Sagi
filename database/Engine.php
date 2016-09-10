@@ -204,7 +204,13 @@ class Engine
 
         $count = count($entity->datas);
 
-        foreach (array_keys($entity->datas[0]) as $key => $value) {
+        if ($entity->multipile === false) {
+            $keys = array_keys($entity->datas);
+        }else{
+            $keys = array_keys($entity->datas[0]);
+        }
+
+        foreach ($keys as $key => $value) {
             $s .= $value . ",";
         }
 
