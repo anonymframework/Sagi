@@ -82,7 +82,7 @@ class Model extends QueryBuilder
         }
 
         if (!empty($this->fields)) {
-            $this->setSelect($this->fields);
+            $this->select($this->fields);
         }
     }
 
