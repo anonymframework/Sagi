@@ -537,7 +537,7 @@ class Model extends QueryBuilder
      */
     public static function set($datas)
     {
-        return static::createNewInstance()->setAttributes($datas);
+        return new static($datas);
     }
 
 
