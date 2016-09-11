@@ -28,10 +28,10 @@ class Auth extends Model
      */
     protected $timestamps = ['created_at','updated_at'];
 
-    public static function getTableName()
-    {
-        return  'auth';
-    }
+     /**
+      * @var string
+      */
+    protected $table = 'auth';
 
 
 }

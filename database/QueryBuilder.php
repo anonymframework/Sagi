@@ -14,6 +14,10 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
 
 
     /**
+     * @var array
+     */
+    protected $error;
+    /**
      * @var string
      */
     private $lastQueryString;
@@ -24,7 +28,7 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function error()
     {
-        return $this->pdo->errorInfo();
+        return $this->error;
     }
 
     /**
@@ -52,6 +56,8 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         $prepared = $this->pdo->prepare($query);
 
         $exed = $prepared->execute($args);
+
+        $this->error = $prepared->errorInfo();
 
         return $execute ? $exed : $prepared;
     }

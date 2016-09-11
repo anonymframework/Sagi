@@ -708,6 +708,10 @@ class Model extends QueryBuilder
         }
 
 
+        if (empty($this->attributes)) {
+            $this->one();
+        }
+
         if (false === $this->attributes) {
             throw new \PDOException('your query is failed');
         }

@@ -26,7 +26,9 @@ class Row
         'datetime' => '`%s` DATETIME',
         'text' => '`%s` TEXT',
         'float' => '`%s` FLOAT(%d)',
-        'decimal' => '`%s` DECIMAL(%d,%d)'
+        'decimal' => '`%s` DECIMAL(%d,%d)',
+        'bool' => '`%s` BOOLEAN',
+        'bit' => '`%s` BIT'
     ];
 
     /**
@@ -116,6 +118,29 @@ class Row
     }
 
     /**
+     * add a new time string
+     *
+     * @param string $name
+     * @return Command
+     */
+    public function bool($name)
+    {
+        return $this->addCommand('bool', $this->madeArray($name));
+    }
+
+
+    /**
+     * add a new time string
+     *
+     * @param string $name
+     * @return Command
+     */
+    public function bit($name)
+    {
+        return $this->addCommand('bit', $this->madeArray($name));
+    }
+
+    /**
      * add a new timestamp column to mysql
      *
      * @param string $name
@@ -189,6 +214,7 @@ class Row
     {
         return $this->addCommand('decimal', [$name, $precision, $scale]);
     }
+
     /**
      * @param string $name
      * @param int $precision

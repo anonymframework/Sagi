@@ -36,4 +36,13 @@ class RelationShip
         $this->relatedWith->$name = $value;
     }
 
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        return call_user_func_array([$this->relatedWith, $name], $arguments);
+    }
 }
