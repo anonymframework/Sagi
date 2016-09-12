@@ -23,6 +23,9 @@ class Loggable implements LoggerAwareInterface
     public function __construct()
     {
         $this->setLogger(new Logger());
+
+        set_error_handler([$this, 'errorHandler']);
+        set_exception_handler([$this, 'expectionHandler']);
     }
 
     /**
@@ -37,6 +40,21 @@ class Loggable implements LoggerAwareInterface
     }
 
 
+    /**
+     * @param $code
+     * @param $message
+     * @param $file
+     * @param $line
+     * @throws ErrorException
+     */
+    public function errorHandler($code, $message, $file, $line)
+    {
+        throw new ErrorException($message, $code, $line, $file);
+    }
 
+    public function exceptionHandler(\Exception $exception)
+    {
+
+    }
 
 }
