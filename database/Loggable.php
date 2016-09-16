@@ -25,7 +25,7 @@ class Loggable implements LoggerAwareInterface
         $this->setLogger(new Logger());
 
         set_error_handler([$this, 'errorHandler']);
-        set_exception_handler([$this, 'expectionHandler']);
+        set_exception_handler([$this, 'exceptionHandler']);
     }
 
     /**
@@ -52,9 +52,33 @@ class Loggable implements LoggerAwareInterface
         throw new ErrorException($message, $code, $line, $file);
     }
 
+    /**
+     * @param \Exception $exception
+     */
     public function exceptionHandler(\Exception $exception)
     {
+        $message = $exception->getMessage();
+        $code = $exception->getCode();
+        $line = $exception->getLine();
+        $file = $exception->getFile();
 
+
+        $context = compact('code', 'line', 'file');
+
+        switch ($code) {
+            case E_USER_ERROR:
+            case E_COMPILE_ERROR:
+            case E_CORE_ERROR:
+                $this->logger->error($message, $context);
+                break;
+            case E_USER_NOTICE:
+            case E_USER_WARNING:
+                $this->logger->warning($message, $context);
+                break;
+            case 0:
+                $this->logger->info($message, $context);
+                break;
+        }
     }
 
 }
