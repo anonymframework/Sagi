@@ -2,9 +2,6 @@
 
 include "vendor/autoload.php";
 
-if (!\Sagi\Database\Identitiy::isLogined()) {
-    header('Location: login.php');
-}
 
 if (!isset($_GET['page'])) {
     $page = 'index';
@@ -16,7 +13,7 @@ $file = 'pages' . DIRECTORY_SEPARATOR . $page . '.php';
 
 $user = \Sagi\Database\Identitiy::user();
 
-$configs = \Models\Configs::find()->one();
+$logined = \Sagi\Database\Identitiy::isLogined();
 
 include "header.php";
 
