@@ -144,6 +144,8 @@ class Logger implements LoggerInterface
         $code = $context['code'];
         $file = $context['file'];
         $line = $context['line'];
+        $trace = $context['trace'];
+        $trace_string = $content['traceAsString'];
 
         $fullPath = $path . DIRECTORY_SEPARATOR . $fileName;
 
@@ -152,13 +154,14 @@ class Logger implements LoggerInterface
              'Code'    : $code,
              'Line'    : $line,
              'Message' : $message, 
-             'File'    : $file
+             'File'    : $file,
+             'Trace'   : $trace_string
 CONTENT;
 
 
         $view = new View('error');
 
-        $view->with(compact('message', 'code', 'line', 'file'));
+        $view->with(compact('message', 'code', 'line', 'file', 'trace'));
 
         echo $view->show();
 
