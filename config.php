@@ -11,6 +11,13 @@ return [
         'port' => 11211
     ],
 
+    'logging' => [
+        'open' => true,
+        'mailing' => [
+            'aa@bb.com'
+        ]
+    ],
+
     'policies' => [
         //
     ],

@@ -75,6 +75,11 @@ class Model extends QueryBuilder
     protected $alias;
 
     /**
+     * @var Loggable
+     */
+    protected $logging;
+
+    /**
      * Model constructor.
      * @param array $attributes
      */
@@ -101,8 +106,19 @@ class Model extends QueryBuilder
         if (!empty($attributes)) {
             $this->fill($attributes);
         }
+
+
+        $this->bootLogging();
     }
 
+    private function bootLogging()
+    {
+        $logging = ConfigManager::get('logging', ['open' => false]);
+
+        if($logging['open'] === true){
+            $this->logging = new Loggable();
+        }
+    }
 
     /**
      * @param array $attributes
