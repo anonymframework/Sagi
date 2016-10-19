@@ -26,6 +26,12 @@ class Loggable implements LoggerAwareInterface
 
         set_error_handler([$this, 'errorHandler']);
         set_exception_handler([$this, 'exceptionHandler']);
+
+        if(!file_exists('logs') && !dir('logs')){
+            mkdir('logs', 0777);
+        }
+
+
     }
 
     /**
