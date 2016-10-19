@@ -148,6 +148,7 @@ class Logger implements LoggerInterface
         touch($fullPath = $path.DIRECTORY_SEPARATOR.$fileName);
 
         $content= <<<CONTENT
+        An error happen;
              'Code'    : $code,
              'Line'    : $line,
              'Message' : $message, 
@@ -155,6 +156,8 @@ class Logger implements LoggerInterface
 CONTENT;
 
         file_put_contents($fullPath, $content);
+
+        echo $content;
     }
 
 }
