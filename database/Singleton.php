@@ -22,9 +22,9 @@ class Singleton
     public static function load($class, $parameters = [])
     {
         if (!isset(static::$instance[$class]) || static::$instance[$class] instanceof $class) {
-            $class = new \ReflectionClass($class);
+            $reflectionClass= new \ReflectionClass($class);
 
-            static::$instance[$class] = $class->newInstance($parameters);
+            static::$instance[$class] = $reflectionClass->newInstance($parameters);
         }
 
         return static::$instance[$class];

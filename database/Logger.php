@@ -23,7 +23,7 @@ class Logger implements LoggerInterface
      */
     public function emergency($message, array $context = array())
     {
-        $this->log(0, $message, $context);
+        $this->log(1, $message, $context);
     }
 
     /**
@@ -53,7 +53,7 @@ class Logger implements LoggerInterface
      */
     public function critical($message, array $context = array())
     {
-        $this->log(0, $message, $context);
+        $this->log(1, $message, $context);
 
     }
 
@@ -67,7 +67,7 @@ class Logger implements LoggerInterface
      */
     public function error($message, array $context = array())
     {
-        $this->log(0, $message, $context);
+        $this->log(1, $message, $context);
 
     }
 
@@ -139,15 +139,15 @@ class Logger implements LoggerInterface
     public function log($level, $message, array $context = array())
     {
         $path = Loggable::$logFile;
-        $fileName = date('H:i:s d-m-Y') . '_' . $context['file'] . '_' . $context['line'] . '_' . $context['code'] . '.log';
+        $fileName = date('H_i_s_d_m_Y') . '_' . $context['line'] . '_' . $context['code'] . '.log';
 
         $code = $context['code'];
         $file = $context['file'];
         $line = $context['line'];
 
-        touch($fullPath = $path.DIRECTORY_SEPARATOR.$fileName);
+        $fullPath = $path . DIRECTORY_SEPARATOR . $fileName;
 
-        $content= <<<CONTENT
+        $content = <<<CONTENT
         An error happen;
              'Code'    : $code,
              'Line'    : $line,
@@ -155,13 +155,18 @@ class Logger implements LoggerInterface
              'File'    : $file
 CONTENT;
 
-        file_put_contents($fullPath, $content);
 
-        $view = View::createContentWithFile('error');
+        $view = new View('error');
 
         $view->with(compact('message', 'code', 'line', 'file'));
 
         echo $view->show();
+
+        if ($level === 1) {
+            file_put_contents($fullPath, $content);
+
+            exit();
+        }
     }
 
 }

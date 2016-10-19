@@ -2,8 +2,8 @@
 
 return [
     'username' => 'root',
-    'password' => 'aa',
-    'dsn' => 'mysql:host=localhost;dbname=aa',
+    'password' => '',
+    'dsn' => 'mysql:host=localhost;dbname=test',
     'driver' => 'mysql',
 
     'cache' => [

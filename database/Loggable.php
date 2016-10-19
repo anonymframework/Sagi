@@ -33,8 +33,8 @@ class Loggable implements LoggerAwareInterface
         set_exception_handler([$this, 'exceptionHandler']);
 
         $logs = static::$logFile;
-        if(!file_exists($logs) && !dir($logs)){
-            mkdir($logs, 0777);
+        if(!file_exists($logs)){
+            mkdir($logs, 0777, true);
         }
     }
 
@@ -89,7 +89,7 @@ class Loggable implements LoggerAwareInterface
                 $this->logger->warning($message, $context);
                 break;
             case 0:
-                $this->logger->info($message, $context);
+                $this->logger->critical($message, $context);
                 break;
             default:
                 $this->logger->notice($message, $context);

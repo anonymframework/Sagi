@@ -1,3 +1,6 @@
 An error happened;
 
-{{$line}}
+<br>Message: {{$message}}</br>
+<br>File: {{$file}}</br>
+<br>Line: {{$line}}</br>
+<br>Code: {{$code}}</br>
