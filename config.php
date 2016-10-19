@@ -13,9 +13,6 @@ return [
 
     'logging' => [
         'open' => true,
-        'mailing' => [
-            'aa@bb.com'
-        ]
     ],
 
     'policies' => [
