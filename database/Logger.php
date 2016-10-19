@@ -13,6 +13,7 @@ namespace Sagi\Database;
 class Logger implements LoggerInterface
 {
 
+
     /**
      * System is unusable.
      *
@@ -137,7 +138,23 @@ class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = array())
     {
-        // TODO: Implement log() method.
+        $path = Loggable::$logFile;
+        $fileName = date('H:i:s d-m-Y') . '_' . $context['file'] . '_' . $context['line'] . '_' . $context['code'] . '.log';
+
+        $code = $context['code'];
+        $file = $context['file'];
+        $line = $context['line'];
+
+        touch($fullPath = $path.DIRECTORY_SEPARATOR.$fileName);
+
+        $content= <<<CONTENT
+             'Code'    : $code,
+             'Line'    : $line,
+             'Message' : $message, 
+             'File'    : $file
+CONTENT;
+
+        file_put_contents($fullPath, $content);
     }
 
 }

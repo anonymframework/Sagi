@@ -18,6 +18,11 @@ class Loggable implements LoggerAwareInterface
     protected $logger;
 
     /**
+     * @var string
+     */
+    public static $logFile = 'logs';
+
+    /**
      * Loggable constructor.
      */
     public function __construct()
@@ -27,11 +32,10 @@ class Loggable implements LoggerAwareInterface
         set_error_handler([$this, 'errorHandler']);
         set_exception_handler([$this, 'exceptionHandler']);
 
-        if(!file_exists('logs') && !dir('logs')){
-            mkdir('logs', 0777);
+        $logs = static::$logFile;
+        if(!file_exists($logs) && !dir($logs)){
+            mkdir($logs, 0777);
         }
-
-
     }
 
     /**
