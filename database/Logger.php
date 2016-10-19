@@ -157,7 +157,11 @@ CONTENT;
 
         file_put_contents($fullPath, $content);
 
-        echo $content;
+        $view = View::createContentWithFile('error');
+
+        $view->with(compact('message', 'code', 'line', 'file'));
+
+        echo $view->show();
     }
 
 }
