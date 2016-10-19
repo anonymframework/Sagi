@@ -71,9 +71,10 @@ class Loggable implements LoggerAwareInterface
         $code = $exception->getCode();
         $line = $exception->getLine();
         $file = $exception->getFile();
+        $trace = $exception->getTrace();
 
 
-        $context = compact('code', 'line', 'file');
+        $context = compact('code', 'line', 'file', 'trace');
 
         switch ($code) {
             case E_USER_ERROR:
