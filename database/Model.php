@@ -116,7 +116,7 @@ class Model extends QueryBuilder
         $logging = ConfigManager::get('logging', ['open' => false]);
 
         if($logging['open'] === true){
-            $this->logging = new Loggable();
+            $this->logging = Singleton::load('Sagi\Database\Loggable');
         }
     }
 
