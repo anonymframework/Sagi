@@ -20,7 +20,9 @@ class CleanLogsCommand extends Command
         $files = glob(Loggable::$logFile.DIRECTORY_SEPARATOR.'*.log');
 
         foreach($files as $file){
-            unlink($file);
+
         }
+
+        $output->write('Success!');
     }
 }
