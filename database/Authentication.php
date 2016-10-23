@@ -35,7 +35,7 @@ trait Authentication
 
                 $this->setRules([
                     $username => 'required|digit_min:5|match_db',
-                    $password => 'required|digit_min:5|match_db_with:'.$username
+                    $password => 'required|digit_min:5|match_db_with:' . $username
                 ]);
 
                 $this->setFilters([
@@ -44,10 +44,9 @@ trait Authentication
                 ]);
 
 
-
                 $this->setMessages([
-                    'match_db.' . $username => ConfigManager::get('authentication.error_messages.'.$username, 'Wrong Username'),
-                    'match_db_with.' . $password =>  ConfigManager::get('authentication.error_messages.'.$username, 'Wrong Password')
+                    'match_db.' . $username => ConfigManager::get('authentication.error_messages.' . $username, 'Wrong Username'),
+                    'match_db_with.' . $password => ConfigManager::get('authentication.error_messages.' . $password, 'Wrong Password')
                 ]);
                 if ($this->validate($datas)) {
                     if ($find->exists()) {
