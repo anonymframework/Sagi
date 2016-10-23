@@ -43,9 +43,11 @@ trait Authentication
                     $password => 'xss|strip_tags'
                 ]);
 
+
+
                 $this->setMessages([
-                    'match_db.' . $username => 'Kullanıcı Adınızı Yanlış Girdiniz',
-                    'match_db_with.' . $password => 'Şifrenizi Yanlış Girdiniz'
+                    'match_db.' . $username => ConfigManager::get('authentication.error_messages.'.$username, 'Wrong Username'),
+                    'match_db_with.' . $password =>  ConfigManager::get('authentication.error_messages.'.$username, 'Wrong Password')
                 ]);
                 if ($this->validate($datas)) {
                     if ($find->exists()) {

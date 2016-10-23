@@ -22,6 +22,10 @@ return [
     'PRIVATE_KEY' => md5('YOUR KEY'),
 
     'authentication' => [
-        'login' => ['username', 'password']
+        'login' => ['username', 'password'],
+        'error_messages' => [
+            'username' => 'Kullanıcı Adınızı Yanlış Girdiniz',
+            'password' => 'Şifrenizi Yanlış Giridiniz'
+        ]
     ]
 ];
