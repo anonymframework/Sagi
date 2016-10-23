@@ -16,7 +16,7 @@ class CryptManager
      */
     public static function getKey()
     {
-        if(empty(static::$key)){
+        if (empty(static::$key)) {
             static::$key = ConfigManager::get('PRIVATE_KEY');
         }
 
@@ -37,6 +37,10 @@ class CryptManager
      */
     public static function encode($value)
     {
+        if (!is_string($value)) {
+            $value = serialize($value);
+        }
+
         return mcrypt_encrypt(MCRYPT_3DES, static::prepareKey(static::getKey()), $value, MCRYPT_MODE_ECB);
     }
 
@@ -44,7 +48,8 @@ class CryptManager
      * @param $key
      * @return string
      */
-    private static function prepareKey($key){
+    private static function prepareKey($key)
+    {
         return substr($key, 0, 24);
     }
 
@@ -54,6 +59,12 @@ class CryptManager
      */
     public static function decode($value)
     {
-        return mcrypt_decrypt(MCRYPT_3DES, static::prepareKey(static::getKey()), $value, MCRYPT_MODE_ECB);
+        $decoded = mcrypt_decrypt(MCRYPT_3DES, static::prepareKey(static::getKey()), $value, MCRYPT_MODE_ECB);
+
+        if (!is_string($decoded)) {
+            $decoded = unserialize($decoded);
+        }
+
+        return $decoded;
     }
 }
