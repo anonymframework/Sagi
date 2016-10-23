@@ -40,12 +40,16 @@ class CryptManager
         return mcrypt_encrypt(MCRYPT_3DES, static::prepareKey(static::getKey()), $value, MCRYPT_MODE_ECB);
     }
 
+    /**
+     * @param $key
+     * @return string
+     */
     private static function prepareKey($key){
         return substr($key, 0, 24);
     }
 
     /**
-     * @param $value
+     * @param string $value
      * @return string
      */
     public static function decode($value)
