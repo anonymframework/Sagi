@@ -15,6 +15,8 @@ use Sagi\Database\Console\CreateSeedCommand;
 use Sagi\Database\Console\SeedFileCommand;
 use Sagi\Database\Console\SeedAllFileCommand;
 use Sagi\Database\Console\CreateMigrationsCommand;
+use Sagi\Database\Console\MigrationAuthCommand;
+use Sagi\Database\Console\MigrationLanguageCommand;
 
 $application = new Application();
 
@@ -30,7 +32,9 @@ $application->addCommands([
     new SeedFileCommand(),
     new SeedAllFileCommand(),
     new CreateMigrationsCommand(),
-    new CleanLogsCommand()
+    new CleanLogsCommand(),
+    new MigrationAuthCommand(),
+    new MigrationLanguageCommand()
 ]);
 
 $application->run();

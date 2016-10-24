@@ -1,0 +1,38 @@
+<?php
+
+/**
+ *  Created by Sagi Database Console
+ *
+ */
+
+use Sagi\Database\Schema;
+use Sagi\Database\Row as Table;
+use Sagi\Database\MigrationInterface;
+
+/**
+ * @class CreateAuthTable
+ */
+class CreateLanguageTable extends Schema implements MigrationInterface
+{
+
+    /**
+     * includes createTable functions
+     *
+     */
+    public function up()
+    {
+        $this->createTable('languages', function (Table $row) {
+           $row->pk('id');
+           $row->string('name');
+        });
+    }
+
+    /**
+     * includes dropTable function
+     *
+     */
+    public function down()
+    {
+        $this->dropTable('languages');
+    }
+}

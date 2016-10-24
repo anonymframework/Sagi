@@ -155,7 +155,7 @@ class Model extends QueryBuilder
     {
         foreach ($traits as $trait) {
             if (method_exists($this, $method = 'boot' . $this->classBaseName($trait))) {
-                forward_static_call($method);
+                call_user_func_array([$this, $method],  []);
             }
         }
     }

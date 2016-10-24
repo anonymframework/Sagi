@@ -33,7 +33,7 @@ trait Cache
         static::$memcache->addServer($configs['host'], $configs['port']);
     }
 
-    public static function bootCache()
+    public function bootCache()
     {
         static::makeCacheConnection( );
     }
