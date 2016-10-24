@@ -25,6 +25,13 @@ class CreateLanguageTable extends Schema implements MigrationInterface
            $row->pk('id');
            $row->string('name');
         });
+
+        $this->createTable('language_texts', function(Table $row){
+           $row->pk('id');
+           $row->int('table_id');
+           $row->int('column_id');
+           $row->text('text');
+        });
     }
 
     /**

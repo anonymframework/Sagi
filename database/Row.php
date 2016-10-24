@@ -186,6 +186,13 @@ class Row
     }
 
     /**
+     * @return Row
+     */
+    public function language()
+    {
+        return $this->string('language_columns', 255)->null();
+    }
+    /**
      * add a new time stamp with CURRENT_TIMESTAMP
      *
      * @param string $name

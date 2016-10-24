@@ -22,7 +22,8 @@ class Command
         [
             'default' => 'DEFAULT %s',
             'null' => 'NULL',
-            'notnull' => 'NOT NULL'
+            'notnull' => 'NOT NULL',
+            'unique' => 'UNIQUE'
         ];
 
     /**
@@ -45,6 +46,11 @@ class Command
     public function null()
     {
         return $this->addCommand('null', []);
+    }
+
+    public function unique()
+    {
+        return $this->addCommand('unique', []);
     }
 
     /**
