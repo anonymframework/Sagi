@@ -9,8 +9,6 @@
 
 namespace Sagi\Http;
 
-use Sahi\Http\Server;
-
 
 /**
  * the class of request
@@ -21,12 +19,6 @@ use Sahi\Http\Server;
 class Request
 {
 
-    /**
-     * the instance of response
-     *
-     * @var Response
-     */
-    private $response;
 
     /**
      *  the constant of http head method
@@ -635,7 +627,7 @@ class Request
 
 
     /**
-     * @return \Anonym\Http\Server
+     * @return \Sagi\Http\Server
      */
     public function getServer()
     {
@@ -645,7 +637,7 @@ class Request
     /**
      * register the server instance
      *
-     * @param \Anonym\Http\Server $server
+     * @param \Sagi\Http\Server $server
      * @return Request
      */
     public function setServer(Server $server)
