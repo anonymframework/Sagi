@@ -8,7 +8,6 @@
  */
 
 namespace Anonym\Http;
-use Anonym\Http\RedirectUrlEmptyException;
 
 /**
  * Class Redirect

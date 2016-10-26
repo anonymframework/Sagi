@@ -7,12 +7,11 @@
  *
  */
 
-namespace Anonym\Http;
+namespace Sagi\Http;
 
 
 use Sagi\Database\CookieManager;
-use Sagi\Http\HttpResponseException;
-use Sagi\Http\ResponseInterface;
+
 
 /**
  * Class Response
