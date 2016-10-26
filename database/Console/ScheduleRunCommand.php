@@ -4,11 +4,8 @@ namespace Sagi\Database\Console;
 
 
 use Sagi\Cron\Cron;
-use Sagi\Database\MigrationManager;
-use Sagi\Database\Schema;
-use Sagi\Database\TemplateManager;
+use Sagi\Cron\Task\TaskReposity;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -16,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class MigrationCreateFormat
  * @package Sagi\Database\Console
  */
-class MigrationAuthCommand extends Command
+class ScheduleRunCommand extends Command
 {
 
     protected function configure()
