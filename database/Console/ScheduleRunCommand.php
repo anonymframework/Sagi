@@ -3,6 +3,7 @@
 namespace Sagi\Database\Console;
 
 
+use Sagi\Cron\Cron;
 use Sagi\Database\MigrationManager;
 use Sagi\Database\Schema;
 use Sagi\Database\TemplateManager;
@@ -30,8 +31,29 @@ class MigrationAuthCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $schedule = new Cron();
 
+        if(file_exists('schedule.php'))
+        {
+            include 'schedule.php';
+        }
 
+        $events = $schedule->dueEvents($schedule->getEvents());
+
+        if (!count($events)) {
+            $output->write('<error>There isnt any event from schedule</error>');
+
+            return false;
+        }
+
+        foreach ($events as $event) {
+
+            if ($event instanceof TaskReposity) {
+                $output->writeln(sprintf('<info> %s Command is Runnig', $event->getSummaryForDescription().'</info>'));
+
+                $event->execute();
+            }
+        }
     }
 
 
