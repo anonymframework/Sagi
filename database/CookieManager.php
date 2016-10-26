@@ -73,4 +73,9 @@ class CookieManager
             static::delete($item);
         }
     }
+
+    public static function getCookies()
+    {
+        return $_COOKIE;
+    }
 }

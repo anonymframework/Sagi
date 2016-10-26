@@ -8,6 +8,7 @@
  */
 
 namespace Sagi\Http;
+use Sagi\Database\CookieManager;
 
 
 /**
@@ -129,7 +130,7 @@ class Request
     {
         $headers = (new ServerHttpHeaders())->getHeaders();
         $this->setHeaders($headers);
-        $this->setCookies((new CookieBag())->getCookies());
+        $this->setCookies((CookieManager::getCookies());
         $this->setServer(new Server());
         $this->setValidate($validation);
         $this->setInput(new Input());
