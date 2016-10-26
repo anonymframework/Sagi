@@ -8,6 +8,7 @@
  */
 
 namespace Sagi\Http;
+
 use Sagi\Database\CookieManager;
 
 
@@ -133,9 +134,10 @@ class Request
         $this->setCookies(CookieManager::getCookies());
         $this->setServer(new Server());
         $this->setInput(new Input());
-        $this->setQuery( new Query());
+        $this->setQuery(new Query());
         $this->segments = explode('/', $this->getUrl());
     }
+
     /**
      * upload a file with input name and uplaod dir,
      *
@@ -144,8 +146,8 @@ class Request
      *  $name parameter must be a string and it is has to be exists
      *  $uploadDir         must be an instance of string and it's must be a dir.
      *
-     * @param string $name        the name of upload input
-     * @param string $uploadDir   the dir to upload file
+     * @param string $name the name of upload input
+     * @param string $uploadDir the dir to upload file
      * @throws FileNotUploadedException
      * @return FileUpload
      */
@@ -217,24 +219,28 @@ class Request
      */
     public function getUrl()
     {
-        $docRoot = $this->findDocumentRootInScriptFileName();
+        $base = $this->getRequestUri();
 
-        if ($docRoot === $this->removeLastSlash($this->root)) {
-            return $this->getRequestUri();
-        }else{
-            return $this->getSchemeAndHost().str_replace($this->root, '', $docRoot);
+        if ('' !== $qs = $this->getQueryString()) {
+            $qs = '?' . $qs;
+
+            $base = $base . $qs;
         }
 
+        return $base;
     }
+
 
     /**
      * find and return user called uri
      *
      * @return string
      */
-    public function getUri(){
+    public function getUri()
+    {
         return $this->getUrl();
     }
+
     /**
      * remove last slash from your string
      *
@@ -265,7 +271,7 @@ class Request
         $parse = explode('/', $filename);
         $count = count($parse);
         if ($count && $count > 1) {
-            $path = array_slice($parse, 0, $count-1);
+            $path = array_slice($parse, 0, $count - 1);
             return $this->removeLastSlash(join('/', $path));
         } else {
             return '/';
@@ -353,7 +359,9 @@ class Request
      */
     public function getRequestUri()
     {
-        return str_replace('?'.$this->getQueryString(), '', $this->uri);
+        $docRoot = $this->findDocumentRootInScriptFileName();
+
+        return $this->getSchemeAndHost() . $this->removeLastSlash(str_replace($this->root, '', $docRoot));
     }
 
     /**
@@ -407,8 +415,9 @@ class Request
      *
      * @return mixed
      */
-    public function query(){
-        return  $this->getQuery()->getAll();
+    public function query()
+    {
+        return $this->getQuery()->getAll();
     }
 
     /**
@@ -488,7 +497,8 @@ class Request
      *
      * @return bool if method is post return true, else return false
      */
-    public function isPost(){
+    public function isPost()
+    {
         return $this->getMethod() === self::METHOD_POST;
     }
 
@@ -497,7 +507,8 @@ class Request
      *
      * @return bool if method is get return true, else return false
      */
-    public function isGet(){
+    public function isGet()
+    {
         return $this->getMethod() === self::METHOD_GET || $this->getMethod() === self::METHOD_HEAD;
     }
 
@@ -506,7 +517,8 @@ class Request
      *
      * @return bool if method is put return true, else return false
      */
-    public function isPut(){
+    public function isPut()
+    {
         return $this->getMethod() === self::METHOD_PUT;
     }
 
@@ -515,7 +527,8 @@ class Request
      *
      * @return bool if method is delete return true, else return false
      */
-    public function isDelete(){
+    public function isDelete()
+    {
         return $this->getMethod() === self::METHOD_DELETE;
     }
 
@@ -525,7 +538,8 @@ class Request
      *
      * @return bool if method is options return true, else return false
      */
-    public function isOptions(){
+    public function isOptions()
+    {
         return $this->getMethod() === self::METHOD_OPTIONS;
     }
 
@@ -534,7 +548,8 @@ class Request
      *
      * @return bool if method is options return true, else return false
      */
-    public function isPurge(){
+    public function isPurge()
+    {
         return $this->getMethod() === self::METHOD_PURGE;
     }
 
@@ -544,7 +559,8 @@ class Request
      *
      * @return bool if method is options return true, else return false
      */
-    public function isTrace(){
+    public function isTrace()
+    {
         return $this->getMethod() === self::METHOD_TRACE;
     }
 
@@ -553,7 +569,8 @@ class Request
      *
      * @return bool if method is options return true, else return false
      */
-    public function isConnect(){
+    public function isConnect()
+    {
         return $this->getMethod() === self::METHOD_CONNECT;
     }
 
@@ -562,9 +579,11 @@ class Request
      *
      * @return bool if method is options return true, else return false
      */
-    public function isPatch(){
+    public function isPatch()
+    {
         return $this->getMethod() === self::METHOD_PATCH;
     }
+
     /**
      * Get a subset of the items from the input data.
      *
