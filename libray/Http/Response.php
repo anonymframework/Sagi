@@ -325,7 +325,7 @@ class Response implements ResponseInterface
      */
     public function getCookies()
     {
-        return CookieContainer::getCookies();
+        return CookieManager::getCookies();
     }
 
     /**
