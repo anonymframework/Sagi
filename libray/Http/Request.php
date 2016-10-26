@@ -132,7 +132,6 @@ class Request
         $this->setHeaders($headers);
         $this->setCookies(CookieManager::getCookies());
         $this->setServer(new Server());
-        $this->setValidate($validation);
         $this->setInput(new Input());
         $this->setQuery( new Query());
         $this->segments = explode('/', $this->getUrl());
