@@ -126,7 +126,7 @@ class Request
     /**
      * Sınıfı başlatır ve header bilgilerini atar
      */
-    public function __construct(Validate $validation = null)
+    public function __construct()
     {
         $headers = (new ServerHttpHeaders())->getHeaders();
         $this->setHeaders($headers);
