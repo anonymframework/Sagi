@@ -217,12 +217,14 @@ class Request
      */
     public function getUrl()
     {
-        if ($this->findDocumentRootInScriptFileName() === $this->removeLastSlash($this->root)) {
-            return $this->getRequestUri();
-        }
-        $path = $this->server->get('PATH_INFO');
+        $docRoot = $this->findDocumentRootInScriptFileName();
 
-        return $path;
+        if ($docRoot === $this->removeLastSlash($this->root)) {
+            return $this->getRequestUri();
+        }else{
+            return $this->getSchemeAndHost().str_replace($this->root, '', $docRoot);
+        }
+
     }
 
     /**

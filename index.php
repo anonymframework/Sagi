@@ -2,8 +2,6 @@
 
 include "vendor/autoload.php";
 
-$users = new \Models\Users();
+$request = new \Sagi\Http\Request();
 
-var_dump($users);
-
-throw new Exception();
+var_dump($request->getUri());
