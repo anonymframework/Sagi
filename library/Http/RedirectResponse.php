@@ -50,7 +50,7 @@ class RedirectResponse extends Response implements ResponseInterface
      */
     public function back()
     {
-        self::to($_SERVER['HTTP_REFERER']);
+        self::create($_SERVER['HTTP_REFERER']);
     }
 
     /**
