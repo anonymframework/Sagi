@@ -196,6 +196,7 @@ class Request
         return $this;
     }
 
+
     /**
      * return the current request method
      *
