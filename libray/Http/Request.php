@@ -130,7 +130,6 @@ class Request
         $headers = (new ServerHttpHeaders())->getHeaders();
         $this->setHeaders($headers);
         $this->setCookies((new CookieBag())->getCookies());
-        $this->setResponse(new Response());
         $this->setServer(new Server());
         $this->setValidate($validation);
         $this->setInput(new Input());
