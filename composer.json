@@ -18,7 +18,8 @@
     "psr-4": {
       "Sagi\\Database\\": "database/",
       "Models\\": "models/",
-      "Policies\\": "policies/"
+      "Policies\\": "policies/",
+      "Sagi\\Http\\": "library/Http"
     }
   },
   "extra": {
