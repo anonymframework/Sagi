@@ -8,7 +8,6 @@
      */
 
     namespace Sagi\Http;
-    use Sagi\Http\Response;
 
     /**
      * Bu sınıf AnonymFramework' de kullanılmak üzere tasarlanmıştır, Json Response leri oluşturmak üzere tasarlanmıştır

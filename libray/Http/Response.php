@@ -10,6 +10,7 @@
 namespace Anonym\Http;
 
 
+use Sagi\Database\CookieManager;
 use Sagi\Http\HttpResponseException;
 use Sagi\Http\ResponseInterface;
 
@@ -19,7 +20,6 @@ use Sagi\Http\ResponseInterface;
  */
 class Response implements ResponseInterface
 {
-
     /**
      * dosya tipi
      *
@@ -336,11 +336,7 @@ class Response implements ResponseInterface
      */
     public function getCookie($name = '')
     {
-        if (isset(CookieContainer::getCookies()[$name])) {
-            return CookieContainer::getCookies()[$name];
-        } else {
-            return false;
-        }
+        return CookieManager::get($name);
     }
 
     /**
