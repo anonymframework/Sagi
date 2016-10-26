@@ -20,7 +20,8 @@
       "Sagi\\Database\\": "database/",
       "Models\\": "models/",
       "Policies\\": "policies/",
-      "Sagi\\Http\\": "library/Http"
+      "Sagi\\Http\\": "library/Http",
+      "Sagi\\Cron\\": "library/Cron"
     }
   },
   "extra": {
