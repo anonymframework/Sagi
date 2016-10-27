@@ -11,6 +11,10 @@ use Sagi\Database\Mapping\Entity;
 class MigrationManager extends Schema
 {
 
+    protected static $systemMigrations = [
+        'auth',
+    ];
+
     /**
      * @var string
      */
@@ -27,6 +31,8 @@ class MigrationManager extends Schema
     public function __construct()
     {
         parent::__construct();
+
+        static::$systemMigrations[] = $this->migrationTable;
     }
 
 
