@@ -32,6 +32,11 @@ class CreateMigrationsCommand extends Command
 
         foreach ($mapped as $table) {
 
+            if(in_array($table->name, MigrationManager::$systemMigrations))
+            {
+                continue;
+            }
+
             $create = '$this->createTable("' . $table->name . '", function(Table $table){' . "\n\r";
 
             foreach ($table->columns as $column) {
