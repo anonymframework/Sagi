@@ -13,7 +13,8 @@
     "php": ">=5.4.0",
     "symfony/console": "2.8",
     "symfony/process": "~2.4",
-    "nesbot/carbon": "~1.19"
+    "nesbot/carbon": "~1.19",
+    "mtdowling/cron-expression": "~1.0"
   },
   "minimum-stability": "dev",
   "autoload": {
