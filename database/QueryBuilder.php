@@ -187,6 +187,11 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
         return $ins ? $ins->rowCount() : false;
     }
 
+    public function all()
+    {
+        return $this->get()->fetchAll(PDO::FETCH_OBJ);
+    }
+
     /**
      * @param string $name
      * @return mixed

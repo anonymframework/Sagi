@@ -94,6 +94,7 @@ class MigrationManager extends Schema
         $ids = [];
         $files = [];
 
+
         foreach ($migration as $migrate) {
             $path = $migrate->path;
             $name = $migrate->filename;
@@ -141,7 +142,7 @@ class MigrationManager extends Schema
             $exp = explode("_", $name);
 
             $exp = array_map(function ($value) {
-                return ucfirst(MigrationManager::cleanTurkishChars($value));
+                return MigrationManager::cleanTurkishChars(ucfirst($value));
             }, $exp);
 
 
