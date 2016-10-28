@@ -7,7 +7,7 @@
  *
  */
 
-namespace Anonym\Http;
+namespace Sagi\Http;
 
 /**
  * Class Redirect

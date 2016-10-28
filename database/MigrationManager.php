@@ -90,8 +90,6 @@ class MigrationManager extends Schema
         }
 
         $migration = QueryBuilder::createNewInstance()->setTable($this->migrationTable)->all();
-
-        $ids = [];
         $files = [];
 
 
@@ -107,14 +105,15 @@ class MigrationManager extends Schema
             if ($class instanceof MigrationInterface) {
                 $class->down();
 
-                $ids[] = $migrate->id;
                 $files[] = $path;
             }
         }
 
-        if (!empty($ids)) {
-            QueryBuilder::createNewInstance()->setTable('migrations')->in('id', $ids)->delete();
-        }
+        $schema = new Schema();
+
+        $schema->dropTable($this->migrationTable);
+
+
 
 
         return $files;
@@ -149,9 +148,13 @@ class MigrationManager extends Schema
             return join('', $exp);
         }
 
-        return ucfirst($name);
+        return MigrationManager::cleanTurkishChars(ucfirst($name));
     }
 
+    /**
+     * @param $value
+     * @return mixed
+     */
     public static function cleanTurkishChars($value)
     {
         $find = array('ç', 'Ç', 'ı', 'İ', 'ğ', 'Ğ', 'ü', 'ö', 'Ş', 'ş', 'Ö', 'Ü', ',', ' ', '(', ')', '[', ']');

@@ -41,22 +41,20 @@ class Command
     }
 
     /**
-     * @return Command
+     * @return Row
      */
     public function null()
     {
         return $this->addCommand('null', []);
     }
-    /**
-     * @return Command
-     */
+
     public function unique()
     {
         return $this->addCommand('unique', []);
     }
 
     /**
-     * @return Command
+     * @return Row
      */
     public function notNull()
     {
