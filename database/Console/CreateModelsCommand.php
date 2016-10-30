@@ -1,7 +1,7 @@
 <?php
 namespace Sagi\Database\Console;
 
-
+use Symfony\Component\Console\Input\InputArgument;
 use Sagi\Database\MigrationManager;
 use Sagi\Database\QueryBuilder;
 use Sagi\Database\TemplateManager;
@@ -17,7 +17,8 @@ class CreateModelsCommand extends Command
 
     protected function configure()
     {
-        $this->setName('model:all')->setDescription('auto create model files');
+        $this->setName('model:all')->setDescription('auto create model files')
+            ->addArgument('force', InputArgument::OPTIONAL, 'force for delete old models');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -34,13 +35,21 @@ class CreateModelsCommand extends Command
             return $value;
         }, $tables);
 
+        $force = $input->getArgument('force');
+
+
+        if($force !== 'force'){
+            $force = 'standart';
+        }
+
+
         foreach ($tables as $table) {
 
             if (in_array($table, $this->expects)) {
                 continue;
             }
 
-            $this->getApplication()->find('model:create')->run(new ArrayInput(array('name' => $table)), $output);
+            $this->getApplication()->find('model:create')->run(new ArrayInput(array('name' => $table, 'force' => $force)), $output);
         }
     }
 

@@ -2,6 +2,7 @@
 
 
 namespace Sagi\Database;
+
 use Sagi\Database\Mapping\Entity;
 
 /**
@@ -12,7 +13,7 @@ class MigrationManager extends Schema
 {
 
     public static $systemMigrations = [
-        'auth','migrations'
+        'auth', 'migrations'
     ];
 
     /**
@@ -57,6 +58,10 @@ class MigrationManager extends Schema
 
 
             if ($this->checkMigrated($file, $prepared)) {
+                $files[] = [
+                    'name' => $file,
+                    'status' => 2
+                ];
                 continue;
             }
 
@@ -77,7 +82,10 @@ class MigrationManager extends Schema
                 'path' => $file
             ]));
 
-            $files[] = $file;
+            $files[] = [
+                'name' => $file,
+                'status' => 1
+            ];
         }
 
         return $files;
@@ -97,7 +105,9 @@ class MigrationManager extends Schema
             $path = $migrate->path;
             $name = $migrate->filename;
 
-
+            if (!file_exists($path)) {
+                continue;
+            }
             include $path;
 
             $class = new $name;
@@ -112,8 +122,6 @@ class MigrationManager extends Schema
         $schema = new Schema();
 
         $schema->dropTable($this->migrationTable);
-
-
 
 
         return $files;
@@ -141,14 +149,20 @@ class MigrationManager extends Schema
             $exp = explode("_", $name);
 
             $exp = array_map(function ($value) {
-                return MigrationManager::cleanTurkishChars(ucfirst($value));
+                $ucfirst = mb_convert_case($value, MB_CASE_TITLE);
+
+                return $ucfirst;
             }, $exp);
 
 
-            return join('', $exp);
+            $name = join('', $exp);
+        } else {
+            $name = mb_convert_case($name, MB_CASE_TITLE);
+
         }
 
-        return MigrationManager::cleanTurkishChars(ucfirst($name));
+
+        return $name;
     }
 
     /**

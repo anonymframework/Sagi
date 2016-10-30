@@ -34,4 +34,6 @@ class {{name}} extends Model
     protected $table = '{{table}}';
 
 
+    {{relations}}
+
 }

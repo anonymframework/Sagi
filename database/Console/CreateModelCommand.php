@@ -2,6 +2,7 @@
 
 namespace Sagi\Database\Console;
 
+use Sagi\Database\ColumnMapper;
 use Sagi\Database\QueryBuilder;
 use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,7 +17,8 @@ class CreateModelCommand extends Command
     {
         $this->setName('model:create')
             ->setDescription('create a new model file')
-            ->addArgument('name', InputArgument::REQUIRED, 'the name of file');
+            ->addArgument('name', InputArgument::REQUIRED, 'the name of file')
+            ->addArgument('force', InputArgument::OPTIONAL, 'force for delete old models');
 
     }
 
@@ -35,18 +37,27 @@ class CreateModelCommand extends Command
 
         $timestamps = $this->findTimestamps($fields);
 
+        $mapper = new ColumnMapper();
+        $mapped = $mapper->map($name);
+
+
         $content = TemplateManager::prepareContent('model', [
             'table' => $name,
+            'relations' => $this->prepareRelations($mapped).$this->prepareRelationsMany($name),
             'name' => $name = MigrationManager::prepareClassName($name),
-            'fields' => $this->prepareFields($fields),
+            'fields' => $this->prepareFields($mapped),
             'primary' => $primary = $this->findPrimaryKey($columns),
-            'timestamps' => $timestamps
+            'timestamps' => $timestamps,
         ]);
 
 
-
         $path = 'models/' . $name . '.php';
+        $force = $input->getArgument('force');
 
+
+        if (file_exists($path) && $force == "force") {
+            unlink($path);
+        }
 
         if (!file_exists($path)) {
             if (file_put_contents($path, $content)) {
@@ -79,14 +90,116 @@ class CreateModelCommand extends Command
         return empty($timestamps) ? 'false' : '[' . join(',', $timestamps) . ']';
     }
 
+    /**
+     * @param $fields
+     * @return string
+     */
     private function prepareFields($fields)
     {
         $fields = array_map(function ($value) {
-            return "'$value'";
+            return "'$value->name'";
         }, $fields);
 
-
         return join(',', $fields);
+    }
+
+    private function prepareRelationsMany($name)
+    {
+
+        $subname = $name.'_id';
+
+        $tables = QueryBuilder::createNewInstance()->query('SHOW TABLES')->fetchAll();
+
+        $content = '';
+
+        foreach ($tables as $table){
+            $table = $table[0];
+
+            if($table == $name){
+                continue;
+            }
+
+
+            if(in_array($table, MigrationManager::$systemMigrations)){
+                continue;
+            }
+
+            $columns  = QueryBuilder::createNewInstance()->query("SELECT $subname FROM `$table`");
+
+            if(!$columns)
+            {
+                continue;
+            }
+
+
+            $command = '$this->hasMany';
+            $function = lcfirst(MigrationManager::prepareClassName($table));
+            $class = MigrationManager::prepareClassName($table);
+
+            $content .= <<<MANY
+    /**
+     *
+     * @return \Sagi\Database\RelationShip
+     */
+      public function $function(){
+            return $command($class::className(), ["id", '$subname' ]);
+      }
+      
+
+MANY;
+
+        }
+
+        return $content;
+
+    }
+
+    private function prepareRelations($fields)
+    {
+
+        $fields = array_map(function ($value) {
+            if (strpos($value->name, "_id") !== false) {
+                $table_ex = explode("_", $value->name);
+                $table = $table_ex[0];
+                $class = MigrationManager::prepareClassName($table);
+                $target_name = $table.'_id';
+                $command = '$this->hasOne';
+            }else{
+                return '';
+            }
+
+            $tables = QueryBuilder::createNewInstance()->query("SHOW TABLES LIKE '$table'")->fetchAll();
+
+            if(!$tables){
+                $tableplural = $table.'s';
+                $class = MigrationManager::prepareClassName($tableplural);
+                $tables = QueryBuilder::createNewInstance()->query("SHOW TABLES LIKE '$tableplural'")->fetchAll();
+            }
+
+
+            $function = lcfirst(MigrationManager::prepareClassName($table));
+
+            if ($tables) {
+                return <<<CODE
+    /**
+     *
+     * @return \Sagi\Database\RelationShip
+     */
+      public function $function(){
+            return $command($class::className(), ["id", '$target_name']);
+      }
+      
+
+CODE;
+            }else{
+                return '';
+            }
+
+
+
+        }, $fields);
+
+        return join('', $fields);
     }
 
     /**

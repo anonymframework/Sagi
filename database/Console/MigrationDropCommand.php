@@ -26,7 +26,7 @@ class MigrationDropCommand extends Command
         $files = $migration->down();
 
         foreach ($files as $file) {
-            $output->writeln("<info>" . $file . " dopped successfully.</info>");
+            $output->writeln("<info>" . $file . " dropped successfully.</info>");
         }
     }
 }

@@ -35,7 +35,11 @@ class MigrateCommand extends Command
         $files = $migration->migrate();
 
         foreach ($files as $file) {
-            $output->writeln("<info>" . $file . " migrated.</info>");
+            if($file['status'] == 1){
+                $output->writeln("<info>" . $file['name'] . " migrated.</info>");
+            }elseif($file['status'] == 2){
+                $output->writeln('<error>'.$file['name'].' already exists </error>');
+            }
         }
     }
 

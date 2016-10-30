@@ -65,7 +65,7 @@ class Loggable implements LoggerAwareInterface
     /**
      * @param \Exception $exception
      */
-    public function exceptionHandler(\Exception $exception)
+    public function exceptionHandler($exception)
     {
         $message = $exception->getMessage();
         $code = $exception->getCode();

@@ -100,7 +100,7 @@ class Model extends QueryBuilder
         }
 
         if (!empty($this->fields)) {
-            $this->select($this->fields);
+            $this->select(array_keys($this->fields));
         }
 
         if (!empty($attributes)) {
@@ -115,7 +115,7 @@ class Model extends QueryBuilder
     {
         $logging = ConfigManager::get('logging', ['open' => false]);
 
-        if($logging['open'] === true){
+        if ($logging['open'] === true) {
             $this->logging = Singleton::load('Sagi\Database\Loggable');
         }
     }
@@ -155,7 +155,7 @@ class Model extends QueryBuilder
     {
         foreach ($traits as $trait) {
             if (method_exists($this, $method = 'boot' . $this->classBaseName($trait))) {
-                call_user_func_array([$this, $method],  []);
+                call_user_func_array([$this, $method], []);
             }
         }
     }
@@ -709,6 +709,24 @@ class Model extends QueryBuilder
         }
 
         $this->attributes[$key] = $value;
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        if (substr($name, 0, 3) === "get") {
+            $name = lcfirst(substr($name, 2, strlen($name) - 3));
+
+            if (method_exists($this, $name)) {
+                return call_user_func_array([$this, $name], $arguments);
+            }
+        } else {
+            throw new \BadMethodCallException(sprintf('%s method not found', $name));
+        }
     }
 
 

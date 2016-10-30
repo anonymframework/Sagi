@@ -145,7 +145,7 @@ class Logger implements LoggerInterface
         $file = $context['file'];
         $line = $context['line'];
         $trace = $context['trace'];
-        $trace_string = $content['traceAsString'];
+        $trace_string = $context['traceAsString'];
 
         $fullPath = $path . DIRECTORY_SEPARATOR . $fileName;
 

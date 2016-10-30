@@ -31,7 +31,10 @@ class TableMapper implements MapperInterface
                 $instance = new Table();
                 $instance->name = $table[0];
 
-                $instance->columns = $mapper->map($table[0]);
+                $map = $mapper->map($table[0]);
+
+                $instance->columns = $map;
+
                 $mapped[] = $instance;
             }
         }
