@@ -2,8 +2,6 @@
 
 namespace Sagi\Application;
 
-use Sagi\Database\SessionManager;
-use Sagi\Database\View;
 use Sagi\Http\Request;
 
 class App
@@ -28,6 +26,7 @@ class App
     /**
      * App constructor.
      * @param array $configs
+     * @param Request $request
      */
     public function __construct(array $configs = [],Request $request)
     {
