@@ -65,8 +65,9 @@ class MigrationManager extends Schema
                 continue;
             }
 
-
-            include $file;
+            if (!class_exists($prepared)) {
+                include $file;
+            }
 
 
             $migration = new $prepared;

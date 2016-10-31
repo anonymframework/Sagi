@@ -3,6 +3,7 @@
 namespace Sagi\Database\Console;
 
 use Sagi\Database\ColumnMapper;
+use Sagi\Database\ConfigManager;
 use Sagi\Database\QueryBuilder;
 use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Input\InputArgument;
@@ -43,9 +44,9 @@ class CreateModelCommand extends Command
 
         $content = TemplateManager::prepareContent('model', [
             'table' => $name,
-            'relations' => $this->prepareRelations($mapped).$this->prepareRelationsMany($name),
+            'relations' => ConfigManager::get('prepare_relations', false) === true ?  $this->prepareRelations($mapped, $name).$this->prepareRelationsMany($name): '',
             'name' => $name = MigrationManager::prepareClassName($name),
-            'fields' => $this->prepareFields($mapped),
+            'fields' => $this->prepareFields($mapped, $name),
             'primary' => $primary = $this->findPrimaryKey($columns),
             'timestamps' => $timestamps,
         ]);
@@ -131,10 +132,13 @@ class CreateModelCommand extends Command
                 continue;
             }
 
+            if($configs = ConfigManager::get('relations.'.$table, 'many')){
+                $command = '$this->has'.ucfirst($configs);
+            }
 
-            $command = '$this->hasMany';
             $function = lcfirst(MigrationManager::prepareClassName($table));
             $class = MigrationManager::prepareClassName($table);
+
 
             $content .= <<<MANY
     /**
@@ -154,10 +158,10 @@ MANY;
 
     }
 
-    private function prepareRelations($fields)
+    private function prepareRelations($fields, $name)
     {
 
-        $fields = array_map(function ($value) {
+        $fields = array_map(function ($value) use($name) {
             if (strpos($value->name, "_id") !== false) {
                 $table_ex = explode("_", $value->name);
                 $table = $table_ex[0];

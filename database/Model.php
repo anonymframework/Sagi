@@ -100,7 +100,7 @@ class Model extends QueryBuilder
         }
 
         if (!empty($this->fields)) {
-            $this->select(array_keys($this->fields));
+            $this->select($this->fields);
         }
 
         if (!empty($attributes)) {
