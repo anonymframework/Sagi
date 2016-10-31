@@ -145,26 +145,4 @@ class App
         $this->configs = $configs;
         return $this;
     }
-
-    /**
-     * @param $uri
-     * @param null $time
-     * @param array $sessions
-     */
-    public static function redirect($uri, $time = null, $sessions = null)
-    {
-        if (!is_null($sessions)) {
-            SessionManager::set('errors', $sessions);
-        }
-
-        $uri = static::$uri . $uri;
-
-        if (is_null($time)) {
-            header('Location: ' . $uri);
-        } else {
-            header('refresh: ' . $time . ';url=' . $uri);
-        }
-
-
-    }
 }
