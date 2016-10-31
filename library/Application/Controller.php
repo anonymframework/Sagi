@@ -7,6 +7,8 @@
 namespace Sagi\Application;
 
 
+use Sagi\Database\CookieManager;
+use Sagi\Database\CryptManager;
 use Sagi\Database\SessionManager;
 
 class Controller
@@ -50,5 +52,44 @@ class Controller
         static::$view->render($file)->show();
 
         return $this;
+    }
+
+    /**
+     * @param $name
+     * @param null $value
+     * @return mixed
+     */
+    public function session($name, $value = null){
+        if($name && $value !== null){
+            SessionManager::set($name, $value);
+        }else{
+            return SessionManager::get($name);
+        }
+    }
+
+    /**
+     * @param $name
+     * @param null $value
+     * @return mixed
+     */
+    public function cookie($name, $value = null){
+        if($name && $value !== null){
+            CookieManager::set($name, $value);
+        }else{
+            return CookieManager::get($name);
+        }
+    }
+
+    /**
+     * @param $name
+     * @param null $value
+     * @return mixed
+     */
+    public function crypt($name, $value = null){
+        if($name && $value !== null){
+            CryptManager::encode($name, $value);
+        }else{
+            return CryptManager::decode($name);
+        }
     }
 }
