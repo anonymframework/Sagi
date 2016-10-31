@@ -23,7 +23,10 @@
       "Models\\": "models/",
       "Policies\\": "policies/",
       "Sagi\\Http\\": "library/Http",
-      "Sagi\\Cron\\": "library/Cron"
+      "Sagi\\Cron\\": "library/Cron",
+      "Sagi\\Application\\": "library/Application",
+      "Controllers\\": "app/controllers"
+
     }
   },
   "extra": {

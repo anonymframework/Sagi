@@ -3,6 +3,7 @@
 namespace Sagi\Application;
 
 use Sagi\Http\Request;
+use Sagi\Http\Response;
 
 class App
 {
@@ -16,6 +17,9 @@ class App
      */
     private $url;
 
+    /**
+     * @var string
+     */
     private static $uri;
 
     /**
@@ -24,20 +28,26 @@ class App
     protected $controller;
 
     /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * App constructor.
      * @param array $configs
      * @param Request $request
      */
-    public function __construct(array $configs = [],Request $request)
+    public function __construct(array $configs = [], Request $request)
     {
         $this->configs = $configs;
-        $this->url = $request->getUri();
-        static::$uri = $request->getUri();
+        $this->url = $request->query('path');
+        static::$uri = $request->query('path');
+        $this->request = $request;
     }
 
     public function handleRequest()
     {
-        $this->url = substr($this->url, 1, strlen($this->url));
+
         $parsed = explode("/", $this->url);
 
         switch (count($parsed)) {
@@ -99,7 +109,14 @@ class App
 
         $this->createControllerInstance($controller);
 
-        call_user_func_array(array($this->controller, $method), $args);
+        $content = call_user_func_array(array($this->controller, $method), $args);
+
+
+        if(!$content instanceof  Response){
+             $this->request->getResponse()->setContent($content)->send();
+        }else{
+            $content->send();
+        }
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
 
-include "vendor/autoload.php";
+include 'vendor/autoload.php';
 
+$configs = \Sagi\Database\ConfigManager::get('mvc');
 $request = new \Sagi\Http\Request();
+$app = new \Sagi\Application\App($configs, $request);
 
-var_dump($request->query());
-
-var_dump($request->getUri());
+$app->handleRequest();

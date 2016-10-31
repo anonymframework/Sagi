@@ -108,12 +108,8 @@ class Response implements ResponseInterface
         511 => 'Network Authentication Required',                             // RFC6585
     ];
 
-    /**
-     * Cookie objesi
-     *
-     * @var Cookie
-     */
-    private $cookieBase;
+
+
     /**
      * İçeriği tutar
      *
@@ -146,7 +142,6 @@ class Response implements ResponseInterface
     {
         $this->setContent($content);
         $this->setStatusCode($statusCode);
-        $this->cookieBase = new Cookie();
     }
 
     /**
@@ -375,7 +370,6 @@ class Response implements ResponseInterface
      */
     private function sendHeaders()
     {
-        $this->useCookies();
         $this->setProtocolAndCode();
         header(
             sprintf(
@@ -394,15 +388,6 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Cookileri kullanır
-     */
-    private function useCookies()
-    {
-        $useCookies = new UseCookieHeaders();
-        $useCookies->useCookies();
-    }
-
-    /**
      * Protocol version ve code atamasını yapar
      */
     private function setProtocolAndCode()
@@ -418,24 +403,6 @@ class Response implements ResponseInterface
         http_response_code($code);
     }
 
-    /**
-     * @return Cookie
-     */
-    public function getCookieBase()
-    {
-        return $this->cookieBase;
-    }
-
-    /**
-     * @param Cookie $cookieBase
-     * @return Response
-     */
-    public function setCookieBase($cookieBase)
-    {
-        $this->cookieBase = $cookieBase;
-
-        return $this;
-    }
 
     /**
      * Gönderilecek yanıtın bir json sayfasına ait olacağını ayarlar

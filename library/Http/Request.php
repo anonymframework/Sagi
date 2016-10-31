@@ -413,11 +413,19 @@ class Request
     /**
      * return all query variables
      *
-     * @return mixed
+     * @return string|Query
      */
-    public function query()
+    public function query($query = null)
     {
-        return $this->getQuery()->getAll();
+
+        $return = $this->getQuery()->getAll();
+
+        if (!is_null($query) && is_string($query)) {
+            $return = isset($return[$query]) ? $return[$query] : false;
+        }
+
+        return $return;
+
     }
 
     /**
