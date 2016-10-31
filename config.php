@@ -27,5 +27,11 @@ return [
             'username' => 'Kullanıcı Adınızı Yanlış Girdiniz',
             'password' => 'Şifrenizi Yanlış Giridiniz'
         ]
+    ],
+
+
+    'mvc' => [
+        'default_controller' => 'home'
+
     ]
 ];
