@@ -24,6 +24,7 @@
       "Policies\\": "policies/",
       "Sagi\\Http\\": "library/Http",
       "Sagi\\Cron\\": "library/Cron",
+      "Sagi\\Mail\\": "library/Mail",
       "Sagi\\Application\\": "library/Application",
       "Controllers\\": "app/controllers"
 
