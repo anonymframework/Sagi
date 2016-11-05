@@ -29,14 +29,4 @@ return [
         ]
     ],
 
-
-    'mvc' => [
-        'default_controller' => 'home',
-        'view' => [
-
-            'view_path' => 'app/views',
-            'dalvik_path' => 'app/dalviks'
-        ],
-
-    ]
 ];
