@@ -50,8 +50,8 @@ class PhpMailerDriver implements DriverInterface
         $phpmailer->SMTPSecure = $secure;
         $phpmailer->isHTML(true);
 
-        if(Arr::has($configs, 'from.mail')){
-            $phpmailer->setFrom(Arr::get($configs, 'from.mail'), Arr::get($configs, 'from.name', null));
+        if(isset($configs['from']['mail'])){
+            $phpmailer->setFrom($configs['from']['mail'], $configs['from']['name']);
         }
 
         $this->mailer = $phpmailer;
