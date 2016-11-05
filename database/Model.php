@@ -770,7 +770,16 @@ class Model extends QueryBuilder
             }
         }
 
-        return $value;
+        return $this->getValueContainer($value);
+    }
+
+    /**
+     * @param $value
+     * @return ValueContainer
+     */
+    public function getValueContainer($value)
+    {
+        return new ValueContainer($value);
     }
 
     /**
