@@ -614,6 +614,7 @@ class Model extends QueryBuilder
         return $this->json();
     }
 
+    /**
     public function json()
     {
         return json_encode($this->getAttributesByFields($this->fields));
@@ -747,7 +748,7 @@ class Model extends QueryBuilder
         }
 
         if (false === $this->attributes) {
-            throw new \PDOException('your query is failed');
+              throw new \PDOException('your query has failed');
         }
 
 
