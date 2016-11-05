@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Sagi\Database\MigrationManager;
 
-class CreateSeedCommand extends Command
+class CreateControllerCommand extends Command
 {
     protected function configure()
     {
@@ -49,50 +49,5 @@ class CreateSeedCommand extends Command
         } else {
             $output->writeln("<error>" . $name . ' already exists in ' . $path . "</error>");
         }
-    }
-
-    /**
-     * @param $fields
-     * @return array|bool
-     */
-    private function findTimestamps($fields)
-    {
-        $timestamps = [];
-
-        if (in_array('created_at', $fields)) {
-            $timestamps[] = "'created_at'";
-        }
-
-        if (in_array('updated_at', $fields)) {
-            $timestamps[] = "'updated_at'";
-        }
-
-        return empty($timestamps) ? 'false' : '[' . join(',', $timestamps) . ']';
-    }
-
-    private function prepareFields($fields)
-    {
-        $fields = array_map(function ($value) {
-            return "'$value'";
-        }, $fields);
-
-
-        return join(',', $fields);
-    }
-
-    /**
-     * @param $array
-     * @return mixed
-     */
-    private function findPrimaryKey($array)
-    {
-        foreach ($array as $item) {
-            if ($item['Key'] === 'PRI') {
-                return "'{$item['Field']}'";
-
-            }
-        }
-
-        return "'id'";
     }
 }

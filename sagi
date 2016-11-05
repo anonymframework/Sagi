@@ -36,7 +36,7 @@ $application->addCommands([
     new MigrationAuthCommand(),
     new MigrationLanguageCommand(),
     new \Sagi\Database\Console\ScheduleRunCommand(),
-
+    new \Sagi\Database\Console\CreateControllerCommand(),
 ]);
 
 $application->run();
