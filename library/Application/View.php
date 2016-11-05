@@ -49,7 +49,8 @@ class View
         'endwhile',
         'endfor',
         'endforeach',
-        'break'
+        'break',
+        'endsection'
     ];
 
     /**
@@ -60,10 +61,11 @@ class View
         'while',
         'for',
         'foreach',
-        'swith',
+        'switch',
         'case',
         'else',
-        'elseif'
+        'elseif',
+        'section'
     ];
 
     private $selfMethods = [
@@ -75,7 +77,7 @@ class View
     /**
      * View constructor.
      * @param array $configs
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct($configs = [], $file = '')
     {
@@ -83,7 +85,7 @@ class View
             $this->setConfigs($configs);
             $this->checkDirs();
         } else {
-            throw new Exception('we need to view_path and dalvik_path for make a good start');
+            throw new \Exception('we need to view_path and dalvik_path for make a good start');
         }
 
         $this->file = $file;
@@ -128,10 +130,11 @@ class View
             preg_match('/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', $matches[0], $m);
             $raw = $m[1];
 
+
             if (array_search($raw, $this->loopTags) !== false) {
-                $content = str_replace($matches[0], "<?php " . $match . ": ?>", $content);
+                $content = $this->loopReplacer($matches[0], $match, $content, $raw);
             } elseif (array_search($raw, $this->endTags) !== false) {
-                $content = str_replace($matches[0], "<?php " . $match . "; ?>", $content);
+                $content = $this->loopReplacer($matches[0], $match, $content, $raw);
             } elseif (array_search($raw, $this->selfMethods) !== false) {
                 $replace = $this->procressMethod($raw, $m);
                 $content = str_replace($matches[0], $replace, $content);
@@ -146,6 +149,38 @@ class View
         return $content;
     }
 
+    private function loopReplacer($search, $match, $content, $raw)
+    {
+
+        if (!method_exists($this, $raw . 'Replacer')) {
+            return str_replace($search, "<?php " . $match . ": ?>", $content);
+        }else{
+            return call_user_func_array([$this, $raw."Replacer"], func_get_args());
+        }
+    }
+
+
+    /**
+     * @param $match
+     * @param $replace
+     * @param $content
+     * @param $raw
+     * @return mixed
+     */
+    protected function sectionReplacer($search, $match, $content, $raw){
+        return str_replace($search, '<?php $this->_add'. ucfirst($match). "; ?>", $content);
+    }
+
+    /**
+     * @param $match
+     * @param $replace
+     * @param $content
+     * @param $raw
+     * @return mixed
+     */
+    protected function endsectionReplacer($search, $match, $content, $raw){
+        return str_replace($search, '<?php $this->_addEnd'. ucfirst($match). "(); ?>", $content);
+    }
 
     /**
      * @param $raw
@@ -164,6 +199,8 @@ class View
 
         return call_user_func_array(array($this, $methodName), $argsN);
     }
+
+
 
     /**
      * @param $file
@@ -261,6 +298,7 @@ class View
         if ($content = $this->getFileContent()) {
             $replaceContent = $this->handleContent($content);
 
+
             if ($return) {
                 return $replaceContent;
             } else {
@@ -268,7 +306,7 @@ class View
                 return $this;
             }
         } else {
-            throw new Exception($file . ' does not exists in your view_path');
+            throw new \Exception($file . ' does not exists in your view_path');
         }
     }
 
@@ -285,8 +323,8 @@ class View
         if (!empty($this->dalvikPath)) {
             try {
                 include $this->dalvikPath;
-            } catch (Exception $e) {
-                throw new Exception("Gösterme işlemi sırasında bir hata oluştu:, message:" . $e->getMessage());
+            } catch (\Exception $e) {
+                throw new \Exception("Gösterme işlemi sırasında bir hata oluştu:, message:" . $e->getMessage());
             }
         }
 

@@ -123,7 +123,10 @@ class Request
      */
     private $query;
 
-
+    /**
+     * @var Response
+     */
+    private $response;
     /**
      * Sınıfı başlatır ve header bilgilerini atar
      */
@@ -136,6 +139,7 @@ class Request
         $this->setInput(new Input());
         $this->setQuery(new Query());
         $this->segments = explode('/', $this->getUrl());
+        $this->setResponse(new Response());
     }
 
     /**

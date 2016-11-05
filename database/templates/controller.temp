@@ -1,0 +1,15 @@
+<?php
+/**
+ *  SAGI DATABASE ORM FILE
+ *
+ */
+namespace Controllers;
+
+use Sagi\Application\Controller;
+
+class {{ name }} extends Controller {
+    public function index()
+    {
+        //
+    }
+}

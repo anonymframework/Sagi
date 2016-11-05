@@ -112,9 +112,16 @@ class App
         $content = call_user_func_array(array($this->controller, $method), $args);
 
 
-        if(!$content instanceof  Response){
-             $this->request->getResponse()->setContent($content)->send();
-        }else{
+        if (!$content instanceof Response) {
+
+            if($content instanceof View){
+                 $content->show();
+            }else{
+                $this->request->getResponse()->setContent($content)->send();
+            }
+
+
+        } else {
             $content->send();
         }
     }

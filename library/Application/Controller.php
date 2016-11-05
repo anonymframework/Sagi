@@ -7,6 +7,7 @@
 namespace Sagi\Application;
 
 
+use Sagi\Database\ConfigManager;
 use Sagi\Database\CookieManager;
 use Sagi\Database\CryptManager;
 use Sagi\Database\SessionManager;
@@ -23,7 +24,7 @@ class Controller
      */
     public function __construct()
     {
-        static::$view = new View();
+        static::$view = new View(ConfigManager::get('mvc.view'));
     }
 
     /**
@@ -39,7 +40,7 @@ class Controller
     }
     /**
      * @param $file
-     * @return $this
+     * @return View
      */
     public function view($file)
     {
@@ -49,9 +50,8 @@ class Controller
 
         SessionManager::delete('errors');
 
-        static::$view->render($file)->show();
+        return static::$view->render($file);
 
-        return $this;
     }
 
     /**
@@ -81,15 +81,18 @@ class Controller
     }
 
     /**
-     * @param $name
      * @param null $value
      * @return mixed
      */
-    public function crypt($name, $value = null){
-        if($name && $value !== null){
-            CryptManager::encode($name, $value);
-        }else{
-            return CryptManager::decode($name);
-        }
+    public function crypt($value = null){
+        return CryptManager::encode($value);
+    }
+
+    /**
+     * @param null $value
+     * @return mixed
+     */
+    public function decrypt($value = null){
+        return CryptManager::decode($value);
     }
 }
