@@ -4,6 +4,7 @@ namespace Sagi\Database;
 
 use PDO;
 use Sagi\Database\Mapping\Entity;
+use Sagi\Event\EventDispatcher;
 
 /**
  * Created by PhpStorm.
@@ -14,6 +15,10 @@ use Sagi\Database\Mapping\Entity;
 class Model extends QueryBuilder
 {
 
+    /**
+     * @var EventDispatcher
+     */
+    protected $eventManager;
     /**
      * @var array
      */
@@ -91,6 +96,9 @@ class Model extends QueryBuilder
 
         $this->bootTraits($traits);
 
+        $this->eventManager = new EventDispatcher();
+
+        $this->addSubscribes();
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
             if (is_string($policy)) {
                 $this->policy(new $policy);
@@ -109,6 +117,11 @@ class Model extends QueryBuilder
 
 
         $this->bootLogging();
+    }
+
+    private function addSubscribes()
+    {
+
     }
 
     private function bootLogging()

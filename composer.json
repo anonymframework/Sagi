@@ -16,7 +16,8 @@
     "nesbot/carbon": "~1.19",
     "mtdowling/cron-expression": "~1.0",
     "swiftmailer/swiftmailer": "5.4.1",
-    "phpmailer/phpmailer": "~5.2"
+    "phpmailer/phpmailer": "~5.2",
+    "anonymframework/event": "dev-master"
   },
   "minimum-stability": "dev",
   "autoload": {
