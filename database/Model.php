@@ -385,6 +385,11 @@ class Model extends QueryBuilder
         }
 
 
+
+        $append = '#'.$link[1].':'.$this->__get($link[1]);
+
+        $name .= $append;
+
         if (!RelationBag::isPreparedBefore($name, 'many')) {
 
             RelationBag::addRelative($name, $class, $link, 'many');
@@ -408,6 +413,10 @@ class Model extends QueryBuilder
         } else {
             $name = $class->getTable();
         }
+
+        $append = '#'.$link[1].':'.$this->__get($link[1]);
+
+        $name .= $append;
 
         if (!RelationBag::isPreparedBefore($name, 'one')) {
 
@@ -458,7 +467,6 @@ class Model extends QueryBuilder
         } else {
             if ($this->can('create')) {
                 $created = $this->create();
-
 
                 if ($this->isAuthorizationUsed()) {
                     $this->createUserAuth($created->id);
@@ -627,7 +635,7 @@ class Model extends QueryBuilder
     {
         $arr = parent::__sleep();
 
-        return array_merge($arr, ['table', 'attributes', 'primaryKey', 'usedModules', 'policy', 'protected', 'expects', 'fields']);
+        return array_merge($arr, ['table', 'attributes', 'primaryKey', 'usedModules', 'policy', 'protected', 'fields', 'json']);
     }
 
     /**
@@ -747,6 +755,7 @@ class Model extends QueryBuilder
             $this->one();
         }
 
+
         if (false === $this->attributes) {
               throw new \PDOException('your query has failed');
         }
@@ -771,7 +780,7 @@ class Model extends QueryBuilder
             }
         }
 
-        return $this->getValueContainer($value);
+        return isset($this->timestamps[$name]) ? new ValueContainer($value) : $value;
     }
 
     /**

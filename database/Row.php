@@ -28,7 +28,8 @@ class Row
         'float' => '`%s` FLOAT(%d)',
         'decimal' => '`%s` DECIMAL(%d,%d)',
         'bool' => '`%s` BOOLEAN',
-        'bit' => '`%s` BIT'
+        'bit' => '`%s` BIT',
+        'char' => '`%s` CHAR(%d)',
     ];
 
     /**
@@ -57,6 +58,18 @@ class Row
     public function string($name, $limit = 255)
     {
         return $this->addCommand('varchar', $this->madeArray($name, $limit));
+    }
+
+    /**
+     * add a new char command
+     *
+     * @param string $name
+     * @param int $limit
+     * @return Command
+     */
+    public function char($name, $limit = 255)
+    {
+        return $this->addCommand('char', $this->madeArray($name, $limit));
     }
 
     /**

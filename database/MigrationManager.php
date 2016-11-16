@@ -106,6 +106,7 @@ class MigrationManager extends Schema
             $path = $migrate->path;
             $name = $migrate->filename;
 
+
             if (!file_exists($path)) {
                 continue;
             }
@@ -115,6 +116,12 @@ class MigrationManager extends Schema
 
             if ($class instanceof MigrationInterface) {
                 $class->down();
+
+                $builder = QueryBuilder::createNewInstance($this->migrationTable)->where('path', $path)->where('filename', $name);
+
+                if($builder->exists()){
+                    $builder->delete();
+                }
 
                 $files[] = $path;
             }

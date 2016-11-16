@@ -1,6 +1,7 @@
 <?php
 
 namespace Sagi\Database\Drivers;
+use Sagi\Database\Mapping\Group;
 
 /**
  * Class Driver
@@ -67,12 +68,14 @@ class Driver
     /**
      * @return string
      */
-    public function prepareGroupQuery($group)
+    public function prepareGroupQuery(Group $group = null)
     {
 
-        if (empty($group)) {
+        if (is_null($group)) {
             return "";
         }
+
+        $group = join(',', $group->group);
 
         return "GROUP BY $group";
     }
@@ -85,7 +88,7 @@ class Driver
     /**
      * @return string
      */
-    public function prepareJoinQuery($joins)
+    public function prepareJoinQuery($joins, $table)
     {
         if (empty($joins)) {
             return '';
@@ -97,7 +100,7 @@ class Driver
             $type = isset($join[0]) ? $join[0] : 'LEFT JOIN';
             $targetTable = isset($join[1]) ? $join[1] : '';
             $targetColumn = isset($join[2]) ? $join[2] : '';
-            $ourTable = $this->getTable();
+            $ourTable = $table;
             $ourColumn = isset($join[3]) ? $join[3] : '';
             $string .= "$type $targetTable ON $ourTable.$ourColumn = $targetTable.$targetColumn";
         }

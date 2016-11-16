@@ -31,7 +31,6 @@ class Identitiy
         if (static::isLogined()) {
 
             $user = static::findLogin();
-
             /**
              * @var Model $user
              */
@@ -46,10 +45,10 @@ class Identitiy
      * @param Model $model
      * @param $remember
      */
-    public static function login(Model $model, $remember = false)
+    public static function login(Model $model, $remember = false, $time = 7200)
     {
         if ($remember === true) {
-            CookieManager::set('identity', $model, 7200);
+            CookieManager::set('identity', $model, $time);
         } else {
             SessionManager::set('identity', $model);
         }

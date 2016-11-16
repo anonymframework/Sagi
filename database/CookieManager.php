@@ -18,7 +18,8 @@ class CookieManager
             $value =serialize($value) . '__serialized';
         }
 
-        $value =  base64_encode(CryptManager::encode($value));
+        $value =  CryptManager::encode(base64_encode($value));
+
 
         return setcookie($name, $value, time() + $time, $path);
     }
@@ -42,13 +43,12 @@ class CookieManager
             return false;
         }
 
-        $value = CryptManager::decode(base64_decode($_COOKIE[$name]));
-
+        $value = base64_decode(CryptManager::decode($_COOKIE[$name]));
 
         if (strpos($value, $explode = "__serialized") !== false) {
             $value = explode($explode, $value)[0];
 
-            return unserialize($value);
+            $value = unserialize($value);
         }
 
         return $value;

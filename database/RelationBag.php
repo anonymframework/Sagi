@@ -59,7 +59,6 @@ class RelationBag
      */
     public static function getRelation($name, Model $our, $type)
     {
-
         if (!static::isPreparedBefore($name)) {
             static::prepareRelation($name, $our, $type);
         }
@@ -113,8 +112,6 @@ class RelationBag
 
         if ($type === 'one') {
             $model = $model->limit(1);
-        } else {
-            $model = $model->all();
         }
 
         $relationShip = new RelationShip();

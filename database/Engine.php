@@ -7,6 +7,7 @@ use PDO;
 use Sagi\Database\Drivers\Driver;
 use Sagi\Database\Drivers\MysqlDriver;
 use Sagi\Database\Mapping\Entity;
+use Sagi\Database\Mapping\Group;
 use Sagi\Database\Mapping\Where;
 
 /**
@@ -206,7 +207,7 @@ class Engine
 
         if ($entity->multipile === false) {
             $keys = array_keys($entity->datas);
-        }else{
+        } else {
             $keys = array_keys($entity->datas[0]);
         }
 
@@ -262,14 +263,22 @@ class Engine
     public function prepareGetQuery()
     {
 
-
+        $group = $this->getGroupBy();
         $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
+
+        if ($group instanceof Group) {
+            if ($group->isMultipile) {
+                $pattern = 'SELECT :select FROM :from :join :where :group :having :order :limit';
+            }
+        }
+
+
 
         $handled = $this->handlePattern($pattern, [
             ':select' => $this->driver->prepareSelectQuery($this->getSelect()),
             ':from' => $this->getTable(),
-            ':join' => $this->driver->prepareJoinQuery($this->getJoin()),
-            ':group' => $this->driver->prepareGroupQuery($this->getGroupBy()),
+            ':join' => $this->driver->prepareJoinQuery($this->getJoin(), $this->getTable()),
+            ':group' => $this->driver->prepareGroupQuery($group),
             ':having' => $this->driver->prepareHavingQuery($this->getHaving()),
             ':where' => $this->prepareWhereQuery($this->getWhere()),
             ':order' => $this->driver->prepareOrderQuery($this->getOrder()),
@@ -426,13 +435,17 @@ class Engine
 
         $table = $this->getTable();
 
-        $select = array_map(function ($value) use ($table) {
-            if (is_string($value) && strpos($value, '.') === false) {
-                return $table . '.' . $value;
-            }
+        if (isset($this->fields)) {
+            $fields = $this->fields;
 
-            return $value;
-        }, $select);
+            $select = array_map(function ($value) use ($table, $fields) {
+                if (is_string($value) && strpos($value, '.') === false && in_array($value, $fields)) {
+                    return $table . '.' . $value;
+                }
+
+                return $value;
+            }, $select);
+        }
 
 
         return $this->setSelect($select);
@@ -470,7 +483,22 @@ class Engine
      */
     public function group($group)
     {
-        return $this->setGroupBy($group);
+        $multipile = false;
+
+        if(!is_array($group) && is_string($group)){
+            $group = explode(",", $group);
+        }
+
+        if (count($group) > 1) {
+            $multipile = true;
+        }
+
+        $groupBy = new Group();
+
+        $groupBy->group = $group;
+        $groupBy->isMultipile = $multipile;
+
+        return $this->setGroupBy($groupBy);
     }
 
     /**
