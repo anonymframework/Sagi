@@ -136,6 +136,7 @@ class Model extends QueryBuilder
 
 
         $this->bootLogging();
+
     }
 
     /**
