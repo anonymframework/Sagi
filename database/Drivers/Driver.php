@@ -42,28 +42,7 @@ class Driver
         return "ORDER BY {$id} {$type}";
     }
 
-    /**
-     * @return string
-     */
-    public function prepareSelectQuery($select)
-    {
 
-        if (empty($select)) {
-            $select = ["*"];
-        }
-
-        $app = $this;
-
-        $select = array_map(function ($value) use ($app) {
-            if (is_callable($value)) {
-                $value = $app->prepareSubQuery($value);
-            }
-
-            return $value;
-        }, $select);
-
-        return (join(",", $select));
-    }
 
     /**
      * @return string

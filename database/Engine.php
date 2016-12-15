@@ -275,7 +275,7 @@ class Engine
 
 
         $handled = $this->handlePattern($pattern, [
-            ':select' => $this->driver->prepareSelectQuery($this->getSelect()),
+            ':select' => $this->prepareSelectQuery($this->getSelect()),
             ':from' => $this->getTable(),
             ':join' => $this->driver->prepareJoinQuery($this->getJoin(), $this->getTable()),
             ':group' => $this->driver->prepareGroupQuery($group),
@@ -355,6 +355,38 @@ class Engine
 
 
         return $s;
+    }
+
+    /**
+     * @return string
+     */
+    public function prepareSelectQuery($select)
+    {
+
+        if (empty($select)) {
+            $select = ["*"];
+        }
+
+        $app = static::createNewInstance();
+
+        $builder = &$app;
+
+        $select = array_map(function ($value) use ($builder) {
+            if (is_callable($value)) {
+                $value = $builder->prepareSubQuery($value, $builder);
+
+                $builder->setArgs(array_merge($value[1]));
+
+                $value = $value[0];
+            }
+
+            return $value;
+        }, $select);
+
+
+        $this->setArgs($app->getArgs());
+
+        return implode(',', $select);
     }
 
     /**

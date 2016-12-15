@@ -13,10 +13,6 @@
     "php": ">=5.4.0",
     "symfony/console": "2.8",
     "symfony/process": "~2.4",
-    "nesbot/carbon": "~1.19",
-    "mtdowling/cron-expression": "~1.0",
-    "swiftmailer/swiftmailer": "5.4.1",
-    "phpmailer/phpmailer": "~5.2",
     "anonymframework/event": "dev-master"
   },
   "minimum-stability": "dev",
@@ -24,10 +20,7 @@
     "psr-4": {
       "Sagi\\Database\\": "database/",
       "Models\\": "models/",
-      "Policies\\": "policies/",
-      "Sagi\\Http\\": "library/Http",
-      "Sagi\\Cron\\": "library/Cron",
-      "Sagi\\Mail\\": "library/Mail"
+      "Policies\\": "policies/"
     }
   },
   "extra": {
