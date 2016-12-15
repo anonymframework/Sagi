@@ -14,13 +14,38 @@ trait AttachManager
     public function bootAttachManager()
     {
 
-        $this->beforeAttach(function ($saved, $model){
-            if(is_bool($saved)){
+        $this->beforeAttach(function ($saved, $model) {
+            if (is_bool($saved)) {
                 throw new \Exception($model->error()[2]);
             }
         });
 
-        $this->eventManager->listen('after_create', function ($saved,Model $model) {
+        $this->getEventManager()->listen('before_attach_delete', function ($status, Model $model) {
+            if (!$status) {
+                throw new \Exception($model->error()[2]);
+            }
+        });
+
+        $this->getEventManager()->listen('after_delete', function ($status, Model $model) {
+
+            $eventMan->hasListiner('before_attach_delete') ? $eventMan->fire('before_attach_delete',
+                [$status, $model]) : null;
+
+
+            if (count($attach = $model->getAttach())) {
+                foreach ($attach as $manager) {
+                    $target = $manager['attach_by'][0];
+                    $our = $manager['attach_by'][1];
+
+                    $attachModel = $manager['attach_with'];
+
+                    $attachModel->where($target, $model->attribute($our));
+                    $attachModel->delete();
+                }
+            }
+        });
+
+        $this->eventManager->listen('after_create', function ($saved, Model $model) {
 
             $eventMan = $model->getEventManager();
 
@@ -39,6 +64,7 @@ trait AttachManager
 
                     $attachModel->save();
                 }
+
             }
         });
     }

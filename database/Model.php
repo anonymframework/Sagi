@@ -622,7 +622,7 @@ class Model extends QueryBuilder
         $return = parent::delete();
 
         $this->eventManager->hasListiner('after_delete')
-            ? $this->eventManager->fire('after_delete', [$return]) : null;
+            ? $this->eventManager->fire('after_delete', [$return, $this]) : null;
 
         return $this;
     }
