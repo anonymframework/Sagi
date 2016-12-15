@@ -987,3 +987,17 @@ var_dump(Sagi\Database\Identity::user());
 
 var_dump(Sagi\Database\Identity::isLogined()); // true or false
 ```
+
+#attach
+
+```php 
+ 
+ $model1 = Model1::find(1);
+ 
+ $model1->attach(new Model2());
+ 
+ $model1->save();
+ 
+ // model1'in primary keyine sahip yeni bir model oluşturur
+
+```
