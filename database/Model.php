@@ -95,6 +95,12 @@ class Model extends QueryBuilder
     protected $attach;
 
     /**
+     * @var array
+     *
+     */
+    protected $hide = [];
+
+    /**
      * Model constructor.
      * @param array $attributes
      */
@@ -321,7 +327,7 @@ class Model extends QueryBuilder
     }
 
     /**
-     * @return mixed
+     * @return Model
      */
     public function one()
     {
@@ -377,7 +383,7 @@ class Model extends QueryBuilder
 
     /**
      * @param int $id
-     * @return mixed
+     * @return Model
      */
     public static function findOne($id)
     {
@@ -694,12 +700,34 @@ class Model extends QueryBuilder
         return (is_array($this->timestamps)) ? in_array($value, $this->timestamps) : false;
     }
 
+    public function json()
+    {
+        return json_encode($this->getAttributesWithoutHide());
+    }
+
+    /**
+     * @return array
+     */
+    private function getAttributesWithoutHide(){
+        $attributes = $this->getAttributes();
+
+        if (!empty($this->hide)) {
+            foreach ($this->hide as $key){
+
+                if (isset($attributes[$key])) {
+                    unset($attributes[$key]);
+                }
+            }
+        }
+
+        return $attributes;
+    }
     /**
      * @return string
      */
     public function __toString()
     {
-        return serialize($this);
+        return serialize($this->getAt);
     }
 
     /**
@@ -724,6 +752,7 @@ class Model extends QueryBuilder
                 'guarded',
                 'totallyGuarded',
                 'alias',
+                'hide',
             ]);
     }
 
@@ -737,16 +766,6 @@ class Model extends QueryBuilder
         $this->prepareDriver();
     }
 
-    /**
-     * @param $fields
-     * @return array
-     */
-    public function getAttributesByFields($fields)
-    {
-        $attrs = $this->getAttributes();
-
-        return array_intersect_key($attrs, array_flip($fields));
-    }
 
     /**
      * @return string|array
@@ -855,7 +874,7 @@ class Model extends QueryBuilder
 
 
         if (false === $this->attributes) {
-            throw new \PDOException('your query has failed');
+            throw new \PDOException(sprintf('Your query has been failed, message: %s', $this->error()[2]));
         }
 
 
