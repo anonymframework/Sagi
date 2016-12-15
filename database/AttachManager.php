@@ -28,6 +28,8 @@ trait AttachManager
 
         $this->getEventManager()->listen('after_delete', function ($status, Model $model) {
 
+            $eventMan = $this->getEventManager();
+
             $eventMan->hasListiner('before_attach_delete') ? $eventMan->fire('before_attach_delete',
                 [$status, $model]) : null;
 
