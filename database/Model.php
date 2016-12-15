@@ -104,9 +104,11 @@ class Model extends QueryBuilder
         parent::__construct();
         $this->usedModules = $traits = class_uses(static::className());
         $this->fetchMode = ConfigManager::get('fetch_mode', PDO::FETCH_OBJ);
-        $this->bootTraits($traits);
 
         $this->eventManager = new EventDispatcher();
+
+        $this->bootTraits($traits);
+
 
         $this->addSubscribes();
 
@@ -139,6 +141,8 @@ class Model extends QueryBuilder
             if ($model->can('create') === false) {
                 $model->throwPolicyException('create');
             }
+
+
         });
 
         $this->eventManager->listen('before_update', function (Model $model) {
@@ -146,7 +150,9 @@ class Model extends QueryBuilder
                 $model->throwPolicyException('update');
             }
         });
+
     }
+
 
     private function bootLogging()
     {
@@ -248,6 +254,37 @@ class Model extends QueryBuilder
     public function policy(PolicyInterface $policy)
     {
         $this->policy = $policy;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $callable
+     * @return $this
+     */
+    public function beforeAttach(callable  $callable){
+        $this->eventManager->listen('before_attach', $callable);
+
+        return $this;
+    }
+
+
+    public function attach(Model $model, $alias = false)
+    {
+        if (!$model->hasPrimaryKey()) {
+            throw new \Exception('Your model class have a primary key to use attach method');
+        }
+
+        $table = $this->primaryKey;
+
+        if ($alias == true) {
+            $table = $alias;
+        }
+
+        $this->attach[Model::className()] = [
+            'attach_by' => [$model->primaryKey, $table],
+            'attach_with' => $model
+        ];
 
         return $this;
     }
@@ -544,8 +581,9 @@ class Model extends QueryBuilder
             $return = false;
         }
 
+
         $this->eventManager->hasListiner('after_create')
-            ? $this->eventManager->fire('after_creare', [$return]) : null;
+            ? $this->eventManager->fire('after_create', [$return, $this]) : null;
 
         return $return;
     }
@@ -568,7 +606,7 @@ class Model extends QueryBuilder
         $return = parent::update($datas);
 
         $this->eventManager->hasListiner('after_update')
-            ? $this->eventManager->fire('after_update', [$return]) : null;
+            ? $this->eventManager->fire('after_update', [$return, $this]) : null;
 
         return $return;
     }
@@ -871,5 +909,20 @@ class Model extends QueryBuilder
     public function totallyGuarded()
     {
         return $this->setTotallyGuarded(true);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttach()
+    {
+        return $this->attach;
+    }
+
+    /**
+     * @return EventDispatcher
+     */
+    public function getEventManager(){
+        return $this->eventManager;
     }
 }
