@@ -13,7 +13,7 @@
     "php": ">=5.4.0",
     "symfony/console": "2.8",
     "symfony/process": "~2.4",
-    "anonymframework/event": "dev-master"
+    "anonym-php/anonym-event": "dev-master"
   },
   "minimum-stability": "dev",
   "autoload": {

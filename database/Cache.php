@@ -20,22 +20,14 @@ trait Cache
      */
     private static $memcache;
 
-    /**
-     *  makes memcache connection
-     */
-    private static function makeCacheConnection()
+
+    public function bootCache()
     {
         $configs = ConfigManager::get('cache');
 
         static::$memcache = new Memcached();
 
-
         static::$memcache->addServer($configs['host'], $configs['port']);
-    }
-
-    public function bootCache()
-    {
-        static::makeCacheConnection( );
     }
 
     /**

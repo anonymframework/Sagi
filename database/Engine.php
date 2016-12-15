@@ -273,9 +273,38 @@ class Engine
         }
 
 
-
         $handled = $this->handlePattern($pattern, [
             ':select' => $this->prepareSelectQuery($this->getSelect()),
+            ':from' => $this->getTable(),
+            ':join' => $this->driver->prepareJoinQuery($this->getJoin(), $this->getTable()),
+            ':group' => $this->driver->prepareGroupQuery($group),
+            ':having' => $this->driver->prepareHavingQuery($this->getHaving()),
+            ':where' => $this->prepareWhereQuery($this->getWhere()),
+            ':order' => $this->driver->prepareOrderQuery($this->getOrder()),
+            ':limit' => $this->driver->prepareLimitQuery($this->getLimit())
+        ]);
+
+        return $handled;
+    }
+
+    /**
+     * @return string
+     */
+    public function prepareCountQuery()
+    {
+
+        $group = $this->getGroupBy();
+        $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
+
+        if ($group instanceof Group) {
+            if ($group->isMultipile) {
+                $pattern = 'SELECT :select FROM :from :join :where :group :having :order :limit';
+            }
+        }
+
+
+        $handled = $this->handlePattern($pattern, [
+            ':select' => 'COUNT(*) as row_count',
             ':from' => $this->getTable(),
             ':join' => $this->driver->prepareJoinQuery($this->getJoin(), $this->getTable()),
             ':group' => $this->driver->prepareGroupQuery($group),
@@ -517,7 +546,7 @@ class Engine
     {
         $multipile = false;
 
-        if(!is_array($group) && is_string($group)){
+        if (!is_array($group) && is_string($group)) {
             $group = explode(",", $group);
         }
 
@@ -681,6 +710,28 @@ class Engine
         $values = array_values($columns);
         $this->join[] = [$type, $table, $values[0], $indexs[0]];
         return $this;
+    }
+
+    /**
+     * @param $a
+     * @param null $b
+     * @param null $c
+     * @return Model
+     */
+    public function cWhere($a, $b = null, $c = null)
+    {
+        return $this->where($a, $b, $c, 'AND', false);
+    }
+
+    /**
+     * @param $a
+     * @param null $b
+     * @param null $c
+     * @return Model
+     */
+    public function cOrWhere($a, $b = null, $c = null)
+    {
+        return $this->orWhere($a, $b, $c, 'OR', false);
     }
 
     /**

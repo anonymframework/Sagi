@@ -20,6 +20,20 @@ trait Authorization
     }
 
     /**
+     *
+     */
+    public function bootAuthorization()
+    {
+        $this->eventManager->listen('after_create', function (Model $model){
+           $model->createUserAuth($model->getPrimaryValue());
+        });
+
+        $this->eventManager->listen('before_delete', function (Model $model){
+            $model->deleteAuthRow();
+        });
+    }
+
+    /**
      * @return bool
      */
     public function isSuperAdmin()

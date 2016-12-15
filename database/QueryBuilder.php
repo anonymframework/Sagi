@@ -148,11 +148,13 @@ class QueryBuilder extends Engine implements Iterator, ArrayAccess
      */
     public function count()
     {
-        $handled = $this->prepare($this->prepareGetQuery(), $this->getArgs());
+        $handled = $this->prepare($this->prepareCountQuery(), $this->getArgs());
 
         $this->setArgs([]);
 
-        return $handled->rowCount();
+        $fetched = $handled->fetch(PDO::FETCH_OBJ);
+
+        return $fetched->row_count;
     }
 
     /**

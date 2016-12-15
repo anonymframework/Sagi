@@ -159,12 +159,7 @@ class Logger implements LoggerInterface
 CONTENT;
 
 
-        $view = new View('error');
-
-        $view->with(compact('message', 'code', 'line', 'file', 'trace'));
-
-        echo $view->show();
-
+        echo $content;
         if ($level === 1) {
             file_put_contents($fullPath, $content);
 

@@ -2,9 +2,9 @@
 
 namespace Sagi\Database;
 
+use Anonym\Components\Event\EventDispatcher;
 use PDO;
 use Sagi\Database\Mapping\Entity;
-use Sagi\Event\EventDispatcher;
 
 /**
  * Created by PhpStorm.
@@ -14,6 +14,11 @@ use Sagi\Event\EventDispatcher;
  */
 class Model extends QueryBuilder
 {
+
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+
+    private $fetchMode = PDO::FETCH_OBJ;
 
     /**
      * @var EventDispatcher
@@ -85,6 +90,11 @@ class Model extends QueryBuilder
     protected $logging;
 
     /**
+     * @var array
+     */
+    protected $attach;
+
+    /**
      * Model constructor.
      * @param array $attributes
      */
@@ -93,12 +103,13 @@ class Model extends QueryBuilder
 
         parent::__construct();
         $this->usedModules = $traits = class_uses(static::className());
-
+        $this->fetchMode = ConfigManager::get('fetch_mode', PDO::FETCH_OBJ);
         $this->bootTraits($traits);
 
         $this->eventManager = new EventDispatcher();
 
         $this->addSubscribes();
+
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
             if (is_string($policy)) {
                 $this->policy(new $policy);
@@ -119,9 +130,22 @@ class Model extends QueryBuilder
         $this->bootLogging();
     }
 
+    /**
+     *
+     */
     private function addSubscribes()
     {
+        $this->eventManager->listen('before_create', function (Model $model) {
+            if ($model->can('create') === false) {
+                $model->throwPolicyException('create');
+            }
+        });
 
+        $this->eventManager->listen('before_update', function (Model $model) {
+            if (!$model->can('create')) {
+                $model->throwPolicyException('update');
+            }
+        });
     }
 
     private function bootLogging()
@@ -398,8 +422,7 @@ class Model extends QueryBuilder
         }
 
 
-
-        $append = '#'.$link[1].':'.$this->__get($link[1]);
+        $append = '#' . $link[1] . ':' . $this->__get($link[1]);
 
         $name .= $append;
 
@@ -427,7 +450,7 @@ class Model extends QueryBuilder
             $name = $class->getTable();
         }
 
-        $append = '#'.$link[1].':'.$this->__get($link[1]);
+        $append = '#' . $link[1] . ':' . $this->__get($link[1]);
 
         $name .= $append;
 
@@ -464,35 +487,22 @@ class Model extends QueryBuilder
     public function save()
     {
 
+        $this->eventManager->hasListiner('before_save') ?
+            $this->eventManager->fire('before_save', [$this]) : null;
 
         if (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
 
-            if ($this->can('update')) {
-                if ($this->update()) {
-                    return $this;
-                } else {
-                    return false;
-                }
-            } else {
-                $this->throwPolicyException('create');
-            }
+            $return = $this->update() ? $this : false;
 
+            return $return;
         } else {
-            if ($this->can('create')) {
-                $created = $this->create();
-
-                if ($this->isAuthorizationUsed()) {
-                    $this->createUserAuth($created->id);
-                }
-
-                return $created;
-            } else {
-                $this->throwPolicyException('create');
-            }
+            $return = $this->create();
         }
 
+        $this->eventManager->hasListiner('after_save')
+            ? $this->eventManager->fire('after_save', [$return]) : null;
 
-        return $this;
+        return $return;
     }
 
     /**
@@ -501,6 +511,9 @@ class Model extends QueryBuilder
      */
     public function create($data = null)
     {
+        $this->eventManager->hasListiner('before_create')
+            ? $this->eventManager->fire('before_create', [$this, $data]) : null;
+
         if (empty($data)) {
             $data = $this->getAttributes();
         }
@@ -526,10 +539,15 @@ class Model extends QueryBuilder
                 $created = static::set($this->getAttributes());
             }
 
-            return $created;
+            $return = $created;
         } else {
-            return false;
+            $return = false;
         }
+
+        $this->eventManager->hasListiner('after_create')
+            ? $this->eventManager->fire('after_creare', [$return]) : null;
+
+        return $return;
     }
 
 
@@ -539,13 +557,20 @@ class Model extends QueryBuilder
      */
     public function update($datas = [])
     {
+        $this->eventManager->hasListiner('before_update')
+            ? $this->eventManager->fire('before_update', [$this, $datas]) : null;
         if (empty($datas)) {
             $datas = $this->getAttributes();
         }
 
         $this->setUpdatedAt();
 
-        return parent::update($datas);
+        $return = parent::update($datas);
+
+        $this->eventManager->hasListiner('after_update')
+            ? $this->eventManager->fire('after_update', [$return]) : null;
+
+        return $return;
     }
 
     /**
@@ -553,11 +578,15 @@ class Model extends QueryBuilder
      */
     public function delete()
     {
-        if ($this->isAuthorizationUsed()) {
-            $this->deleteAuthRow();
-        }
+        $this->eventManager->hasListiner('before_delete')
+            ? $this->eventManager->fire('before_delete', [$this]) : null;
 
-        return parent::delete();
+        $return = parent::delete();
+
+        $this->eventManager->hasListiner('after_delete')
+            ? $this->eventManager->fire('after_delete', [$return]) : null;
+
+        return $this;
     }
 
     /**
@@ -585,7 +614,7 @@ class Model extends QueryBuilder
     private function setUpdatedAt()
     {
 
-        if ($this->hasTimestamp($updated = 'updated_at')) {
+        if ($this->hasTimestamp($updated = static::UPDATED_AT)) {
             $this->attributes[$updated] = date($this->timestampFormat(), $this->getCurrentTime());
         }
 
@@ -605,7 +634,7 @@ class Model extends QueryBuilder
      * @param $name
      * @return bool
      */
-    private function isProtected($name)
+    public function isProtected($name)
     {
         return isset($this->protected[$name]);
     }
@@ -622,7 +651,7 @@ class Model extends QueryBuilder
      * @param $value
      * @return bool|mixed
      */
-    private function hasTimestamp($value)
+    public function hasTimestamp($value)
     {
         return (is_array($this->timestamps)) ? in_array($value, $this->timestamps) : false;
     }
@@ -632,24 +661,34 @@ class Model extends QueryBuilder
      */
     public function __toString()
     {
-        return $this->json();
+        return serialize($this);
     }
 
     /**
-    public function json()
-    {
-        return json_encode($this->getAttributesByFields($this->fields));
-    }
-
-    /**
-     * @return string
+     * @return array
      */
     public function __sleep()
     {
         $arr = parent::__sleep();
 
-        return array_merge($arr, ['table', 'attributes', 'primaryKey', 'usedModules', 'policy', 'protected', 'fields', 'json']);
+        return array_merge($arr,
+            [
+                'table',
+                'attributes',
+                'eventManager',
+                'primaryKey',
+                'usedModules',
+                'policy',
+                'protected',
+                'fields',
+                'json',
+                'array',
+                'guarded',
+                'totallyGuarded',
+                'alias',
+            ]);
     }
+
 
     /**
      *
@@ -677,6 +716,14 @@ class Model extends QueryBuilder
     public static function getTableName()
     {
         return '';
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    public function getPrimaryValue()
+    {
+        return $this->hasPrimaryKey() ? $this->attribute($this->primaryKey) : false;
     }
 
     /**
@@ -724,9 +771,9 @@ class Model extends QueryBuilder
      */
     public function setAttribute($key, $value)
     {
-        if ($this->isJson($key) && !$this->hasAttribute($key)) {
+        if ($this->isJson($key) && is_object($value) || is_array($value)) {
             $value = json_encode($value);
-        } elseif ($this->isArray($key) && !$this->hasAttribute($key)) {
+        } elseif ($this->isArray($key) && is_object($value) || is_array($value)) {
             $value = serialize($value);
         }
 
@@ -770,7 +817,7 @@ class Model extends QueryBuilder
 
 
         if (false === $this->attributes) {
-              throw new \PDOException('your query has failed');
+            throw new \PDOException('your query has failed');
         }
 
 
@@ -782,15 +829,9 @@ class Model extends QueryBuilder
 
 
         if ($this->isJson($name)) {
-
-            if (is_array($value) || is_object($value)) {
-                $value = json_decode($value);
-            }
-
+            $value = json_decode($value);
         } elseif ($this->isArray($name)) {
-            if (is_array($value) || is_object($value)) {
-                $value = unserialize($value);
-            }
+            $value = unserialize($value);
         }
 
         return isset($this->timestamps[$name]) ? new ValueContainer($value) : $value;
