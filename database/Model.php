@@ -116,6 +116,7 @@ class Model extends QueryBuilder
         $this->usedModules = $traits = class_uses(static::className());
         $this->fetchMode = ConfigManager::get('fetch_mode', PDO::FETCH_OBJ);
 
+        $this->eventManager = new EventDispatcher();
         $this->bootTraits($traits);
 
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
@@ -162,6 +163,7 @@ class Model extends QueryBuilder
             }
         });
 
+        $this->subscribedBefore = true;
     }
 
 
@@ -323,6 +325,9 @@ class Model extends QueryBuilder
      */
     public function all()
     {
+        $this->eventManager = null;
+
+
         $class = get_called_class();
 
         if ($this->isCacheUsed()) {
@@ -337,6 +342,9 @@ class Model extends QueryBuilder
      */
     public function one()
     {
+
+        $this->eventManager = null;
+
         if ($this->isCacheUsed()) {
             $this->cacheOne();
         } else {
@@ -600,7 +608,13 @@ class Model extends QueryBuilder
             if (!empty($this->primaryKey) && !is_array($this->primaryKey) && $entity->multipile === false) {
                 $created = static::findOne($this->getPdo()->lastInsertId());
             } elseif (empty($this->primaryKey) || is_array($this->primaryKey)) {
-                $created = static::set($this->getAttributes());
+                $created = static::find();
+
+                foreach ($this->primaryKey as $key) {
+                    $created->where($key, $data[$key]);
+                }
+
+                return $created->one();
             }
 
             $return = $created;

@@ -13,10 +13,6 @@ trait AttachManager
 {
     public function bootAttachManager()
     {
-
-        $this->isSubscribedBefore() === false ? $this->eventManager = new EventDispatcher() : null;
-
-
         $this->beforeAttach(function ($saved, $model) {
             if (is_bool($saved)) {
                 throw new \Exception($model->error()[2]);

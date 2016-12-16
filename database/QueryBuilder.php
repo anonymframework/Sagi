@@ -5,6 +5,7 @@ use Exception;
 use ArrayAccess;
 use Sagi\Database\Mapping\Entity;
 use Sagi\Database\Mapping\Group;
+use Sagi\Database\Mapping\Join;
 use Sagi\Database\Mapping\Where;
 use Iterator;
 use PDO;
@@ -284,7 +285,7 @@ class QueryBuilder implements Iterator, ArrayAccess
         $handled = $this->handlePattern($pattern, [
             ':select' => $this->prepareSelectQuery($this->getSelect()),
             ':from' => $this->getTable(),
-            ':join' => $this->driver->prepareJoinQuery($this->getJoin(), $this->getTable()),
+            ':join' => $this->prepareJoinQuery($this->getJoin(), $this->getTable()),
             ':group' => $this->driver->prepareGroupQuery($group),
             ':having' => $this->driver->prepareHavingQuery($this->getHaving()),
             ':where' => $this->prepareWhereQuery($this->getWhere()),
@@ -314,7 +315,7 @@ class QueryBuilder implements Iterator, ArrayAccess
         $handled = $this->handlePattern($pattern, [
             ':select' => 'COUNT(*) as row_count',
             ':from' => $this->getTable(),
-            ':join' => $this->driver->prepareJoinQuery($this->getJoin(), $this->getTable()),
+            ':join' => $this->prepareJoinQuery($this->getJoin(), $this->getTable()),
             ':group' => $this->driver->prepareGroupQuery($group),
             ':having' => $this->driver->prepareHavingQuery($this->getHaving()),
             ':where' => $this->prepareWhereQuery($this->getWhere()),
@@ -392,6 +393,35 @@ class QueryBuilder implements Iterator, ArrayAccess
 
 
         return $s;
+    }
+
+    /**
+     * @return string
+     */
+    public function prepareJoinQuery($joins, $table)
+    {
+        if (empty($joins)) {
+            return '';
+        }
+
+        $string = '';
+
+        foreach ($joins as $join) {
+            /**
+             * @var Join $join
+             */
+
+            if (is_callable($join->target)) {
+                $tCol = $this->prepareSubQuery($join->target, $this);
+            } else {
+                $tCol = $join->table . $join->target;
+            }
+
+
+            $string .= sprintf("%s %s ON %s.%s = %s",
+                $join->type, $join->table, $table, $join->home, $tCol);
+        }
+        return $string;
     }
 
     /**
@@ -719,7 +749,9 @@ class QueryBuilder implements Iterator, ArrayAccess
     {
         $indexs = array_keys($columns);
         $values = array_values($columns);
-        $this->join[] = [$type, $table, $values[0], $indexs[0]];
+
+        $this->join[] = new Join($type, $table, $values[0], $indexs[0]);
+
         return $this;
     }
 

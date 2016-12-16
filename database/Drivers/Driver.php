@@ -1,7 +1,9 @@
 <?php
 
 namespace Sagi\Database\Drivers;
+
 use Sagi\Database\Mapping\Group;
+use Sagi\Database\QueryBuilder;
 
 /**
  * Class Driver
@@ -43,7 +45,6 @@ class Driver
     }
 
 
-
     /**
      * @return string
      */
@@ -59,31 +60,13 @@ class Driver
         return "GROUP BY $group";
     }
 
+    /**
+     * @param $having
+     * @return mixed
+     */
     public function prepareHavingQuery($having)
     {
         return $having;
-    }
-
-    /**
-     * @return string
-     */
-    public function prepareJoinQuery($joins, $table)
-    {
-        if (empty($joins)) {
-            return '';
-        }
-
-        $string = '';
-
-        foreach ($joins as $join) {
-            $type = isset($join[0]) ? $join[0] : 'LEFT JOIN';
-            $targetTable = isset($join[1]) ? $join[1] : '';
-            $targetColumn = isset($join[2]) ? $join[2] : '';
-            $ourTable = $table;
-            $ourColumn = isset($join[3]) ? $join[3] : '';
-            $string .= "$type $targetTable ON $ourTable.$ourColumn = $targetTable.$targetColumn";
-        }
-        return $string;
     }
 
 }
