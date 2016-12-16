@@ -405,7 +405,7 @@ class QueryBuilder implements Iterator, ArrayAccess
                 $tCol = $prepareCol[0];
                 $this->setArgs($prepareCol[1]);
             } else {
-                $tCol = $join->table . $join->target;
+                $tCol = $join->table .'.'. $join->target;
             }
 
 
