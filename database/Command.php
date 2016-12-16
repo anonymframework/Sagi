@@ -23,7 +23,9 @@ class Command
             'default' => 'DEFAULT %s',
             'null' => 'NULL',
             'notnull' => 'NOT NULL',
-            'unique' => 'UNIQUE'
+            'unique' => 'UNIQUE',
+            'unsigned' => 'UNSIGNED',
+            'signed' =>  'SIGNED'
         ];
 
     /**
@@ -53,6 +55,19 @@ class Command
         return $this->addCommand('unique', []);
     }
 
+    /**
+     * @return Command
+     */
+    public function signed(){
+        return $this->addCommand('signed', []);
+    }
+
+    /**
+     * @return Command
+     */
+    public function unsigned(){
+        return $this->addCommand('unsigned', []);
+    }
     /**
      * @return Row
      */

@@ -212,13 +212,22 @@ CODE;
      */
     private function findPrimaryKey($array)
     {
+        $pri = '';
+
+        $count = 0;
         foreach ($array as $item) {
             if ($item['Key'] === 'PRI') {
-                return "'{$item['Field']}'";
-
+                $count += 1;
+                $pri .=  "'{$item['Field']}',";
             }
         }
 
-        return "'id'";
+        $pattern = $count === 1 ? '%s' : '[%s]';
+
+        $pri = rtrim($pri, ',');
+
+        $pri === '' ?: "'id'";
+
+        return sprintf($pattern, $pri);
     }
 }

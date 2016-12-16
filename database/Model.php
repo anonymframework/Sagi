@@ -101,6 +101,11 @@ class Model extends QueryBuilder
     protected $hide = [];
 
     /**
+     * @var bool
+     */
+    protected $subscribedBefore = false;
+
+    /**
      * Model constructor.
      * @param array $attributes
      */
@@ -111,12 +116,7 @@ class Model extends QueryBuilder
         $this->usedModules = $traits = class_uses(static::className());
         $this->fetchMode = ConfigManager::get('fetch_mode', PDO::FETCH_OBJ);
 
-        $this->eventManager = new EventDispatcher();
-
         $this->bootTraits($traits);
-
-
-        $this->addSubscribes();
 
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
             if (is_string($policy)) {
@@ -144,6 +144,10 @@ class Model extends QueryBuilder
      */
     private function addSubscribes()
     {
+        if (is_null($this->eventManager)) {
+            $this->eventManager = new EventDispatcher();
+        }
+
         $this->eventManager->listen('before_create', function (Model $model) {
             if ($model->can('create') === false) {
                 $model->throwPolicyException('create');
@@ -269,7 +273,8 @@ class Model extends QueryBuilder
      * @param callable $callable
      * @return $this
      */
-    public function beforeAttach(callable  $callable){
+    public function beforeAttach(callable  $callable)
+    {
         $this->eventManager->listen('before_attach', $callable);
 
         return $this;
@@ -367,7 +372,16 @@ class Model extends QueryBuilder
             }
 
         } elseif (is_string($conditions) || is_integer($conditions)) {
-            $instance->where($instance->primaryKey, $conditions);
+            $primaryKey = is_array($instance->primaryKey) ?
+                $instance->primaryKey[0] :
+                $instance->primaryKey;
+
+            $instance->where($primaryKey, $conditions);
+        } elseif (func_num_args() > 1 && is_array($instance->primaryKey)) {
+
+            foreach ($instance->primaryKey as $index => $primaryKey) {
+                $instance->where($primaryKey, func_get_arg($index));
+            }
         }
 
         return $instance;
@@ -531,6 +545,8 @@ class Model extends QueryBuilder
     public function save()
     {
 
+        $this->isSubscribedBefore() === false ? $this->addSubscribes() : null;
+
         $this->eventManager->hasListiner('before_save') ?
             $this->eventManager->fire('before_save', [$this]) : null;
 
@@ -546,6 +562,8 @@ class Model extends QueryBuilder
         $this->eventManager->hasListiner('after_save')
             ? $this->eventManager->fire('after_save', [$return]) : null;
 
+        $this->eventManager = null;
+
         return $return;
     }
 
@@ -555,6 +573,8 @@ class Model extends QueryBuilder
      */
     public function create($data = null)
     {
+        $this->isSubscribedBefore() === false ?: $this->addSubscribes();
+
         $this->eventManager->hasListiner('before_create')
             ? $this->eventManager->fire('before_create', [$this, $data]) : null;
 
@@ -577,9 +597,9 @@ class Model extends QueryBuilder
 
 
         if ($created = parent::create($entity)) {
-            if (!empty($this->primaryKey) && $entity->multipile === false) {
-                $created = static::findOne($this->getPdo()->lastInsertId($this->primaryKey));
-            } elseif (empty($this->primaryKey)) {
+            if (!empty($this->primaryKey) && !is_array($this->primaryKey) && $entity->multipile === false) {
+                $created = static::findOne($this->getPdo()->lastInsertId());
+            } elseif (empty($this->primaryKey) || is_array($this->primaryKey)) {
                 $created = static::set($this->getAttributes());
             }
 
@@ -602,6 +622,9 @@ class Model extends QueryBuilder
      */
     public function update($datas = [])
     {
+        $this->isSubscribedBefore() === false ?: $this->addSubscribes();
+
+
         $this->eventManager->hasListiner('before_update')
             ? $this->eventManager->fire('before_update', [$this, $datas]) : null;
         if (empty($datas)) {
@@ -623,6 +646,8 @@ class Model extends QueryBuilder
      */
     public function delete()
     {
+        $this->isSubscribedBefore() === false ?: $this->addSubscribes();
+
         $this->eventManager->hasListiner('before_delete')
             ? $this->eventManager->fire('before_delete', [$this]) : null;
 
@@ -631,6 +656,7 @@ class Model extends QueryBuilder
         $this->eventManager->hasListiner('after_delete')
             ? $this->eventManager->fire('after_delete', [$return, $this]) : null;
 
+        $this->eventManager = null;
         return $this;
     }
 
@@ -709,11 +735,12 @@ class Model extends QueryBuilder
     /**
      * @return array
      */
-    private function getAttributesWithoutHide(){
+    private function getAttributesWithoutHide()
+    {
         $attributes = $this->getAttributes();
 
         if (!empty($this->hide)) {
-            foreach ($this->hide as $key){
+            foreach ($this->hide as $key) {
 
                 if (isset($attributes[$key])) {
                     unset($attributes[$key]);
@@ -723,6 +750,7 @@ class Model extends QueryBuilder
 
         return $attributes;
     }
+
     /**
      * @return string
      */
@@ -754,6 +782,7 @@ class Model extends QueryBuilder
                 'totallyGuarded',
                 'alias',
                 'hide',
+                'subscribedBefore'
             ]);
     }
 
@@ -781,7 +810,11 @@ class Model extends QueryBuilder
      */
     public function getPrimaryValue()
     {
-        return $this->hasPrimaryKey() ? $this->attribute($this->primaryKey) : false;
+        return $this->hasPrimaryKey() ?
+            is_array($this->primaryKey) ?
+                $this->attribute($this->primaryKey[0])
+                : $this->attribute($this->primaryKey)
+            : false;
     }
 
     /**
@@ -942,7 +975,16 @@ class Model extends QueryBuilder
     /**
      * @return EventDispatcher
      */
-    public function getEventManager(){
+    public function getEventManager()
+    {
         return $this->eventManager;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubscribedBefore()
+    {
+        return $this->subscribedBefore;
     }
 }
