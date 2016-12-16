@@ -30,6 +30,7 @@ class Row
         'bool' => '`%s` BOOLEAN',
         'bit' => '`%s` BIT',
         'char' => '`%s` CHAR(%d)',
+        'primary_key' => 'CONSTRAINT %s PRIMARY KEY(%s)'
     ];
 
     /**
@@ -243,6 +244,20 @@ class Row
     public function float($name, $precision)
     {
         return $this->addCommand('float', [$name, $precision]);
+    }
+
+    /**
+     * @param $constraint
+     * @param $keys
+     * @return Command
+     */
+    public function primaryKey($constraint, $keys){
+
+        if (is_array($keys)) {
+            $keys = join(',', $keys);
+        }
+
+        return $this->addCommand('primary_key', [$constraint, $keys]);
     }
 
 
