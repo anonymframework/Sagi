@@ -276,9 +276,7 @@ class QueryBuilder implements Iterator, ArrayAccess
         $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
 
         if ($group instanceof Group) {
-            if ($group->isMultipile) {
-                $pattern = 'SELECT :select FROM :from :join :where :group :having :order :limit';
-            }
+            $pattern = 'SELECT :select FROM :from :join :where :group :having :order :limit';
         }
 
 
@@ -301,28 +299,16 @@ class QueryBuilder implements Iterator, ArrayAccess
      */
     public function prepareCountQuery()
     {
-
-        $group = $this->getGroupBy();
-        $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
-
-        if ($group instanceof Group) {
-            if ($group->isMultipile) {
-                $pattern = 'SELECT :select FROM :from :join :where :group :having :order :limit';
-            }
-        }
+        $pattern = 'SELECT :select FROM :from  :where :order :limit';
 
 
         $handled = $this->handlePattern($pattern, [
             ':select' => 'COUNT(*) as row_count',
             ':from' => $this->getTable(),
-            ':join' => $this->prepareJoinQuery($this->getJoin(), $this->getTable()),
-            ':group' => $this->driver->prepareGroupQuery($group),
-            ':having' => $this->driver->prepareHavingQuery($this->getHaving()),
             ':where' => $this->prepareWhereQuery($this->getWhere()),
             ':order' => $this->driver->prepareOrderQuery($this->getOrder()),
             ':limit' => $this->driver->prepareLimitQuery($this->getLimit())
         ]);
-
         return $handled;
     }
 
@@ -398,7 +384,7 @@ class QueryBuilder implements Iterator, ArrayAccess
     /**
      * @return string
      */
-    public function prepareJoinQuery($joins, $table)
+    protected function prepareJoinQuery($joins, $table)
     {
         if (empty($joins)) {
             return '';
@@ -406,20 +392,27 @@ class QueryBuilder implements Iterator, ArrayAccess
 
         $string = '';
 
+        $new = static::createNewInstance();
+
         foreach ($joins as $join) {
             /**
              * @var Join $join
              */
 
             if (is_callable($join->target)) {
-                $tCol = $this->prepareSubQuery($join->target, $this);
+                $prepareCol = $this->prepareSubQuery($join->target, $new);
+
+                $tCol = $prepareCol[0];
+                $this->setArgs($prepareCol[1]);
             } else {
                 $tCol = $join->table . $join->target;
             }
 
 
             $string .= sprintf("%s %s ON %s.%s = %s",
-                $join->type, $join->table, $table, $join->home, $tCol);
+                $join->type,
+                $join->table,
+                $table, $join->home, $tCol);
         }
         return $string;
     }
