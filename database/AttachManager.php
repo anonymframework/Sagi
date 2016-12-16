@@ -8,11 +8,14 @@
 
 namespace Sagi\Database;
 
-
+use Anonym\Components\Event\EventDispatcher;
 trait AttachManager
 {
     public function bootAttachManager()
     {
+
+        $this->isSubscribedBefore() === false ? $this->eventManager = new EventDispatcher() : null;
+
 
         $this->beforeAttach(function ($saved, $model) {
             if (is_bool($saved)) {
