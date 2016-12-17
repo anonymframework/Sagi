@@ -45,7 +45,8 @@ class CreateModelCommand extends Command
 
         $content = TemplateManager::prepareContent('model', [
             'table' => $name,
-            'relations' => ConfigManager::get('prepare_relations', true) === true ?  $this->prepareRelations($mapped, $name).$this->prepareRelationsMany($name): '',
+            'relations' => ConfigManager::get('prepare_relations', true) === true ? $this->prepareRelations($mapped,
+                    $name) . $this->prepareRelationsMany($name) : '',
             'name' => $name = MigrationManager::prepareClassName($name),
             'fields' => $this->prepareFields($mapped, $name),
             'primary' => $primary = $this->findPrimaryKey($columns),
@@ -108,33 +109,32 @@ class CreateModelCommand extends Command
     private function prepareRelationsMany($name)
     {
 
-        $subname = $name.'_id';
+        $subname = $name . '_id';
 
         $tables = QueryBuilder::createNewInstance()->query('SHOW TABLES')->fetchAll();
 
         $content = '';
 
-        foreach ($tables as $table){
+        foreach ($tables as $table) {
             $table = $table[0];
 
-            if($table == $name){
+            if ($table == $name) {
                 continue;
             }
 
 
-            if(in_array($table, MigrationManager::$systemMigrations)){
+            if (in_array($table, MigrationManager::$systemMigrations)) {
                 continue;
             }
 
-            $columns  = QueryBuilder::createNewInstance()->query("SELECT $subname FROM `$table`");
+            $columns = QueryBuilder::createNewInstance()->query("SELECT $subname FROM `$table`");
 
-            if(!$columns)
-            {
+            if (!$columns) {
                 continue;
             }
 
-            if($configs = ConfigManager::get('relations.'.$table, 'many')){
-                $command = '$this->has'.ucfirst($configs);
+            if ($configs = ConfigManager::get('relations.' . $table, 'many')) {
+                $command = '$this->has' . ucfirst($configs);
             }
 
             $function = lcfirst(MigrationManager::prepareClassName($table));
@@ -162,10 +162,50 @@ MANY;
     private function prepareRelations($fields, $name)
     {
         $keys = QueryBuilder::createNewInstance()
-            ->getPdo()->query("SHOW CREATE TABLE `$name`")->fetch(\PDO::FETCH_OBJ);
+            ->getPdo()->query("SHOW CREATE TABLE `$name`")->fetch(\PDO::FETCH_ASSOC);
 
-        var_dump($keys);
-        exit();
+        $create = $keys['Create Table'];
+        if (strpos($create, 'FOREIGN KEY') === false) {
+            return '';
+        } else {
+            if (preg_match_all('#FOREIGN KEY \((.*?)\) REFERENCES (.*?) \((.*?)\)#si', $create, $field)) {
+
+                array_shift($field);
+
+                $field = array_map(function ($val) {
+                    return array_map(function ($value){
+                        return str_replace(['`', "'", '"'], '', $value);
+                    }, $val);
+                }, $field);
+
+                $ret = '';
+
+                for ($i = 0; $i < count($field[0]); $i++) {
+                    $ourCol = $field[0][$i];
+                    $table = $field[1][$i];
+                    $tarCol = $field[2][$i];
+
+                    $command = '$this->hasOne';
+
+                    $class = MigrationManager::prepareClassName($table);
+
+                    $ret .= <<<CODE
+/**
+      * 
+      * @return mixed
+      */
+      function $table(){
+          return $command(\Models\\$class::className(), ['$tarCol', '$ourCol']);       
+       }
+
+CODE;
+                }
+
+                return $ret;
+            }else{
+                return '';
+            }
+        }
     }
 
     /**
@@ -180,7 +220,7 @@ MANY;
         foreach ($array as $item) {
             if ($item['Key'] === 'PRI') {
                 $count += 1;
-                $pri .=  "'{$item['Field']}',";
+                $pri .= "'{$item['Field']}',";
             }
         }
 
