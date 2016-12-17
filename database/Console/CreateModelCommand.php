@@ -4,6 +4,7 @@ namespace Sagi\Database\Console;
 
 use Sagi\Database\ColumnMapper;
 use Sagi\Database\ConfigManager;
+use Sagi\Database\Model;
 use Sagi\Database\QueryBuilder;
 use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Input\InputArgument;
@@ -44,7 +45,7 @@ class CreateModelCommand extends Command
 
         $content = TemplateManager::prepareContent('model', [
             'table' => $name,
-            'relations' => ConfigManager::get('prepare_relations', false) === true ?  $this->prepareRelations($mapped, $name).$this->prepareRelationsMany($name): '',
+            'relations' => ConfigManager::get('prepare_relations', true) === true ?  $this->prepareRelations($mapped, $name).$this->prepareRelationsMany($name): '',
             'name' => $name = MigrationManager::prepareClassName($name),
             'fields' => $this->prepareFields($mapped, $name),
             'primary' => $primary = $this->findPrimaryKey($columns),
@@ -80,11 +81,11 @@ class CreateModelCommand extends Command
     {
         $timestamps = [];
 
-        if (in_array('created_at', $fields)) {
+        if (in_array(Model::CREATED_AT, $fields)) {
             $timestamps[] = "'created_at'";
         }
 
-        if (in_array('updated_at', $fields)) {
+        if (in_array(Model::UPDATED_AT, $fields)) {
             $timestamps[] = "'updated_at'";
         }
 
@@ -160,50 +161,11 @@ MANY;
 
     private function prepareRelations($fields, $name)
     {
+        $keys = QueryBuilder::createNewInstance()
+            ->getPdo()->query("SHOW CREATE TABLE `$name`")->fetch(\PDO::FETCH_OBJ);
 
-        $fields = array_map(function ($value) use($name) {
-            if (strpos($value->name, "_id") !== false) {
-                $table_ex = explode("_", $value->name);
-                $table = $table_ex[0];
-                $class = MigrationManager::prepareClassName($table);
-                $target_name = $table.'_id';
-                $command = '$this->hasOne';
-            }else{
-                return '';
-            }
-
-            $tables = QueryBuilder::createNewInstance()->query("SHOW TABLES LIKE '$table'")->fetchAll();
-
-            if(!$tables){
-                $tableplural = $table.'s';
-                $class = MigrationManager::prepareClassName($tableplural);
-                $tables = QueryBuilder::createNewInstance()->query("SHOW TABLES LIKE '$tableplural'")->fetchAll();
-            }
-
-
-            $function = lcfirst(MigrationManager::prepareClassName($table));
-
-            if ($tables) {
-                return <<<CODE
-    /**
-     *
-     * @return \Sagi\Database\RelationShip
-     */
-      public function $function(){
-            return $command($class::className(), ["id", '$target_name']);
-      }
-      
-
-CODE;
-            }else{
-                return '';
-            }
-
-
-
-        }, $fields);
-
-        return join('', $fields);
+        var_dump($keys);
+        exit();
     }
 
     /**

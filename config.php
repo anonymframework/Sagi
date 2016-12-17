@@ -3,7 +3,7 @@
 return [
     'username' => 'root',
     'password' => '',
-    'dsn' => 'mysql:host=localhost;dbname=radar',
+    'dsn' => 'mysql:host=localhost;dbname=test',
     'driver' => 'mysql',
 
     'fetch_mode' => PDO::FETCH_OBJ,

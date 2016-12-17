@@ -25,7 +25,10 @@ class Command
             'notnull' => 'NOT NULL',
             'unique' => 'UNIQUE',
             'unsigned' => 'UNSIGNED',
-            'signed' =>  'SIGNED'
+            'signed' =>  'SIGNED',
+            'constraint' => 'CONSTRAINT %s',
+            'delete_cascade' => 'ON DELETE CASCADE',
+            'update_cascade' => 'ON UPDATE CASCADE',
         ];
 
     /**
@@ -43,13 +46,22 @@ class Command
     }
 
     /**
-     * @return Row
+     * @param $name
+     */
+    public function constraint($name){
+       return $this->addCommand('constraint', [$name], true);
+    }
+    /**
+     * @return Command
      */
     public function null()
     {
         return $this->addCommand('null', []);
     }
 
+    /**
+     * @return Command
+     */
     public function unique()
     {
         return $this->addCommand('unique', []);
@@ -69,11 +81,25 @@ class Command
         return $this->addCommand('unsigned', []);
     }
     /**
-     * @return Row
+     * @return Command
      */
     public function notNull()
     {
         return $this->addCommand('notnull', []);
+    }
+
+    /**
+     * @return Command
+     */
+    public function onUpdateCascade(){
+        return $this->addCommand('update_cascade', []);
+    }
+
+    /**
+     * @return Command
+     */
+    public function onDeleteCascade(){
+        return $this->addCommand('delete_cascade', []);
     }
 
     /**
@@ -107,7 +133,7 @@ class Command
      * @param $variables
      * @return Command
      */
-    private function addCommand($type, $variables)
+    private function addCommand($type, $variables, $unshift = false)
     {
         if (!empty($variables)) {
             array_unshift($variables, $this->patterns[$type]);
@@ -117,7 +143,11 @@ class Command
             $command = $this->patterns[$type];
         }
 
-        $this->queires[] = $command;
+        if ($unshift) {
+            array_unshift($this->queires, $command);
+        }else{
+            $this->queires[] = $command;
+        }
 
         return $this;
     }

@@ -30,9 +30,14 @@ class Row
         'bool' => '`%s` BOOLEAN',
         'bit' => '`%s` BIT',
         'char' => '`%s` CHAR(%d)',
-        'primary_key' => 'CONSTRAINT %s PRIMARY KEY(%s)'
+        'primary_key' => 'PRIMARY KEY(%s)',
+        'foreign_key' => 'FOREIGN KEY(%s) REFERENCES %s(%s)',
+        'index' => 'INDEX %s (%s) '
     ];
 
+    public function index($name, $col){
+        return $this->addCommand('index', [$name, $col]);
+    }
     /**
      * @var array
      */
@@ -193,8 +198,8 @@ class Row
      */
     public function timestamps()
     {
-        $this->current('created_at');
-        $this->current('updated_at');
+        $this->current(Model::CREATED_AT);
+        $this->current(Model::UPDATED_AT);
 
         return $this;
     }
@@ -247,18 +252,29 @@ class Row
     }
 
     /**
-     * @param $constraint
      * @param $keys
      * @return Command
      */
-    public function primaryKey($constraint, $keys){
+    public function primaryKey($keys){
 
         if (is_array($keys)) {
             $keys = join(',', $keys);
         }
 
-        return $this->addCommand('primary_key', [$constraint, $keys]);
+        return $this->addCommand('primary_key',  [$keys]);
     }
+
+    /**
+     * @param $keys
+     * @return Command
+     */
+    public function foreignKey($table, $colOur, $colTarget){
+
+
+        return $this->addCommand('foreign_key',  [$colOur, $table, $colTarget]);
+    }
+
+
 
 
     /**
