@@ -943,6 +943,118 @@ class Model extends QueryBuilder
     }
 
     /**
+     * @param $callback
+     * @return $this
+     */
+    public function beforeSave($callback){
+        if (!$this->eventManager instanceof EventDispatcher) {
+            $this->eventManager = new EventDispatcher();
+        }
+
+        $this->eventManager->listen('before_save', $callback);
+
+        return $this;
+    }
+
+    /**
+     * @param $callback
+     * @return $this
+     */
+    public function beforeCreate($callback){
+        if (!$this->eventManager instanceof EventDispatcher) {
+            $this->eventManager = new EventDispatcher();
+        }
+
+        $this->eventManager->listen('before_create', $callback);
+
+        return $this;
+    }
+
+    /**
+     * @param $callback
+     * @return $this
+     */
+    public function beforeUpdate($callback){
+        if (!$this->eventManager instanceof EventDispatcher) {
+            $this->eventManager = new EventDispatcher();
+        }
+
+        $this->eventManager->listen('before_update', $callback);
+
+        return $this;
+    }
+
+    /**
+     * @param $callback
+     * @return $this
+     */
+    public function beforeDelete($callback){
+        if (!$this->eventManager instanceof EventDispatcher) {
+            $this->eventManager = new EventDispatcher();
+        }
+
+        $this->eventManager->listen('before_delete', $callback);
+
+        return $this;
+    }
+    /**
+     * @param $callback
+     * @return $this
+     */
+    public function afterSave($callback){
+        if (!$this->eventManager instanceof EventDispatcher) {
+            $this->eventManager = new EventDispatcher();
+        }
+
+        $this->eventManager->listen('after_save', $callback);
+
+        return $this;
+    }
+
+    /**
+     * @param $callback
+     * @return $this
+     */
+    public function afterUpdate($callback){
+        if (!$this->eventManager instanceof EventDispatcher) {
+            $this->eventManager = new EventDispatcher();
+        }
+
+        $this->eventManager->listen('after_update', $callback);
+
+        return $this;
+    }
+
+    /**
+     * @param $callback
+     * @return $this
+     */
+    public function afterCreate($callback){
+        if (!$this->eventManager instanceof EventDispatcher) {
+            $this->eventManager = new EventDispatcher();
+        }
+
+        $this->eventManager->listen('after_create', $callback);
+
+        return $this;
+    }
+
+    /**
+     * @param $callback
+     * @return $this
+     */
+    public function afterDelete($callback){
+        if (!$this->eventManager instanceof EventDispatcher) {
+            $this->eventManager = new EventDispatcher();
+        }
+
+        $this->eventManager->listen('after_delete', $callback);
+
+        return $this;
+    }
+
+
+    /**
      * @param $value
      * @return ValueContainer
      */
