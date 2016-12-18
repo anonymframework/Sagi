@@ -13,7 +13,6 @@ class Row
 {
 
     protected $patterns = [
-        'auto_increment' => '`%s` INT(%d) UNSIGNED AUTO_INCREMENT PRIMARY KEY',
         'int' => '`%s` INT(%d)',
         'bigint' => '`%s` BIGINT(%d)',
         'tinyint' => '`%s` TINYINT(%d)',
@@ -30,13 +29,23 @@ class Row
         'bool' => '`%s` BOOLEAN',
         'bit' => '`%s` BIT',
         'char' => '`%s` CHAR(%d)',
-        'primary_key' => 'PRIMARY KEY(%s)',
-        'foreign_key' => 'FOREIGN KEY(%s) REFERENCES %s(%s)',
-        'index' => 'INDEX %s (%s) '
+        'primary_key' => 'PRIMARY KEY(`%s`)',
+        'foreign_key' => 'FOREIGN KEY(`%s`) REFERENCES `%s`(`%s`)',
+        'index' => 'INDEX `%s` (`%s`) '
     ];
 
+    /**
+     * @var array
+     */
+    protected $subPatterns = [
+        'string' => ':command :default :null',
+        'integer' => ':command :signed :null :unique :increment',
+        'other' => ':substring :command :end'
+    ];
+
+
     public function index($name, $col){
-        return $this->addCommand('index', [$name, $col]);
+        return $this->addCommand('index', [$name, $col], 'other');
     }
     /**
      * @var array
@@ -51,7 +60,7 @@ class Row
      */
     public function text($name)
     {
-        return $this->addCommand('text', $this->madeArray($name));
+        return $this->addCommand('text', $this->madeArray($name), 'string');
     }
 
     /**
@@ -63,7 +72,7 @@ class Row
      */
     public function string($name, $limit = 255)
     {
-        return $this->addCommand('varchar', $this->madeArray($name, $limit));
+        return $this->addCommand('varchar', $this->madeArray($name, $limit), 'string');
     }
 
     /**
@@ -75,7 +84,7 @@ class Row
      */
     public function char($name, $limit = 255)
     {
-        return $this->addCommand('char', $this->madeArray($name, $limit));
+        return $this->addCommand('char', $this->madeArray($name, $limit), 'string');
     }
 
     /**
@@ -86,7 +95,7 @@ class Row
      */
     public function date($name)
     {
-        return $this->addCommand('date', $this->madeArray($name));
+        return $this->addCommand('date', $this->madeArray($name), 'string');
     }
 
     /**
@@ -98,7 +107,7 @@ class Row
      */
     public function int($name, $limit = 255)
     {
-        return $this->addCommand('int', $this->madeArray($name, $limit));
+        return $this->addCommand('int', $this->madeArray($name, $limit), 'integer');
     }
 
     /**
@@ -110,7 +119,7 @@ class Row
      */
     public function tinyInt($name, $limit = 255)
     {
-        return $this->addCommand('tinyint', $this->madeArray($name, $limit));
+        return $this->addCommand('tinyint', $this->madeArray($name, $limit), 'integer');
     }
 
     /**
@@ -122,7 +131,7 @@ class Row
      */
     public function bigInt($name, $limit = 255)
     {
-        return $this->addCommand('bigint', $this->madeArray($name, $limit));
+        return $this->addCommand('bigint', $this->madeArray($name, $limit), 'integer');
     }
 
     /**
@@ -133,7 +142,7 @@ class Row
      */
     public function time($name)
     {
-        return $this->addCommand('time', $this->madeArray($name));
+        return $this->addCommand('time', $this->madeArray($name), 'integer');
     }
 
     /**
@@ -144,7 +153,7 @@ class Row
      */
     public function bool($name)
     {
-        return $this->addCommand('bool', $this->madeArray($name));
+        return $this->addCommand('bool', $this->madeArray($name), 'integer');
     }
 
 
@@ -156,7 +165,7 @@ class Row
      */
     public function bit($name)
     {
-        return $this->addCommand('bit', $this->madeArray($name));
+        return $this->addCommand('bit', $this->madeArray($name), 'string');
     }
 
     /**
@@ -167,7 +176,7 @@ class Row
      */
     public function timestamp($name)
     {
-        return $this->addCommand('current', $this->madeArray($name));
+        return $this->addCommand('timestamp', $this->madeArray($name), 'string');
     }
 
     /**
@@ -178,7 +187,7 @@ class Row
      */
     public function year($name)
     {
-        return $this->addCommand('year', $this->madeArray($name));
+        return $this->addCommand('year', $this->madeArray($name), 'string');
     }
 
     /**
@@ -190,7 +199,7 @@ class Row
      */
     public function pk($name, $limit = 255)
     {
-        return $this->addCommand('auto_increment', $this->madeArray($name, $limit));
+        return $this->addCommand('int', $this->madeArray($name, $limit), 'integer')->unsigned()->notNull()->autoIncrement();
     }
 
     /**
@@ -199,18 +208,11 @@ class Row
     public function timestamps()
     {
         $this->current(Model::CREATED_AT);
-        $this->current(Model::UPDATED_AT);
+        $this->timestamp(Model::UPDATED_AT)->null();
 
         return $this;
     }
 
-    /**
-     * @return Row
-     */
-    public function language()
-    {
-        return $this->string('language_columns', 255)->null();
-    }
     /**
      * add a new time stamp with CURRENT_TIMESTAMP
      *
@@ -219,7 +221,7 @@ class Row
      */
     public function current($name)
     {
-        return $this->addCommand('current', $this->madeArray($name));
+        return $this->addCommand('current', $this->madeArray($name),'string');
     }
 
     /**
@@ -238,7 +240,7 @@ class Row
      */
     public function decimal($name, $precision, $scale)
     {
-        return $this->addCommand('decimal', [$name, $precision, $scale]);
+        return $this->addCommand('decimal', [$name, $precision, $scale], 'integer');
     }
 
     /**
@@ -248,7 +250,7 @@ class Row
      */
     public function float($name, $precision)
     {
-        return $this->addCommand('float', [$name, $precision]);
+        return $this->addCommand('float', [$name, $precision], 'integer');
     }
 
     /**
@@ -271,7 +273,7 @@ class Row
     public function foreignKey($table, $colOur, $colTarget){
 
 
-        return $this->addCommand('foreign_key',  [$colOur, $table, $colTarget]);
+        return $this->addCommand('foreign_key',  [$colOur, $table, $colTarget], 'other');
     }
 
 
@@ -295,8 +297,11 @@ class Row
      * @param array $variables
      * @return Command
      */
-    private function addCommand($type, $variables)
+    private function addCommand($type, $variables, $childPatternType = null)
     {
+
+        $childPattern = $this->subPatterns[$childPatternType];
+
         if (!empty($variables)) {
             array_unshift($variables, $this->patterns[$type]);
 
@@ -305,7 +310,7 @@ class Row
             $command = $this->patterns[$type];
         }
 
-        static::$sqlCommands[] = $command = new Command($command);
+        static::$sqlCommands[] = $command = new Command($command, $childPattern,$childPatternType);
 
         return $command;
     }

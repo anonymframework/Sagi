@@ -20,16 +20,79 @@ class Command
      */
     protected $patterns =
         [
-            'default' => 'DEFAULT %s',
-            'null' => 'NULL',
-            'notnull' => 'NOT NULL',
-            'unique' => 'UNIQUE',
-            'unsigned' => 'UNSIGNED',
-            'signed' =>  'SIGNED',
-            'constraint' => 'CONSTRAINT %s',
-            'delete_cascade' => 'ON DELETE CASCADE',
-            'update_cascade' => 'ON UPDATE CASCADE',
+            'auto_increment' => [
+              'string' => 'PRIMARY KEY AUTO_INCREMENT',
+                'belongs_to' => 'increment'
+            ],
+            'default' => [
+                'string' => 'DEFAULT %s',
+                'belongs_to' => 'default',
+            ],
+            'null' => [
+                'string' => 'NULL',
+                'belongs_to' => 'null'
+            ],
+
+            'notnull' => [
+                'string' => 'NOT NULL',
+                'belongs_to' => 'null'
+            ],
+            'unique' => [
+                'string' => 'UNIQUE',
+                'belongs_to' => 'unique',
+            ],
+            'unsigned' => [
+                'string' => 'UNSIGNED',
+                'belongs_to' => 'signed'
+            ],
+            'signed' => [
+                'string' => 'SIGNED',
+                'belongs_to' => 'signed'
+            ],
+            'constraint' => [
+                'string' => 'CONSTRAINT %s',
+                'belongs_to' => 'substring'
+            ],
+            'delete_cascade' => [
+                'string' => 'ON DELETE CASCADE',
+                'belongs_to' => 'end'
+            ],
+            'update_cascade' => [
+                'string' => 'ON UPDATE CASCADE',
+                'belongs_to' => 'end'
+            ]
         ];
+
+    /**
+     * @var array
+     */
+    protected $string = [
+        'default',
+        'null',
+        'notnull',
+        'unique'
+    ];
+
+    /**
+     * @var array
+     */
+    protected $integer = [
+        'default',
+        'null',
+        'notnull',
+        'signed',
+        'unsigned',
+        'auto_increment'
+    ];
+
+    /**
+     * @var array
+     */
+    protected $other = [
+        'constraint',
+        'delete_cascade',
+        'update_cascade'
+    ];
 
     /**
      * @var array
@@ -37,20 +100,61 @@ class Command
     protected $queires = [];
 
     /**
+     * @var string
+     */
+    protected $patternString;
+
+    /**
+     * @var string
+     */
+    protected $selectedType;
+
+    /**
+     * @var array
+     */
+    protected $patternNeeds;
+    /**
      * Command constructor.
      * @param string $command
+     * @param string $pattern
+     * @param string $type
      */
-    public function __construct($command)
+    public function __construct($command, $pattern = '', $type = 'string')
     {
-        $this->queires = [$command];
+
+        $this->selectedType = $type;
+        $this->patternString = $pattern;
+
+        $this->patternNeeds = explode(' ', $this->patternString);
+
+        $this->fillNeededAttributes();
+
+        $this->queires['command'] = [$command];
+    }
+
+    protected function fillNeededAttributes(){
+        foreach ($this->patternNeeds as $need){
+            $need = str_replace(':', '', $need);
+
+            $this->queires[$need] = [''];
+        }
     }
 
     /**
-     * @param $name
+     *
      */
-    public function constraint($name){
-       return $this->addCommand('constraint', [$name], true);
+    public function autoIncrement(){
+        $this->addCommand('auto_increment', []);
     }
+    /**
+     * @param string $name
+     * @return Command
+     */
+    public function constraint($name)
+    {
+        return $this->addCommand('constraint', [$name]);
+    }
+
     /**
      * @return Command
      */
@@ -70,16 +174,19 @@ class Command
     /**
      * @return Command
      */
-    public function signed(){
+    public function signed()
+    {
         return $this->addCommand('signed', []);
     }
 
     /**
      * @return Command
      */
-    public function unsigned(){
+    public function unsigned()
+    {
         return $this->addCommand('unsigned', []);
     }
+
     /**
      * @return Command
      */
@@ -91,14 +198,16 @@ class Command
     /**
      * @return Command
      */
-    public function onUpdateCascade(){
+    public function onUpdateCascade()
+    {
         return $this->addCommand('update_cascade', []);
     }
 
     /**
      * @return Command
      */
-    public function onDeleteCascade(){
+    public function onDeleteCascade()
+    {
         return $this->addCommand('delete_cascade', []);
     }
 
@@ -130,24 +239,38 @@ class Command
 
     /**
      * @param $type
-     * @param $variables
-     * @return Command
+     * @return bool
      */
-    private function addCommand($type, $variables, $unshift = false)
+    public function isAllowed($type)
     {
+        $selected = $this->selectedType;
+
+        return array_search($type, $this->$selected);
+    }
+
+    /**
+     * @param $type
+     * @param $variables
+     * @param bool $unshift
+     * @return $this
+     * @throws SchemaException
+     */
+    private function addCommand($type, $variables)
+    {
+        if (!$this->isAllowed($type)) {
+            throw new SchemaException(sprintf('%s command is not allowed on a %s typed method, allows (%s) ', $type, $this->selectedType, join(',', $this->{$this->selectedType})));
+        }
+
         if (!empty($variables)) {
-            array_unshift($variables, $this->patterns[$type]);
+            array_unshift($variables, $this->patterns[$type]['string']);
 
             $command = call_user_func_array('sprintf', $variables);
         } else {
-            $command = $this->patterns[$type];
+            $command = $this->patterns[$type]['string'];
         }
 
-        if ($unshift) {
-            array_unshift($this->queires, $command);
-        }else{
-            $this->queires[] = $command;
-        }
+
+        $this->queires[$this->patterns[$type]['belongs_to']][] = $command;
 
         return $this;
     }
@@ -157,8 +280,25 @@ class Command
      */
     public function prepareCommand()
     {
-        $query = join(' ', $this->queires) . ',';
+        $pattern = $this->patternString;
 
-        return rtrim($query, ',');
+
+        foreach ($this->queires as $search => $values) {
+
+            $search = trim($search);
+            $values = join(' ', $values);
+
+            $pattern = str_replace(':' . $search, $values, $pattern);
+        }
+
+        $pattern =  join(' ', array_filter(explode(' ', $pattern), function ($value){
+            if (!empty($value)) {
+                return $value;
+            }else{
+                return false;
+            }
+        }));
+
+        return $pattern;
     }
 }

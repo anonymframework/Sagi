@@ -65,8 +65,9 @@ class Schema
 
         $this->commands[] = $this->row->prepareRow();
         $this->addCommand('end', [$this->charset]);
-        $prepare = Connector::getConnection()->query($this->prepareSchema());
-        $this->checkResult($prepare);
+
+        $prepare = Connector::getConnection()->query($query = $this->prepareSchema());
+        $this->checkResult($prepare, $query);
     }
 
     /**
@@ -82,20 +83,20 @@ class Schema
 
         $this->commands[] = $this->row->prepareRow();
         $this->addCommand('end', [$this->charset]);
-        $prepare = Connector::getConnection()->query($this->prepareSchema());
-        $this->checkResult($prepare);
+        $prepare = Connector::getConnection()->query($query = $this->prepareSchema());
+        $this->checkResult($prepare, $query);
     }
     /**
      * @param \PDOStatement $prepare
      * @return bool
      * @throws SchemaException
      */
-    private function checkResult($prepare)
+    private function checkResult($prepare, $query = '')
     {
         if ($prepare) {
             return true;
         } else {
-            throw new SchemaException(json_encode(Connector::getConnection()->errorInfo()));
+            throw new SchemaException(json_encode(Connector::getConnection()->errorInfo())." On Query : $query");
         }
     }
 

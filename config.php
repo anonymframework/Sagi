@@ -21,6 +21,10 @@ return [
         //
     ],
 
+    'migrations' => [
+        CreateCategoryTable::class,
+    ],
+
     'PRIVATE_KEY' => md5('YOUR KEY'),
 
     'authentication' => [
@@ -30,5 +34,6 @@ return [
             'password' => 'Şifrenizi Yanlış Giridiniz'
         ]
     ],
+
 
 ];

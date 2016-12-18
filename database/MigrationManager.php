@@ -44,6 +44,9 @@ class MigrationManager extends Schema
         $glob = glob(static::$migrationDir . '/*');
 
         $files = [];
+
+        $migrations = [];
+
         foreach ($glob as $file) {
             $class = explode('__', $file);
 
@@ -56,6 +59,28 @@ class MigrationManager extends Schema
 
             $prepared = static::prepareClassName($class);
 
+            $migrations[$file] = $prepared;
+        }
+
+        $firstMigrations = ConfigManager::get('migrations', []);
+
+        foreach ($firstMigrations as $firstMigration){
+            $search = array_search($firstMigration, $migrations);
+
+            $files = $this->migrateOne($search, $migrations[$search]);
+
+            if ($search !== false) {
+                unset($migrations[$search]);
+            }
+        }
+
+        $files = array_merge($files, $this->runMigrations($migrations));
+
+        return $files;
+    }
+
+    protected function runMigrations($migrations){
+        foreach ($migrations as $file => $prepared) {
 
             if ($this->checkMigrated($file, $prepared)) {
                 $files[] = [
@@ -65,31 +90,35 @@ class MigrationManager extends Schema
                 continue;
             }
 
-            if (!class_exists($prepared)) {
-                include $file;
-            }
-
-
-            $migration = new $prepared;
-
-            if ($migration instanceof MigrationInterface) {
-                $migration->up();
-            } else {
-                throw new \Exception(get_class($migration) . 'is not a instance of MigrationInterface');
-            }
-
-            QueryBuilder::createNewInstance()->setTable('migrations')->create(new Entity([
-                'filename' => $prepared,
-                'path' => $file
-            ]));
-
-            $files[] = [
-                'name' => $file,
-                'status' => 1
-            ];
+            $files[] = $this->migrateOne($file, $prepared);
         }
 
         return $files;
+    }
+
+    public function migrateOne($file, $prepared){
+
+        if (!class_exists($prepared)) {
+            include $file;
+        }
+
+        $migration = new $prepared;
+
+        if ($migration instanceof MigrationInterface) {
+            $migration->up();
+        } else {
+            throw new \Exception(get_class($migration) . 'is not a instance of MigrationInterface');
+        }
+
+        QueryBuilder::createNewInstance()->setTable('migrations')->create(new Entity([
+            'filename' => $prepared,
+            'path' => $file
+        ]));
+
+        return [
+            'name' => $file,
+            'status' => 1
+        ];
     }
 
     public function down()
