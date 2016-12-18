@@ -263,7 +263,7 @@ class Row
             $keys = join(',', $keys);
         }
 
-        return $this->addCommand('primary_key',  [$keys]);
+        return $this->addCommand('primary_key',  [$keys], 'other');
     }
 
     /**
@@ -299,7 +299,6 @@ class Row
      */
     private function addCommand($type, $variables, $childPatternType = null)
     {
-
         $childPattern = $this->subPatterns[$childPatternType];
 
         if (!empty($variables)) {
