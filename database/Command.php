@@ -257,7 +257,7 @@ class Command
      */
     private function addCommand($type, $variables)
     {
-        if (!$this->isAllowed($type) !== false) {
+        if (!$this->isAllowed($type) === false) {
             throw new SchemaException(sprintf('%s command is not allowed on a %s typed method, allows (%s) ', $type, $this->selectedType, join(',', $this->{$this->selectedType})));
         }
 
