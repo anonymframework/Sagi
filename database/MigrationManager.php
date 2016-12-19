@@ -13,7 +13,8 @@ class MigrationManager extends Schema
 {
 
     public static $systemMigrations = [
-        'auth', 'migrations'
+        'auth',
+        'migrations'
     ];
 
     /**
@@ -64,12 +65,11 @@ class MigrationManager extends Schema
 
         $firstMigrations = ConfigManager::get('migrations', []);
 
-        foreach ($firstMigrations as $firstMigration){
+        foreach ($firstMigrations as $firstMigration) {
             $search = array_search($firstMigration, $migrations);
-
-            $files = $this->migrateOne($search, $migrations[$search]);
-
             if ($search !== false) {
+                $files = $this->migrateOne($search, $migrations[$search]);
+
                 unset($migrations[$search]);
             }
         }
@@ -79,16 +79,9 @@ class MigrationManager extends Schema
         return $files;
     }
 
-    protected function runMigrations($migrations){
+    protected function runMigrations($migrations)
+    {
         foreach ($migrations as $file => $prepared) {
-
-            if ($this->checkMigrated($file, $prepared)) {
-                $files[] = [
-                    'name' => $file,
-                    'status' => 2
-                ];
-                continue;
-            }
 
             $files[] = $this->migrateOne($file, $prepared);
         }
@@ -96,7 +89,15 @@ class MigrationManager extends Schema
         return $files;
     }
 
-    public function migrateOne($file, $prepared){
+    public function migrateOne($file, $prepared)
+    {
+
+        if ($this->checkMigrated($file, $prepared)) {
+            return [
+                'name' => $file,
+                'status' => 2
+            ];
+        }
 
         if (!class_exists($prepared)) {
             include $file;
@@ -146,9 +147,10 @@ class MigrationManager extends Schema
             if ($class instanceof MigrationInterface) {
                 $class->down();
 
-                $builder = QueryBuilder::createNewInstance($this->migrationTable)->where('path', $path)->where('filename', $name);
+                $builder = QueryBuilder::createNewInstance($this->migrationTable)->where('path',
+                    $path)->where('filename', $name);
 
-                if($builder->exists()){
+                if ($builder->exists()) {
                     $builder->delete();
                 }
 
@@ -171,7 +173,8 @@ class MigrationManager extends Schema
      */
     public function checkMigrated($file, $class)
     {
-        $builder = QueryBuilder::createNewInstance()->setTable($this->migrationTable)->where('filename', $class)->where('path', $file);
+        $builder = QueryBuilder::createNewInstance()->setTable($this->migrationTable)->where('filename',
+            $class)->where('path', $file);
 
         return $builder->exists();
     }

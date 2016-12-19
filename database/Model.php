@@ -553,8 +553,6 @@ class Model extends QueryBuilder
     public function save()
     {
 
-        $this->isSubscribedBefore() === false ? $this->addSubscribes() : null;
-
         $this->eventManager->hasListiner('before_save') ?
             $this->eventManager->fire('before_save', [$this]) : null;
 
@@ -570,8 +568,6 @@ class Model extends QueryBuilder
         $this->eventManager->hasListiner('after_save')
             ? $this->eventManager->fire('after_save', [$return]) : null;
 
-        $this->eventManager = null;
-
         return $return;
     }
 
@@ -581,8 +577,6 @@ class Model extends QueryBuilder
      */
     public function create($data = null)
     {
-        $this->isSubscribedBefore() === false ?: $this->addSubscribes();
-
         $this->eventManager->hasListiner('before_create')
             ? $this->eventManager->fire('before_create', [$this, $data]) : null;
 
@@ -636,9 +630,6 @@ class Model extends QueryBuilder
      */
     public function update($datas = [])
     {
-        $this->isSubscribedBefore() === false ?: $this->addSubscribes();
-
-
         $this->eventManager->hasListiner('before_update')
             ? $this->eventManager->fire('before_update', [$this, $datas]) : null;
         if (empty($datas)) {
@@ -660,8 +651,6 @@ class Model extends QueryBuilder
      */
     public function delete()
     {
-        $this->isSubscribedBefore() === false ?: $this->addSubscribes();
-
         $this->eventManager->hasListiner('before_delete')
             ? $this->eventManager->fire('before_delete', [$this]) : null;
 

@@ -29,7 +29,7 @@ class Row
         'bool' => '`%s` BOOLEAN',
         'bit' => '`%s` BIT',
         'char' => '`%s` CHAR(%d)',
-        'primary_key' => 'PRIMARY KEY(`%s`)',
+        'primary_key' => 'PRIMARY KEY(%s)',
         'foreign_key' => 'FOREIGN KEY(`%s`) REFERENCES `%s`(`%s`)',
         'index' => 'INDEX `%s` (`%s`) '
     ];
@@ -44,9 +44,11 @@ class Row
     ];
 
 
-    public function index($name, $col){
+    public function index($name, $col)
+    {
         return $this->addCommand('index', [$name, $col], 'other');
     }
+
     /**
      * @var array
      */
@@ -199,7 +201,8 @@ class Row
      */
     public function pk($name, $limit = 255)
     {
-        return $this->addCommand('int', $this->madeArray($name, $limit), 'integer')->unsigned()->notNull()->autoIncrement();
+        return $this->addCommand('int', $this->madeArray($name, $limit),
+            'integer')->unsigned()->notNull()->autoIncrement();
     }
 
     /**
@@ -221,7 +224,7 @@ class Row
      */
     public function current($name)
     {
-        return $this->addCommand('current', $this->madeArray($name),'string');
+        return $this->addCommand('current', $this->madeArray($name), 'string');
     }
 
     /**
@@ -257,26 +260,29 @@ class Row
      * @param $keys
      * @return Command
      */
-    public function primaryKey($keys){
-
-        if (is_array($keys)) {
-            $keys = join(',', $keys);
+    public function primaryKey($keys)
+    {
+        if (is_string($keys)) {
+            $keys = array_map(function ($value){
+                return "`$value`";
+            }, explode(',', $keys));
         }
 
-        return $this->addCommand('primary_key',  [$keys], 'other');
+        $keys = join(',', $keys);
+
+        return $this->addCommand('primary_key', [$keys], 'other');
     }
 
     /**
      * @param $keys
      * @return Command
      */
-    public function foreignKey($table, $colOur, $colTarget){
+    public function foreignKey($table, $colOur, $colTarget)
+    {
 
 
-        return $this->addCommand('foreign_key',  [$colOur, $table, $colTarget], 'other');
+        return $this->addCommand('foreign_key', [$colOur, $table, $colTarget], 'other');
     }
-
-
 
 
     /**
@@ -309,7 +315,7 @@ class Row
             $command = $this->patterns[$type];
         }
 
-        static::$sqlCommands[] = $command = new Command($command, $childPattern,$childPatternType);
+        static::$sqlCommands[] = $command = new Command($command, $childPattern, $childPatternType);
 
         return $command;
     }
