@@ -35,7 +35,7 @@ class Identitiy
              * @var Model $user
              */
 
-            return $user->where($user->primaryKey, $user->{$user->primaryKey});
+            return $user->where($user->getPrimaryKey(), $user->{$user->getPrimaryKey()});
         }
 
         return false;

@@ -12,13 +12,11 @@ use Sagi\Database\Mapping\Entity;
  * Date: 23.08.2016
  * Time: 17:23
  */
-class Model extends QueryBuilder
+class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 {
 
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
-
-    private $fetchMode = PDO::FETCH_OBJ;
 
     /**
      * @var EventDispatcher
@@ -31,7 +29,7 @@ class Model extends QueryBuilder
     /**
      * @var string
      */
-    public $primaryKey = 'id';
+    protected $primaryKey = 'id';
 
     /**
      * @var array
@@ -77,7 +75,7 @@ class Model extends QueryBuilder
     /**
      * @var mixed
      */
-    protected $attributes;
+    public $attributes;
 
     /**
      * @var string
@@ -536,6 +534,7 @@ class Model extends QueryBuilder
     {
         return in_array($json, $this->json);
     }
+
 
     /**
      * @param $name
@@ -1101,5 +1100,145 @@ class Model extends QueryBuilder
     public function isSubscribedBefore()
     {
         return $this->subscribedBefore;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * @param string $primaryKey
+     * @return Model
+     */
+    public function setPrimaryKey($primaryKey)
+    {
+        $this->primaryKey = $primaryKey;
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function attribute($name)
+    {
+        return $this->attributes[$name];
+    }
+
+
+    /**
+     *
+     */
+    public function rewind()
+    {
+        if (empty($this->attributes)) {
+            $this->attributes = $this->all();
+        }
+
+        reset($this->attributes);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function current()
+    {
+        $var = current($this->attributes);
+        return $var;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function key()
+    {
+
+        $var = key($this->attributes);
+        return $var;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function next()
+    {
+        $var = next($this->attributes);
+        return $var;
+    }
+
+    /**
+     * @return bool
+     */
+    public function valid()
+    {
+        $key = key($this->attributes);
+        $var = ($key !== null && $key !== false);
+        return $var;
+    }
+
+    /**
+     * Whether a offset exists
+     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
+     * @param mixed $offset <p>
+     * An offset to check for.
+     * </p>
+     * @return boolean true on success or false on failure.
+     * </p>
+     * <p>
+     * The return value will be casted to boolean if non-boolean was returned.
+     * @since 5.0.0
+     */
+    public function offsetExists($offset)
+    {
+        return $this->hasAttribute($offset);
+    }
+
+    /**
+     * Offset to retrieve
+     * @link http://php.net/manual/en/arrayaccess.offsetget.php
+     * @param mixed $offset <p>
+     * The offset to retrieve.
+     * </p>
+     * @return mixed Can return all value types.
+     * @since 5.0.0
+     */
+    public function offsetGet($offset)
+    {
+        return $this->attribute($offset);
+    }
+
+    /**
+     * Offset to set
+     * @link http://php.net/manual/en/arrayaccess.offsetset.php
+     * @param mixed $offset <p>
+     * The offset to assign the value to.
+     * </p>
+     * @param mixed $value <p>
+     * The value to set.
+     * </p>
+     * @return void
+     * @since 5.0.0
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->attributes[$offset] = $value;
+    }
+
+    /**
+     * Offset to unset
+     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
+     * @param mixed $offset <p>
+     * The offset to unset.
+     * </p>
+     * @return void
+     * @since 5.0.0
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->attributes[$offset]);
     }
 }

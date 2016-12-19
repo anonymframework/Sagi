@@ -6,8 +6,6 @@ return [
     'dsn' => 'mysql:host=localhost;dbname=test',
     'driver' => 'mysql',
 
-    'fetch_mode' => PDO::FETCH_OBJ,
-
     'cache' => [
         'host' => '127.0.0.1',
         'port' => 11211
@@ -22,7 +20,7 @@ return [
     ],
 
     'migrations' => [
-        CreateCategoryTable::class,
+        // put here your primary migrations
     ],
 
     'PRIVATE_KEY' => md5('YOUR KEY'),

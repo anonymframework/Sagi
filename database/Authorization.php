@@ -94,7 +94,7 @@ trait Authorization
      */
     protected function deleteAuthRow()
     {
-        return Auth::find($this->{$this->primaryKey})->delete();
+        return Auth::find($this->{$this->getPrimaryKey()})->delete();
     }
 
 

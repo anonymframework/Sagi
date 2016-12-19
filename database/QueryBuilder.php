@@ -2,18 +2,16 @@
 namespace Sagi\Database;
 
 use Exception;
-use ArrayAccess;
 use Sagi\Database\Mapping\Entity;
 use Sagi\Database\Mapping\Group;
 use Sagi\Database\Mapping\Join;
 use Sagi\Database\Mapping\Where;
-use Iterator;
 use PDO;
 
 /**
  * Class QueryBuilder
  */
-class QueryBuilder implements Iterator, ArrayAccess
+class QueryBuilder
 {
 
 
@@ -29,7 +27,7 @@ class QueryBuilder implements Iterator, ArrayAccess
     /**
      * @var PDO
      */
-    public $pdo;
+    protected $pdo;
     /**
      * @var select query
      */
@@ -534,6 +532,10 @@ class QueryBuilder implements Iterator, ArrayAccess
             $fields = $this->fields;
 
             $select = array_map(function ($value) use ($table, $fields) {
+                if (is_string($value)) {
+                    $value = trim($value);
+                }
+
                 if (is_string($value) && strpos($value, '.') === false && in_array($value, $fields)) {
                     return $table . '.' . $value;
                 }
@@ -1222,66 +1224,6 @@ class QueryBuilder implements Iterator, ArrayAccess
         return $this->get()->fetch(PDO::FETCH_OBJ);
     }
 
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function attribute($name)
-    {
-        return $this->attributes[$name];
-    }
-
-
-    /**
-     *
-     */
-    public function rewind()
-    {
-        if (empty($this->attributes)) {
-            $this->attributes = $this->all();
-        }
-
-        reset($this->attributes);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function current()
-    {
-        $var = current($this->attributes);
-        return $var;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function key()
-    {
-
-        $var = key($this->attributes);
-        return $var;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function next()
-    {
-        $var = next($this->attributes);
-        return $var;
-    }
-
-    /**
-     * @return bool
-     */
-    public function valid()
-    {
-        $key = key($this->attributes);
-        $var = ($key !== null && $key !== false);
-        return $var;
-    }
-
 
     /**
      * @return PDO
@@ -1320,65 +1262,5 @@ class QueryBuilder implements Iterator, ArrayAccess
     }
 
 
-    /**
-     * Whether a offset exists
-     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
-     * @param mixed $offset <p>
-     * An offset to check for.
-     * </p>
-     * @return boolean true on success or false on failure.
-     * </p>
-     * <p>
-     * The return value will be casted to boolean if non-boolean was returned.
-     * @since 5.0.0
-     */
-    public function offsetExists($offset)
-    {
-        return $this->hasAttribute($offset);
-    }
 
-    /**
-     * Offset to retrieve
-     * @link http://php.net/manual/en/arrayaccess.offsetget.php
-     * @param mixed $offset <p>
-     * The offset to retrieve.
-     * </p>
-     * @return mixed Can return all value types.
-     * @since 5.0.0
-     */
-    public function offsetGet($offset)
-    {
-        return $this->attribute($offset);
-    }
-
-    /**
-     * Offset to set
-     * @link http://php.net/manual/en/arrayaccess.offsetset.php
-     * @param mixed $offset <p>
-     * The offset to assign the value to.
-     * </p>
-     * @param mixed $value <p>
-     * The value to set.
-     * </p>
-     * @return void
-     * @since 5.0.0
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->attributes[$offset] = $value;
-    }
-
-    /**
-     * Offset to unset
-     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
-     * @param mixed $offset <p>
-     * The offset to unset.
-     * </p>
-     * @return void
-     * @since 5.0.0
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->attributes[$offset]);
-    }
 }
