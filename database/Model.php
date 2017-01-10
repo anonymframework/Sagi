@@ -116,6 +116,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         $this->usedModules = $traits = class_uses(static::className());
 
         $this->eventManager = new EventDispatcher();
+        $this->addSubscribes();
+
         $this->bootTraits($traits);
 
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
