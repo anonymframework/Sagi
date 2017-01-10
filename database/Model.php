@@ -177,6 +177,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         }
     }
 
+    public function arrayAll()
+    {
+        return parent::all();
+    }
+
     /**
      * @param array $attributes
      * @return $this
@@ -276,7 +281,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param callable $callable
      * @return $this
      */
-    public function beforeAttach(callable  $callable)
+    public function beforeAttach(callable $callable)
     {
         $this->eventManager->listen('before_attach', $callable);
 
@@ -936,7 +941,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param $callback
      * @return $this
      */
-    public function beforeSave($callback){
+    public function beforeSave($callback)
+    {
         if (!$this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
@@ -950,7 +956,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param $callback
      * @return $this
      */
-    public function beforeCreate($callback){
+    public function beforeCreate($callback)
+    {
         if (!$this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
@@ -964,7 +971,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param $callback
      * @return $this
      */
-    public function beforeUpdate($callback){
+    public function beforeUpdate($callback)
+    {
         if (!$this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
@@ -978,7 +986,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param $callback
      * @return $this
      */
-    public function beforeDelete($callback){
+    public function beforeDelete($callback)
+    {
         if (!$this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
@@ -987,11 +996,13 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         return $this;
     }
+
     /**
      * @param $callback
      * @return $this
      */
-    public function afterSave($callback){
+    public function afterSave($callback)
+    {
         if (!$this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
@@ -1005,7 +1016,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param $callback
      * @return $this
      */
-    public function afterUpdate($callback){
+    public function afterUpdate($callback)
+    {
         if (!$this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
@@ -1019,7 +1031,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param $callback
      * @return $this
      */
-    public function afterCreate($callback){
+    public function afterCreate($callback)
+    {
         if (!$this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
@@ -1033,7 +1046,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param $callback
      * @return $this
      */
-    public function afterDelete($callback){
+    public function afterDelete($callback)
+    {
         if (!$this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
