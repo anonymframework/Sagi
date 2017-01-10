@@ -11,6 +11,12 @@ trait Cache
 {
 
     /**
+     * @var array
+     */
+    protected $cacheMode = 1;
+
+
+    /**
      * @var int
      */
     protected $expiration = 600;
@@ -82,6 +88,18 @@ trait Cache
         return static::$memcache->set($key, $value, $this->expiration);
     }
 
+    public function serializeResults()
+    {
+        $class = get_called_class();
+
+        if ($this->cacheMode == Model::FULL_CACHE) {
+            $result =  $this->get()->fetchAll(\PDO::FETCH_CLASS, $class);
+        }else{
+            $result = $this->get()->fetchAll(\PDO::FETCH_OBJ);
+        }
+
+        return $result;
+    }
     /**
      *
      */
@@ -93,7 +111,7 @@ trait Cache
         } else {
             $this->setCache(
                 $key,
-                serialize($get = $this->get()->fetch(PDO::FETCH_ASSOC))
+                serialize($get = $this->serializeResults())
             );
 
             $this->setAttributes($get);
@@ -105,7 +123,6 @@ trait Cache
      */
     protected function cacheAll()
     {
-        $class = get_called_class();
 
         if ($result = $this->getCache($key = $this->prepareCacheKey())) {
 
@@ -114,7 +131,7 @@ trait Cache
         } else {
             $this->setCache(
                 $key, serialize(
-                $get = $this->get()->fetchAll(PDO::FETCH_CLASS, $class)
+                $get = $this->serializeResults()
             ));
 
             $result = $this->setAttributes($get);
@@ -122,6 +139,25 @@ trait Cache
 
         return $result;
     }
+
+    /**
+     * @return array
+     */
+    public function getCacheMode()
+    {
+        return $this->cacheMode;
+    }
+
+    /**
+     * @param array $cacheMode
+     * @return Cache
+     */
+    public function setCacheMode($cacheMode)
+    {
+        $this->cacheMode = $cacheMode;
+        return $this;
+    }
+
 
     /**
      * @return int

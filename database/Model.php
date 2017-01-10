@@ -18,6 +18,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
+    const FULL_CACHE = 1;
+    const PRIMARY_CACHE = 2;
     /**
      * @var EventDispatcher
      */
@@ -112,7 +114,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         parent::__construct();
         $this->usedModules = $traits = class_uses(static::className());
-        $this->fetchMode = ConfigManager::get('fetch_mode', PDO::FETCH_OBJ);
 
         $this->eventManager = new EventDispatcher();
         $this->bootTraits($traits);
@@ -912,7 +913,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         if (false === $this->attributes) {
             throw new \PDOException(sprintf('Your query has been failed, message: %s', $this->error()[2]));
         }
-
 
         if ($this->hasAttribute($name)) {
             $value = $this->attribute($name);

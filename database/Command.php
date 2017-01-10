@@ -21,7 +21,7 @@ class Command
     protected $patterns =
         [
             'auto_increment' => [
-              'string' => 'PRIMARY KEY AUTO_INCREMENT',
+                'string' => 'PRIMARY KEY AUTO_INCREMENT',
                 'belongs_to' => 'increment'
             ],
             'default' => [
@@ -113,6 +113,7 @@ class Command
      * @var array
      */
     protected $patternNeeds;
+
     /**
      * Command constructor.
      * @param string $command
@@ -132,8 +133,9 @@ class Command
         $this->queires['command'] = [$command];
     }
 
-    protected function fillNeededAttributes(){
-        foreach ($this->patternNeeds as $need){
+    protected function fillNeededAttributes()
+    {
+        foreach ($this->patternNeeds as $need) {
             $need = str_replace(':', '', $need);
 
             $this->queires[$need] = [''];
@@ -143,9 +145,11 @@ class Command
     /**
      *
      */
-    public function autoIncrement(){
+    public function autoIncrement()
+    {
         $this->addCommand('auto_increment', []);
     }
+
     /**
      * @param string $name
      * @return Command
@@ -248,6 +252,7 @@ class Command
         return array_search($type, $this->$selected);
     }
 
+
     /**
      * @param $type
      * @param $variables
@@ -258,7 +263,8 @@ class Command
     private function addCommand($type, $variables)
     {
         if ($this->isAllowed($type) === false) {
-            throw new SchemaException(sprintf('%s command is not allowed on a %s typed method, allows (%s) ', $type, $this->selectedType, join(',', $this->{$this->selectedType})));
+            throw new SchemaException(sprintf('%s command is not allowed on a %s typed method, allows (%s) ', $type,
+                $this->selectedType, join(',', $this->{$this->selectedType})));
         }
 
         if (!empty($variables)) {
@@ -291,10 +297,10 @@ class Command
             $pattern = str_replace(':' . $search, $values, $pattern);
         }
 
-        $pattern =  join(' ', array_filter(explode(' ', $pattern), function ($value){
+        $pattern = join(' ', array_filter(explode(' ', $pattern), function ($value) {
             if (!empty($value)) {
                 return $value;
-            }else{
+            } else {
                 return false;
             }
         }));

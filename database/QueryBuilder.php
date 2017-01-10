@@ -407,7 +407,7 @@ class QueryBuilder
             }
 
 
-            $string .= sprintf("%s %s ON %s.%s = %s",
+            $string .= sprintf("%s %s ON %s.%s = %s ",
                 $join->type,
                 $join->table,
                 $table, $join->home, $tCol);
