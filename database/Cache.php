@@ -11,17 +11,6 @@ trait Cache
 {
 
     /**
-     * @var array
-     */
-    protected $cacheMode = 1;
-
-
-    /**
-     * @var int
-     */
-    protected $expiration = 600;
-
-    /**
      * @var \Memcached
      */
     private static $memcache;
