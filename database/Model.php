@@ -28,7 +28,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     protected $cacheMode = 1;
 
-
     /**
      * @var int
      */
@@ -115,13 +114,9 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     protected $hide = [];
 
     /**
-     * @var bool
-     */
-    protected $subscribedBefore = false;
-
-    /**
      * Model constructor.
      * @param array $attributes
+     * @throws \Exception
      */
     public function __construct(array $attributes = [])
     {
@@ -129,10 +124,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         parent::__construct();
         $this->usedModules = $traits = class_uses(static::className());
 
-        $this->eventManager = new EventDispatcher();
-        $this->addSubscribes();
-
         $this->bootTraits($traits);
+
+        $this->eventManager = new EventDispatcher();
+
 
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
             if (is_string($policy)) {
@@ -156,32 +151,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
-     *
+     * boot traits
      */
-    private function addSubscribes()
-    {
-        if (is_null($this->eventManager)) {
-            $this->eventManager = new EventDispatcher();
-        }
-
-        $this->eventManager->listen('before_create', function (Model $model) {
-            if ($model->can('create') === false) {
-                $model->throwPolicyException('create');
-            }
-
-
-        });
-
-        $this->eventManager->listen('before_update', function (Model $model) {
-            if (!$model->can('create')) {
-                $model->throwPolicyException('update');
-            }
-        });
-
-        $this->subscribedBefore = true;
-    }
-
-
     private function bootLogging()
     {
         $logging = ConfigManager::get('logging', ['open' => false]);
@@ -191,6 +162,9 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         }
     }
 
+    /**
+     * @return array
+     */
     public function arrayAll()
     {
         return parent::all();
@@ -201,7 +175,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @return $this
      * @throws \Exception
      */
-    public function fill($attributes)
+    public function fill(array $attributes)
     {
         foreach ($attributes as $key => $value) {
             if ($this->isFillable($key)) {
@@ -216,18 +190,18 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return bool
      */
-    public function isFillable($key)
+    public function isFillable(string $key)
     {
         return !isset($this->guarded[$key]) or !$this->totallyGuarded;
     }
 
     /**
-     * @param $traits
+     * @param array $traits
      */
-    private function bootTraits($traits)
+    private function bootTraits(array $traits)
     {
         foreach ($traits as $trait) {
             if (method_exists($this, $method = 'boot' . $this->classBaseName($trait))) {
@@ -247,7 +221,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function isValidationUsed()
     {
@@ -271,7 +245,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
-     * @param $module
+     * @param string $module
      * @return bool
      */
     public function isModuleUsed($module)
@@ -291,32 +265,34 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         return $this;
     }
 
+
     /**
-     * @param callable $callable
+     * @param Model $model
+     * @param string $targetAlias
+     * @param string $homeAlias
      * @return $this
+     * @throws \Exception
      */
-    public function beforeAttach(callable $callable)
-    {
-        $this->eventManager->listen('before_attach', $callable);
-
-        return $this;
-    }
-
-
-    public function attach(Model $model, $alias = false)
+    public function attach(Model $model,$targetAlias = '',$homeAlias = '')
     {
         if (!$model->hasPrimaryKey()) {
             throw new \Exception('Your model class have a primary key to use attach method');
         }
 
-        $table = $this->primaryKey;
+        $table = $this->getPrimaryKey();
 
-        if ($alias == true) {
-            $table = $alias;
+        if ($targetAlias !== '') {
+            $table = $targetAlias;
+        }
+
+        $home = $model->getPrimaryKey();
+
+        if ($homeAlias !== '') {
+            $home = $homeAlias;
         }
 
         $this->attach[Model::className()] = [
-            'attach_by' => [$model->primaryKey, $table],
+            'attach_by' => [$table, $home],
             'attach_with' => $model
         ];
 
@@ -341,13 +317,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
-     * @return mixed
+     * @return Model
      */
     public function all()
     {
-        $this->eventManager = null;
-
-
         $class = get_called_class();
 
         if ($this->isCacheUsed()) {
@@ -362,8 +335,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function one()
     {
-
-        $this->eventManager = null;
 
         if ($this->isCacheUsed()) {
             $this->cacheOne();
@@ -407,7 +378,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $instance->where($primaryKey, $conditions);
         } elseif (func_num_args() > 1 && is_array($instance->primaryKey)) {
 
-            foreach ($instance->primaryKey as $index => $primaryKey) {
+            foreach ($instance->getPrimaryKey() as $index => $primaryKey) {
                 $instance->where($primaryKey, func_get_arg($index));
             }
         }
@@ -441,7 +412,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param bool $clean
      * @return $this
      */
-    public function where($a, $b = null, $c = null, $type = 'AND', $clean = true)
+    public function where($a, $b = null, $c = null,$type = 'AND',$clean = true)
     {
         $name = is_array($a) ? $a[0] : $a;
 
@@ -470,7 +441,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param bool $clean
      * @return $this
      */
-    public function orWhere($a, $b = null, $c = null, $clean = true)
+    public function orWhere($a, $b = null, $c = null,$clean = true)
     {
         if ($this->can('orWhere')) {
             parent::orWhere($a, $b, $c, $clean);
@@ -483,10 +454,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
-     * @param null $conditions
+     * @param array $conditions
      * @return $this
      */
-    public static function findAll($conditions = null)
+    public static function findAll(array $conditions = null)
     {
         return static::find($conditions)->all();
     }
@@ -497,7 +468,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string $alias
      * @return RelationShip
      */
-    public function hasMany($class, $link, $alias = null)
+    public function hasMany($class,array $link,$alias = null)
     {
         $class = $class::createNewInstance();
 
@@ -523,10 +494,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     /**
      * @param string|Model $class
      * @param array $link
-     * @param array $alias
+     * @param string $alias
      * @return RelationShip
      */
-    public function hasOne($class, $link, $alias = null)
+    public function hasOne($class,array $link,string $alias = null) : RelationShip
     {
         $class = $class::createNewInstance();
 
@@ -552,30 +523,38 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string $json
      * @return bool
      */
-    public function isJson($json)
+    public function isJson(string $json) : bool
     {
         return in_array($json, $this->json);
     }
 
 
     /**
-     * @param $name
+     * @param string $name
      * @return bool
      */
-    public function isArray($name)
+    public function isArray(string  $name) : bool
     {
         return in_array($name, $this->array);
     }
 
 
     /**
+     * @param  callable $callback
+     * @return $this
+     */
+    public function beforeAttach(callable $callback) : Model
+    {
+        $this->beforeAttach[] = $callback;
+
+        return $this;
+    }
+
+    /**
      * @return Model|false
      */
     public function save()
     {
-
-        $this->eventManager->hasListiner('before_save') ?
-            $this->eventManager->fire('before_save', [$this]) : null;
 
         if (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
 
@@ -584,10 +563,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             return $return;
         } else {
             $return = $this->create();
-        }
 
-        $this->eventManager->hasListiner('after_save')
-            ? $this->eventManager->fire('after_save', [$return]) : null;
+        }
 
         return $return;
     }
@@ -598,8 +575,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function create($data = null)
     {
-        $this->eventManager->hasListiner('before_create')
-            ? $this->eventManager->fire('before_create', [$this, $data]) : null;
+        if ($this->can('create') === false) {
+            $this->throwPolicyException('create');
+        }
+
 
         if (empty($data)) {
             $data = $this->getAttributes();
@@ -625,7 +604,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             } elseif (empty($this->primaryKey) || is_array($this->primaryKey)) {
                 $created = static::find();
 
-                foreach ($this->primaryKey as $key) {
+                foreach ($this->getPrimaryKey() as $key) {
                     $created->where($key, $data[$key]);
                 }
 
@@ -651,13 +630,20 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function update($datas = [])
     {
+
+        if (!$this->can('update')) {
+            $this->throwPolicyException('update');
+        }
+
+
         $this->eventManager->hasListiner('before_update')
             ? $this->eventManager->fire('before_update', [$this, $datas]) : null;
+
+        $this->setUpdatedAt();
+
         if (empty($datas)) {
             $datas = $this->getAttributes();
         }
-
-        $this->setUpdatedAt();
 
         $return = parent::update($datas);
 
@@ -701,14 +687,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     {
         return new static($datas);
     }
-
-
     /**
      * @return Model
      */
     private function setUpdatedAt()
     {
-
         if ($this->hasTimestamp($updated = static::UPDATED_AT)) {
             $this->attributes[$updated] = date($this->timestampFormat(), $this->getCurrentTime());
         }
@@ -780,7 +763,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function __toString()
     {
-        return serialize($this->getAt);
+        return serialize($this->getAttributes());
     }
 
     /**
@@ -808,7 +791,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
                 'totallyGuarded',
                 'alias',
                 'hide',
-                'subscribedBefore'
             ]);
     }
 
@@ -818,7 +800,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function __wakeup()
     {
-        $this->pdo = Connector::getConnection();
         $this->prepareDriver();
     }
 
@@ -954,127 +935,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
-     * @param $callback
-     * @return $this
-     */
-    public function beforeSave($callback)
-    {
-        if (!$this->eventManager instanceof EventDispatcher) {
-            $this->eventManager = new EventDispatcher();
-        }
-
-        $this->eventManager->listen('before_save', $callback);
-
-        return $this;
-    }
-
-    /**
-     * @param $callback
-     * @return $this
-     */
-    public function beforeCreate($callback)
-    {
-        if (!$this->eventManager instanceof EventDispatcher) {
-            $this->eventManager = new EventDispatcher();
-        }
-
-        $this->eventManager->listen('before_create', $callback);
-
-        return $this;
-    }
-
-    /**
-     * @param $callback
-     * @return $this
-     */
-    public function beforeUpdate($callback)
-    {
-        if (!$this->eventManager instanceof EventDispatcher) {
-            $this->eventManager = new EventDispatcher();
-        }
-
-        $this->eventManager->listen('before_update', $callback);
-
-        return $this;
-    }
-
-    /**
-     * @param $callback
-     * @return $this
-     */
-    public function beforeDelete($callback)
-    {
-        if (!$this->eventManager instanceof EventDispatcher) {
-            $this->eventManager = new EventDispatcher();
-        }
-
-        $this->eventManager->listen('before_delete', $callback);
-
-        return $this;
-    }
-
-    /**
-     * @param $callback
-     * @return $this
-     */
-    public function afterSave($callback)
-    {
-        if (!$this->eventManager instanceof EventDispatcher) {
-            $this->eventManager = new EventDispatcher();
-        }
-
-        $this->eventManager->listen('after_save', $callback);
-
-        return $this;
-    }
-
-    /**
-     * @param $callback
-     * @return $this
-     */
-    public function afterUpdate($callback)
-    {
-        if (!$this->eventManager instanceof EventDispatcher) {
-            $this->eventManager = new EventDispatcher();
-        }
-
-        $this->eventManager->listen('after_update', $callback);
-
-        return $this;
-    }
-
-    /**
-     * @param $callback
-     * @return $this
-     */
-    public function afterCreate($callback)
-    {
-        if (!$this->eventManager instanceof EventDispatcher) {
-            $this->eventManager = new EventDispatcher();
-        }
-
-        $this->eventManager->listen('after_create', $callback);
-
-        return $this;
-    }
-
-    /**
-     * @param $callback
-     * @return $this
-     */
-    public function afterDelete($callback)
-    {
-        if (!$this->eventManager instanceof EventDispatcher) {
-            $this->eventManager = new EventDispatcher();
-        }
-
-        $this->eventManager->listen('after_delete', $callback);
-
-        return $this;
-    }
-
-
-    /**
      * @param $value
      * @return ValueContainer
      */
@@ -1082,6 +942,29 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     {
         return new ValueContainer($value);
     }
+
+    /**
+     * @return EventDispatcher
+     */
+    public function getEventManager()
+    {
+        if (!$this->eventManager instanceof EventDispatcher) {
+            $this->eventManager = new EventDispatcher();
+        }
+
+        return $this->eventManager;
+    }
+
+    /**
+     * @param EventDispatcher $eventManager
+     * @return Model
+     */
+    public function setEventManager($eventManager)
+    {
+        $this->eventManager = $eventManager;
+        return $this;
+    }
+
 
     /**
      * @return boolean
@@ -1116,22 +999,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function getAttach()
     {
         return $this->attach;
-    }
-
-    /**
-     * @return EventDispatcher
-     */
-    public function getEventManager()
-    {
-        return $this->eventManager;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSubscribedBefore()
-    {
-        return $this->subscribedBefore;
     }
 
     /**

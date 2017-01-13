@@ -123,10 +123,19 @@ class QueryBuilder
     public function __construct()
     {
         $this->prepareDriver();
+    }
 
+    /**
+     *
+     */
+    public function prepareConnection()
+    {
+        if (is_null($this->pdo)) {
+            Connector::madeConnection();
+            $this->pdo = Connector::getConnection();
+        }
 
-        Connector::madeConnection();
-        $this->pdo = Connector::getConnection();
+       return $this->pdo;
     }
 
 
@@ -1077,6 +1086,10 @@ class QueryBuilder
      */
     public function prepare($query, $args, $execute = false)
     {
+        if (!$this->pdo instanceof PDO) {
+            $this->prepareConnection();
+        }
+
         $prepared = $this->pdo->prepare($query);
 
         $exed = $prepared->execute($args);

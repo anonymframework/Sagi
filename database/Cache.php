@@ -54,7 +54,7 @@ trait Cache
         $merged = array_merge($this->getWhere(), $this->getOrWhere(), $limit, $order);
 
 
-        return md5(serialize($this->getTable() . serialize($merged)));
+        return substr(md5(json_encode($this->getTable() . serialize($merged))), 0, 22);
     }
 
 
@@ -96,7 +96,7 @@ trait Cache
     {
 
         if ($result = $this->getCache($key = $this->prepareCacheKey())) {
-            $this->setAttributes(unserialize($result));
+            $this->setAttributes(json_decode($result));
         } else {
             $this->setCache(
                 $key,
