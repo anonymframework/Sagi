@@ -787,9 +787,10 @@ class QueryBuilder
      * @param null $c
      * @param string $type
      * @param bool $clean
-     * @return Model
+     * @param bool $spec
+     * @return QueryBuilder
      */
-    public function where($a, $b = null, $c = null, $type = 'AND', $clean = true)
+    public function where($a, $b = null, $c = null, $type = 'AND', $clean = true, $spec = false)
     {
 
         if (is_null($b) && is_null($c)) {
@@ -814,7 +815,12 @@ class QueryBuilder
         $where->query = $query;
         $where->type = $type;
 
-        $this->where[] = $where;
+        if ($spec == true) {
+            $this->where[$field] = $where;
+        }else{
+            $this->where[] = $where;
+
+        }
 
         return $this;
     }
@@ -823,12 +829,30 @@ class QueryBuilder
      * @param $a
      * @param null $b
      * @param null $c
+     * @param string $type
      * @param bool $clean
-     * @return Model
+     * @return QueryBuilder
      */
-    public function orWhere($a, $b = null, $c = null, $clean = false)
+    public function specWhere($a, $b = null, $c = null, $type = 'AND', $clean = true)
     {
-        return $this->where($a, $b, $c, 'OR', $clean);
+        return $this->where($a, $b, $c, $type, $clean, true);
+    }
+
+    public function orSpecWhere($a, $b = null, $c = nulL, $clean = true)
+    {
+        return $this->orWhere($a, $b, $c, $clean, true);
+    }
+    /**
+     * @param $a
+     * @param null $b
+     * @param null $c
+     * @param bool $clean
+     * @param bool $spec
+     * @return QueryBuilder
+     */
+    public function orWhere($a, $b = null, $c = null, $clean = false, $spec = false)
+    {
+        return $this->where($a, $b, $c, 'OR', $clean, $spec);
     }
 
 
