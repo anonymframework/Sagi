@@ -84,14 +84,11 @@ trait Cache
     {
         $class = get_called_class();
 
-        if ($this->cacheMode == Model::FULL_CACHE) {
-            $result =  $this->get()->fetchAll(\PDO::FETCH_CLASS, $class);
-        }else{
-            $result = $this->get()->fetchAll(\PDO::FETCH_OBJ);
-        }
+        $result = $this->get()->fetchAll(\PDO::FETCH_ASSOC);
 
         return $result;
     }
+
     /**
      *
      */

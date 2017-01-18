@@ -19,15 +19,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
-    const FULL_CACHE = 1;
-    const PRIMARY_CACHE = 2;
-
-
-    /**
-     * @var array
-     */
-    protected $cacheMode = 1;
-
     /**
      * @var int
      */
@@ -801,7 +792,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         return array_merge($arr,
             [
-                'cacheMode',
                 'expiration',
                 'table',
                 'attributes',
