@@ -35,7 +35,6 @@ $application->addCommands([
     new CleanLogsCommand(),
     new MigrationAuthCommand(),
     new MigrationLanguageCommand(),
-    new \Sagi\Database\Console\ScheduleRunCommand(),
 ]);
 
 $application->run();

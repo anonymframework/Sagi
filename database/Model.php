@@ -107,6 +107,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     protected $hide = [];
 
+
+    /**
+     * @var array
+     */
+    protected $saveBefore = [];
     /**
      * Model constructor.
      * @param array $attributes
@@ -582,11 +587,9 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $this->throwPolicyException('create');
         }
 
-
         if (empty($data)) {
             $data = $this->getAttributes();
         }
-
 
         if (!$data instanceof Entity) {
             $entity = new Entity();
@@ -600,6 +603,34 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $entity = $data;
         }
 
+
+
+        if (!empty($this->saveBefore)) {
+            foreach ($this->saveBefore as $item){
+                if ($this->hasAttribute($item)) {
+                    $attr = $this->attribute($item);
+
+                    $save = $attr->save();
+
+                    if(!$save){
+                        throw new QueryException(sprintf('%s could not save. Error message : %s', $item, $attr->error()[2]));
+                    }
+
+                    $primaryValue = $save->attribute($save->getPrimaryKey());
+
+
+                    $entity->datas[$item] = $primaryValue;
+                }else{
+                    throw new AttributeNotFoundException(sprintf('%s attribute could not found, we cant save it', $item));
+                }
+            }
+        }
+
+
+
+        if (empty($data)) {
+            $data = $this->getAttributes();
+        }
 
         if ($created = parent::create($entity)) {
             if (!empty($this->primaryKey) && !is_array($this->primaryKey) && $entity->multipile === false) {
@@ -867,6 +898,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $value = json_encode($value);
         } elseif ($this->isArray($key) && is_object($value) || is_array($value)) {
             $value = serialize($value);
+        }elseif($value instanceof Model){
+            $this->saveBefore[] = $key;
         }
 
         $this->attributes[$key] = $value;
@@ -1044,7 +1077,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
 
         if (is_array($var)) {
-            return Singleton::load(static::className(), [$var, true]);
+            return Singleton::load(static::className())->setAttributes($var);
         }else{
             return $var;
         }

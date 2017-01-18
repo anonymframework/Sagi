@@ -2,9 +2,13 @@
 
 return [
     'username' => 'root',
-    'password' => '',
-    'dsn' => 'mysql:host=localhost;dbname=test',
+    'password' => 'sanane123',
+    'dsn' => 'mysql:host=127.0.0.1;dbname=test',
     'driver' => 'mysql',
+
+    'attr' => [
+        PDO::ATTR_PERSISTENT => true,
+    ],
 
     'cache' => [
         'host' => '127.0.0.1',
