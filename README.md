@@ -81,6 +81,9 @@ Sagi Database Class
  
  $db->where(['username', '=', 'admin']);
  
+ // 
+ 
+ $db->specWhere('username', 'yourusername'); // overwrite old username value
 ```
 
 #### orWhere
@@ -409,6 +412,21 @@ $datas = $data->datas;
      'password' => 'password'
   ]);
  ```
+ 
+ ```php 
+ 
+  $post = Posts::set([
+  'title' => 'Post title',
+  'user' => Users::set(array('username' => admin')), // create a new user with admin username and put its id here
+   ]);
+
+ $post->category = Categories::set([
+ 'title' => 'New Category',
+ ]);
+ 
+ $post->save();
+ ```
+ 
 ####update
 
 
