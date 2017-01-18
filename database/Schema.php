@@ -61,12 +61,12 @@ class Schema
     {
         $this->addCommand('create', [$table]);
 
-        call_user_func_array($closure, [$this->row]);
+        call_user_func_array($closure, [$this->row->setTable($table)]);
 
         $this->commands[] = $this->row->prepareRow();
         $this->addCommand('end', [$this->charset]);
 
-        $prepare = Connector::getConnection()->query($query = $this->prepareSchema());
+        $prepare = QueryBuilder::createNewInstance()->prepare($query = $this->prepareSchema(), []);
         $this->checkResult($prepare, $query);
     }
 
@@ -79,11 +79,11 @@ class Schema
     {
         $this->addCommand('create_if', [$table]);
 
-        call_user_func_array($closure, [$this->row]);
+        call_user_func_array($closure, [$this->row->setTable($table)]);
 
         $this->commands[] = $this->row->prepareRow();
         $this->addCommand('end', [$this->charset]);
-        $prepare = Connector::getConnection()->query($query = $this->prepareSchema());
+        $prepare = QueryBuilder::createNewInstance()->prepare($query = $this->prepareSchema(), []);
         $this->checkResult($prepare, $query);
     }
     /**
@@ -102,13 +102,15 @@ class Schema
 
     /**
      * @param string $table
-     * @return $this
+     * @return mixed
      */
     public function dropTable($table)
     {
         $this->addCommand('drop', [$table]);
 
-        return Connector::getConnection()->query($this->prepareSchema());
+        $builder = new QueryBuilder();
+
+        return $builder->prepare($this->prepareSchema(), []);
     }
 
     /**

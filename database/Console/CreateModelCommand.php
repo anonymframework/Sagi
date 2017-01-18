@@ -15,6 +15,9 @@ use Sagi\Database\MigrationManager;
 
 class CreateModelCommand extends Command
 {
+
+    protected $relations;
+
     protected function configure()
     {
         $this->setName('model:create')
@@ -30,6 +33,9 @@ class CreateModelCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+
+        $this->relations = json_decode(file_get_contents(dirname(__DIR__) . '/relations.json'));
+
         $name = $input->getArgument('name');
 
         $columns = QueryBuilder::createNewInstance()->query("SHOW COLUMNS FROM `$name`")->fetchAll();
@@ -45,10 +51,9 @@ class CreateModelCommand extends Command
 
         $content = TemplateManager::prepareContent('model', [
             'table' => $name,
-            'relations' => ConfigManager::get('prepare_relations', true) === true ? $this->prepareRelations($mapped,
-                    $name) . $this->prepareRelationsMany($name) : '',
+            'relations' => ConfigManager::get('prepare_relations',
+                true) === true ? $this->prepareRelations($name) . $this->prepareRelationsMany($name) : '',
             'name' => $name = MigrationManager::prepareClassName($name),
-            'fields' => $this->prepareFields($mapped, $name),
             'primary' => $primary = $this->findPrimaryKey($columns),
             'timestamps' => $timestamps,
         ]);
@@ -93,119 +98,94 @@ class CreateModelCommand extends Command
         return empty($timestamps) ? 'false' : '[' . join(',', $timestamps) . ']';
     }
 
-    /**
-     * @param $fields
-     * @return string
-     */
-    private function prepareFields($fields)
-    {
-        $fields = array_map(function ($value) {
-            return "'$value->name'";
-        }, $fields);
-
-        return join(',', $fields);
-    }
-
     private function prepareRelationsMany($name)
     {
+        if (isset($this->relations->many->$name)) {
+            $relate = (array) $this->relations->many->$name;
 
-        $subname = $name . '_id';
+            $table = array_keys($relate)[0];
 
-        $tables = QueryBuilder::createNewInstance()->query('SHOW TABLES')->fetchAll();
+            $ourCol = $relate[$table][0];
+            $tarCol = $relate[$table][1];
 
-        $content = '';
+            $content = $this->prepareOne($table, $ourCol, $tarCol, true);
 
-        foreach ($tables as $table) {
-            $table = $table[0];
-
-            if ($table == $name) {
-                continue;
-            }
-
-
-            if (in_array($table, MigrationManager::$systemMigrations)) {
-                continue;
-            }
-
-            $columns = QueryBuilder::createNewInstance()->query("SELECT $subname FROM `$table`");
-
-            if (!$columns) {
-                continue;
-            }
-
-            if ($configs = ConfigManager::get('relations.' . $table, 'many')) {
-                $command = '$this->has' . ucfirst($configs);
-            }
-
-            $function = lcfirst(MigrationManager::prepareClassName($table));
-            $class = MigrationManager::prepareClassName($table);
-
-
-            $content .= <<<MANY
-    /**
-     *
-     * @return \Sagi\Database\RelationShip
-     */
-      public function $function(){
-            return $command($class::className(), ["id", '$subname' ]);
-      }
-      
-
-MANY;
-
+            return $content;
         }
 
-        return $content;
+
+        return '';
 
     }
 
-    private function prepareRelations($fields, $name)
+    private function prepareOne($table, $tarCol, $ourCol, $many = false)
     {
-        $keys = QueryBuilder::createNewInstance()
-            ->getPdo()->query("SHOW CREATE TABLE `$name`")->fetch(\PDO::FETCH_ASSOC);
+        $class = MigrationManager::prepareClassName($table);
 
-        $create = $keys['Create Table'];
-        if (strpos($create, 'FOREIGN KEY') === false) {
-            return '';
-        } else {
-            if (preg_match_all('#FOREIGN KEY \((.*?)\) REFERENCES (.*?) \((.*?)\)#si', $create, $field)) {
 
-                array_shift($field);
-
-                $field = array_map(function ($val) {
-                    return array_map(function ($value){
-                        return str_replace(['`', "'", '"'], '', $value);
-                    }, $val);
-                }, $field);
-
-                $ret = '';
-
-                for ($i = 0; $i < count($field[0]); $i++) {
-                    $ourCol = $field[0][$i];
-                    $table = $field[1][$i];
-                    $tarCol = $field[2][$i];
-
-                    $command = '$this->hasOne';
-
-                    $class = MigrationManager::prepareClassName($table);
-
-                    $ret .= <<<CODE
+        $command = $many == false ? '$this->hasOne' : '$this->hasMany';
+        return <<<CODE
 /**
       * 
       * @return mixed
       */
       function $table(){
-          return $command(\Models\\$class::className(), ['$tarCol', '$ourCol']);       
+          return $command($class::className(), ['$ourCol', '$tarCol']);       
        }
 
 CODE;
-                }
+    }
 
-                return $ret;
-            }else{
+    private function prepareRelations($name)
+    {
+        $ret = '';
+
+        if (isset($this->relations->one->$name)) {
+            $relate = (array) $this->relations->one->$name;
+
+            $table = array_keys($relate)[0];
+
+            $ourCol = $relate[$table][0];
+            $tarCol = $relate[$table][1];
+
+            $ret .= $this->prepareOne($table, $ourCol, $tarCol);
+
+            return $ret;
+        } else {
+            $keys = QueryBuilder::createNewInstance()
+                ->prepare("SHOW CREATE TABLE `$name`", [])->fetch(\PDO::FETCH_ASSOC);
+
+
+            $create = $keys['Create Table'];
+            if (strpos($create, 'FOREIGN KEY') === false) {
                 return '';
+            } else {
+                if (preg_match_all('#FOREIGN KEY \((.*?)\) REFERENCES (.*?) \((.*?)\)#si', $create, $field)) {
+
+                    array_shift($field);
+
+                    $field = array_map(function ($val) {
+                        return array_map(function ($value) {
+                            return str_replace(['`', "'", '"'], '', $value);
+                        }, $val);
+                    }, $field);
+
+                    for ($i = 0; $i < count($field[0]); $i++) {
+                        $ourCol = $field[0][$i];
+                        $table = $field[1][$i];
+                        $tarCol = $field[2][$i];
+
+                        $ret .= $this->prepareOne($table, $tarCol, $ourCol);
+                    }
+
+                    return $ret;
+                } else {
+                    return '';
+                }
             }
         }
+
+
     }
 
     /**

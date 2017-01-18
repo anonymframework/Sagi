@@ -18,6 +18,14 @@ class MigrationManager extends Schema
     ];
 
     /**
+     * @var array
+     */
+    public static $migrationRelations = [
+        'one' => [],
+        'many' => []
+    ];
+
+    /**
      * @var string
      */
     public static $migrationDir = 'migrations';
@@ -75,6 +83,10 @@ class MigrationManager extends Schema
         }
 
         $files = array_merge($files, $this->runMigrations($migrations));
+
+        if (count(static::$migrationRelations['one']) || count(static::$migrationRelations['many'])) {
+            file_put_contents(__DIR__ . '/relations.json', json_encode(static::$migrationRelations));
+        }
 
         return $files;
     }

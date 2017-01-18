@@ -1,0 +1,1 @@
+{"one":{"posts":{"category":["category_id","id"]},"post_images":{"posts":["post_id","id"]},"comments":{"posts":["post_id","id"]}},"many":{"posts":{"comments":["id","post_id"]}}}

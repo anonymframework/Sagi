@@ -6,26 +6,26 @@ use Sagi\Database\Model;
  * @class Users
  *
  */
-class {{name}} extends Model
+class Auth extends Model
 {
 
     /**
      * @var string
      */
-    public $primaryKey = {{primary}};
+    public $primaryKey = 'user_id';
 
     /**
      * @var array|bool
      *
      */
-    protected $timestamps = {{timestamps}};
+    protected $timestamps = ['created_at','updated_at'];
 
      /**
       * @var string
       */
-    protected $table = '{{table}}';
+    protected $table = 'auth';
 
 
-    {{relations}}
+    
 
 }

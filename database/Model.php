@@ -53,12 +53,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
 
     /**
-     * @var array
-     */
-    protected $fields = [];
-
-
-    /**
      * @var mixed
      */
     protected $policy;
@@ -116,11 +110,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     /**
      * Model constructor.
      * @param array $attributes
+     * @param bool $single
      * @throws \Exception
      */
     public function __construct(array $attributes = [])
     {
-
         parent::__construct();
         $this->usedModules = $traits = class_uses(static::className());
 
@@ -137,16 +131,19 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             }
         }
 
-        if (!empty($this->fields)) {
-            $this->select($this->fields);
-        }
+        $this->select('*');
 
         if (!empty($attributes)) {
+
+            if (!is_array($attributes)) {
+                $attributes = (array)$attributes;
+            }
             $this->fill($attributes);
         }
 
 
         $this->bootLogging();
+
 
     }
 
@@ -193,7 +190,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string $key
      * @return bool
      */
-    public function isFillable(string $key)
+    public function isFillable($key)
     {
         return !isset($this->guarded[$key]) or !$this->totallyGuarded;
     }
@@ -273,7 +270,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @return $this
      * @throws \Exception
      */
-    public function attach(Model $model,$targetAlias = '',$homeAlias = '')
+    public function attach(Model $model, $targetAlias = '', $homeAlias = '')
     {
         if (!$model->hasPrimaryKey()) {
             throw new \Exception('Your model class have a primary key to use attach method');
@@ -326,7 +323,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         if ($this->isCacheUsed()) {
             return $this->cacheAll();
         } else {
-            return static::set($this->get()->fetchAll(PDO::FETCH_CLASS, $class));
+            $fetched = $this->get()->fetchAll(PDO::FETCH_ASSOC);
+
+
+            $this->setAttributes($fetched);
+            return $this;
         }
     }
 
@@ -410,9 +411,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param null $c
      * @param string $type
      * @param bool $clean
+     * @param  bool $spec
      * @return $this
      */
-    public function where($a, $b = null, $c = null,$type = 'AND',$clean = true)
+    public function where($a, $b = null, $c = null, $type = 'AND', $clean = true, $spec = false)
     {
         $name = is_array($a) ? $a[0] : $a;
 
@@ -426,7 +428,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
                 $value
             ))
         ) {
-            parent::where($a, $b, $c, $type, $clean);
+            parent::where($a, $b, $c, $type, $clean, $spec);
 
             return $this;
         } else {
@@ -439,16 +441,17 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param null $b
      * @param null $c
      * @param bool $clean
+     * @param bool $spec
      * @return $this
      */
-    public function orWhere($a, $b = null, $c = null,$clean = true)
+    public function orWhere($a, $b = null, $c = null, $clean = true, $spec = false)
     {
         if ($this->can('orWhere')) {
-            parent::orWhere($a, $b, $c, $clean);
+            parent::orWhere($a, $b, $c, $clean, $spec);
 
             return $this;
         } else {
-            $this->throwPolicyException('where');
+            $this->throwPolicyException('or where');
         }
 
     }
@@ -468,7 +471,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string $alias
      * @return RelationShip
      */
-    public function hasMany($class,array $link,$alias = null)
+    public function hasMany($class, array $link, $alias = null)
     {
         $class = $class::createNewInstance();
 
@@ -479,7 +482,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         }
 
 
-        $append = '#' . $link[1] . ':' . $this->__get($link[1]);
+        $append = '#' . $link[0] . ':' . $this->__get($link[0]);
 
         $name .= $append;
 
@@ -497,7 +500,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string $alias
      * @return RelationShip
      */
-    public function hasOne($class,array $link,string $alias = null) : RelationShip
+    public function hasOne($class, array $link, $alias = null)
     {
         $class = $class::createNewInstance();
 
@@ -507,7 +510,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $name = $class->getTable();
         }
 
-        $append = '#' . $link[1] . ':' . $this->__get($link[1]);
+        $append = '#' . $link[0] . ':' . $this->__get($link[0]);
 
         $name .= $append;
 
@@ -523,7 +526,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string $json
      * @return bool
      */
-    public function isJson(string $json) : bool
+    public function isJson($json)
     {
         return in_array($json, $this->json);
     }
@@ -533,7 +536,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string $name
      * @return bool
      */
-    public function isArray(string  $name) : bool
+    public function isArray($name)
     {
         return in_array($name, $this->array);
     }
@@ -543,7 +546,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param  callable $callback
      * @return $this
      */
-    public function beforeAttach(callable $callback) : Model
+    public function beforeAttach(callable $callback)
     {
         $this->beforeAttach[] = $callback;
 
@@ -600,18 +603,9 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         if ($created = parent::create($entity)) {
             if (!empty($this->primaryKey) && !is_array($this->primaryKey) && $entity->multipile === false) {
-                $created = static::findOne($this->getPdo()->lastInsertId());
-            } elseif (empty($this->primaryKey) || is_array($this->primaryKey)) {
-                $created = static::find();
-
-                foreach ($this->getPrimaryKey() as $key) {
-                    $created->where($key, $data[$key]);
-                }
-
-                return $created->one();
+                $return = static::findOne($this->getPdo()->lastInsertId());
             }
 
-            $return = $created;
         } else {
             $return = false;
         }
@@ -687,6 +681,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     {
         return new static($datas);
     }
+
     /**
      * @return Model
      */
@@ -784,7 +779,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
                 'usedModules',
                 'policy',
                 'protected',
-                'fields',
                 'json',
                 'array',
                 'guarded',
@@ -1047,7 +1041,13 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function current()
     {
         $var = current($this->attributes);
-        return $var;
+
+
+        if (is_array($var)) {
+            return Singleton::load(static::className(), [$var, true]);
+        }else{
+            return $var;
+        }
     }
 
     /**

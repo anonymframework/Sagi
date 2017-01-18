@@ -83,6 +83,7 @@ class Loggable implements LoggerAwareInterface
                 break;
             case E_COMPILE_ERROR:
                 $this->logger->emergency($message, $context);
+                break;
             case E_CORE_ERROR:
                 $this->logger->error($message, $context);
                 break;

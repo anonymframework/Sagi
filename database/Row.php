@@ -43,6 +43,30 @@ class Row
         'other' => ':substring :command :end'
     ];
 
+    /**
+     * @var string
+     */
+    protected $table = '';
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @param string $table
+     * @return Row
+     */
+    public function setTable($table)
+    {
+        $this->table = $table;
+        return $this;
+    }
+
+
 
     public function index($name, $col)
     {
@@ -284,7 +308,42 @@ class Row
         return $this->addCommand('foreign_key', [$colOur, $table, $colTarget], 'other');
     }
 
+    /**
+     * @param $table
+     * @param $ourCol
+     * @param $tarCol
+     * @return Row
+     */
+    public function makeOneRelation($table, $ourCol, $tarCol)
+    {
+        return $this->makeRelation('one', $table, $ourCol, $tarCol);
+    }
 
+    /**
+     * @param $table
+     * @param $ourCol
+     * @param $tarCol
+     * @return Row
+     */
+    public function makeManyRelation($table, $ourCol, $tarCol)
+    {
+        return $this->makeRelation('many', $table, $ourCol, $tarCol);
+    }
+
+    /**
+     * @param string $type
+     * @param $table
+     * @param $ourCol
+     * @param $tarCol
+     * @return $this
+     */
+    public function makeRelation($type = 'one', $table, $ourCol, $tarCol)
+    {
+        MigrationManager::$migrationRelations[$type][$this->table] = [
+            $table => [$ourCol, $tarCol]];
+
+        return $this;
+    }
     /**
      * get all args
      *

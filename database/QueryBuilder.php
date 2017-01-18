@@ -57,14 +57,14 @@ class QueryBuilder
      *
      * @var array
      */
-    private $where = [];
+    protected $where = [];
 
     /**
      * or where query
      *
      * @var array
      */
-    private $orWhere = [];
+    protected $orWhere = [];
 
     /**
      * @var array
@@ -96,6 +96,15 @@ class QueryBuilder
      * @var bool
      */
     private $prepareValues = true;
+
+    protected $marks = [
+        '=' => 'equal',
+        '>' => 'bigger',
+        '<' => 'smaller',
+        '!=' => 'diffrent',
+        '>=' => 'ebigger',
+        '=<' => 'esmaller'
+    ];
 
     /**
      * @var array
@@ -815,11 +824,18 @@ class QueryBuilder
         $where->query = $query;
         $where->type = $type;
 
-        if ($spec == true) {
+        if ($spec === true) {
             $this->where[$field] = $where;
         }else{
-            $this->where[] = $where;
+            $mark = trim($backet);
+            if(isset($this->marks[$mark])){
+                $mark = $this->marks[$mark];
+                $name =  $field.'.'.$type.'.'.$mark;
 
+                $this->where[$name] = $where;
+            }else{
+                throw new Exception(sprintf('%s could not found, you can use one of these(%s)', $mark, $this->join(',', $this->marks)));
+            }
         }
 
         return $this;
@@ -1085,7 +1101,7 @@ class QueryBuilder
      */
     public function __sleep()
     {
-        return ['driver'];
+        return ['driver','where', 'orWhere'];
     }
 
     /**
@@ -1126,11 +1142,12 @@ class QueryBuilder
 
     /**
      * @param $query
+     * @param array $args
      * @return \PDOStatement
      */
-    public function query($query)
+    public function query($query, $args=  [])
     {
-        return $this->pdo->query($query);
+        return $this->prepare($query, $args);
     }
 
 
@@ -1233,8 +1250,7 @@ class QueryBuilder
     public function tableExists($table = null)
     {
         $table = $table === null ? $this->table : $table;
-
-        $inst = $this->pdo->query("SHOW TABLES LIKE '{$table}'");
+        $inst = $this->prepare("SHOW TABLES LIKE '{$table}'", []);
 
 
         return $inst ? $inst->rowCount() : false;
@@ -1246,7 +1262,7 @@ class QueryBuilder
      */
     public function columnExists($column)
     {
-        $ins = $this->pdo->query("SHOW COLUMNS FROM `{$this->table}` LIKE '$column';");
+        $ins = $this->prepare("SHOW COLUMNS FROM `{$this->table}` LIKE '$column';", []);
 
         return $ins ? $ins->rowCount() : false;
     }

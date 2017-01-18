@@ -21,12 +21,13 @@ class Singleton
      */
     public static function load($class, $parameters = [])
     {
-        if (!isset(static::$instance[$class]) || static::$instance[$class] instanceof $class) {
+        if (!isset(static::$instance[$class]) || !static::$instance[$class] instanceof $class) {
             $reflectionClass= new \ReflectionClass($class);
 
-            static::$instance[$class] = $reflectionClass->newInstance($parameters);
+            static::$instance[$class] = $reflectionClass->newInstanceArgs($parameters);
         }
 
         return static::$instance[$class];
     }
+
 }

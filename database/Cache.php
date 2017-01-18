@@ -20,6 +20,9 @@ trait Cache
     {
         $configs = ConfigManager::get('cache');
 
+        if (class_exists('Memcached') === false) {
+            throw new \Exception('Memcache extension could not found');
+        }
         static::$memcache = new Memcached();
 
         static::$memcache->addServer($configs['host'], $configs['port']);
@@ -64,7 +67,7 @@ trait Cache
      */
     public function getCache($key)
     {
-        return static::$memcache->get($key);
+        return gzuncompress(static::$memcache->get($key));
     }
 
     /**
@@ -74,7 +77,7 @@ trait Cache
      */
     public function setCache($key, $value)
     {
-        return static::$memcache->set($key, $value, $this->expiration);
+        return static::$memcache->set($key, gzcompress($value), $this->expiration);
     }
 
     public function serializeResults()

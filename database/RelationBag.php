@@ -106,9 +106,9 @@ class RelationBag
 
         $propeties = $relation['propeties'];
 
-        $col = $propeties[1];
+        $col = $propeties[0];
 
-        $model->where($propeties[0], $our->$col);
+        $model->where($propeties[1], $our->$col);
 
         if ($type === 'one') {
             $model = $model->limit(1);
