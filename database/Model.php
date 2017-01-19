@@ -612,7 +612,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         if (parent::create($entity)) {
             if (!empty($this->primaryKey) && !is_array($this->primaryKey) && $entity->multipile === false) {
-                $return = static::findOne($this->getPdo()->lastInsertId());
+                $return = static::findOne($this->lastInsertId());
             }
 
         } else {
@@ -626,7 +626,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         return $return;
     }
 
-
+    /**
+     * @return int
+     */
+    public function lastInsertId(){
+        return $this->prepareConnection()->lastInsertId();
+    }
     /**
      * @param array $datas
      * @return PDOStatement
