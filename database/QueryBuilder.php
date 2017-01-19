@@ -103,6 +103,15 @@ class QueryBuilder
         'NOT IN' => 'notin'
     ];
 
+    /**
+     * @param select $select
+     * @return QueryBuilder
+     */
+    public function setSelect($select)
+    {
+        $this->select = $select;
+        return $this;
+    }
 
 
     /**
@@ -123,11 +132,11 @@ class QueryBuilder
             $this->pdo = Connector::getConnection();
         }
 
-       return $this->pdo;
+        return $this->pdo;
     }
 
     /**
-     * @return PDOStatement
+     * @return mixed
      */
     protected function prepareDelete()
     {
@@ -135,7 +144,7 @@ class QueryBuilder
 
         $handled = $this->handlePattern($pattern, array(
             ':from' => $this->getTable(),
-            ':where' => $this->prepareWhereQuery($this->getWhere())
+            ':where' => $this->prepareWhereQuery($this->where)
         ));
 
         return $handled;
@@ -143,7 +152,7 @@ class QueryBuilder
 
     /**
      * @param Entity $sets
-     * @return PDOStatement
+     * @return mixed
      */
     protected function prepareUpdate(Entity $sets)
     {
@@ -156,7 +165,7 @@ class QueryBuilder
         $handled = $this->handlePattern($pattern, [
             ':from' => $this->getTable(),
             ':update' => $setted['content'],
-            ':where' => $this->prepareWhereQuery($this->getWhere())
+            ':where' => $this->prepareWhereQuery($this->where)
         ]);
 
         return $handled;
@@ -246,7 +255,7 @@ class QueryBuilder
     /**
      * @return string
      */
-    public function prepareLimitQuery($limit)
+    private function prepareLimitQuery($limit)
     {
 
         if (empty($limit)) {
@@ -255,13 +264,26 @@ class QueryBuilder
 
         if (isset($limit[1])) {
             $s = sprintf('LIMIT %d OFFSET %d', $limit[1], $limit[0]);
-        }else{
+        } else {
             $s = sprintf('LIMIT %d', $limit[0]);
         }
 
         return $s;
     }
 
+    /**
+     * @param $name
+     * @return $this
+     */
+    public static function table($name)
+    {
+        return static::createNewInstance($name);
+    }
+
+    /**
+     * @param $order
+     * @return string
+     */
     private function prepareOrderQuery($order)
     {
         if (empty($order)) {
@@ -298,6 +320,7 @@ class QueryBuilder
     {
         return $having;
     }
+
     /**
      * @return string
      */
@@ -308,7 +331,7 @@ class QueryBuilder
 
         if ($group instanceof Group) {
             $pattern = 'SELECT :select FROM :from :join :where :group :having :order :limit';
-        }else{
+        } else {
             $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
         }
 
@@ -316,12 +339,12 @@ class QueryBuilder
         $handled = $this->handlePattern($pattern, [
             ':select' => $this->prepareSelectQuery($this->getSelect()),
             ':from' => $this->getTable(),
-            ':join' => $this->prepareJoinQuery($this->getJoin(), $this->getTable()),
+            ':join' => $this->prepareJoinQuery($this->join, $this->getTable()),
             ':group' => $this->prepareGroupQuery($group),
-            ':having' => $this->prepareHavingQuery($this->getHaving()),
-            ':where' => $this->prepareWhereQuery($this->getWhere()),
-            ':order' => $this->prepareOrderQuery($this->getOrder()),
-            ':limit' => $this->prepareLimitQuery($this->getLimit())
+            ':having' => $this->prepareHavingQuery($this->having),
+            ':where' => $this->prepareWhereQuery($this->where),
+            ':order' => $this->prepareOrderQuery($this->order),
+            ':limit' => $this->prepareLimitQuery($this->limit)
         ]);
 
         return $handled;
@@ -338,9 +361,9 @@ class QueryBuilder
         $handled = $this->handlePattern($pattern, [
             ':select' => 'COUNT(*) as row_count',
             ':from' => $this->getTable(),
-            ':where' => $this->prepareWhereQuery($this->getWhere()),
-            ':order' => $this->prepareOrderQuery($this->getOrder()),
-            ':limit' => $this->prepareLimitQuery($this->getLimit())
+            ':where' => $this->prepareWhereQuery($this->where),
+            ':order' => $this->prepareOrderQuery($this->order),
+            ':limit' => $this->prepareLimitQuery($this->limit)
         ]);
         return $handled;
     }
@@ -427,7 +450,7 @@ class QueryBuilder
 
         $string = '';
 
-        $new = static::createNewInstance();
+        $new = Singleton::load(get_called_class());
 
         foreach ($joins as $join) {
             /**
@@ -440,7 +463,7 @@ class QueryBuilder
                 $tCol = $prepareCol[0];
                 $this->setArgs($prepareCol[1]);
             } else {
-                $tCol = $join->table .'.'. $join->target;
+                $tCol = $join->table . '.' . $join->target;
             }
 
 
@@ -455,14 +478,14 @@ class QueryBuilder
     /**
      * @return string
      */
-    public function prepareSelectQuery($select)
+    private function prepareSelectQuery($select)
     {
 
         if (empty($select)) {
             $select = ["*"];
         }
 
-        $app = static::createNewInstance();
+        $app = Singleton::load(get_called_class());
 
         $builder = &$app;
 
@@ -477,7 +500,6 @@ class QueryBuilder
 
             return $value;
         }, $select);
-
 
         $this->setArgs($app->getArgs());
 
@@ -503,6 +525,8 @@ class QueryBuilder
 
         if ($builder->hasAs()) {
             $query .= ' AS ' . $builder->getAs();
+        }else{
+            throw new Exception('You must set AS statement with setAs method in subqueries');
         }
 
         return [$query, $builder->getArgs()];
@@ -554,21 +578,17 @@ class QueryBuilder
 
         $table = $this->getTable();
 
-        if (isset($this->fields)) {
-            $fields = $this->fields;
+        $select = array_map(function ($value) use ($table) {
+            if (is_string($value)) {
+                $value = trim($value);
+            }
 
-            $select = array_map(function ($value) use ($table, $fields) {
-                if (is_string($value)) {
-                    $value = trim($value);
-                }
+            if (is_string($value) && strpos($value, '.') === false) {
+                return $table . '.' . $value;
+            }
 
-                if (is_string($value) && strpos($value, '.') === false && in_array($value, $fields)) {
-                    return $table . '.' . $value;
-                }
-
-                return $value;
-            }, $select);
-        }
+            return $value;
+        }, $select);
 
 
         return $this->setSelect($select);
@@ -768,6 +788,33 @@ class QueryBuilder
     }
 
     /**
+     * @return $this
+     */
+    public function beginTransaction(){
+        $this->prepareConnection()->beginTransaction();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function commit(){
+        $this->prepareConnection()->commit();
+
+        return $this;
+    }
+
+
+    /**
+     * @return $this
+     */
+    public function rollBack(){
+        $this->prepareConnection()->rollBack();
+
+        return $this;
+    }
+    /**
      * @param $a
      * @param null $b
      * @param null $c
@@ -817,6 +864,10 @@ class QueryBuilder
 
         $where = new Where();
 
+        if (strpos($field, ".") === false) {
+            $field = $this->getTable() . '.' . $field;
+        }
+
         $where->field = $field;
         $where->backet = $backet;
         $where->clean = $clean;
@@ -825,14 +876,14 @@ class QueryBuilder
 
         if ($spec === true) {
             $this->where[$field] = $where;
-        }else{
+        } else {
             $mark = trim($backet);
-            if(isset($this->marks[$mark])){
+            if (isset($this->marks[$mark])) {
                 $mark = $this->marks[$mark];
-                $name =  $field.'.'.$type.'.'.$mark;
+                $name = $field . '.' . $type . '.' . $mark;
 
                 $this->where[$name] = $where;
-            }else{
+            } else {
                 throw new Exception(sprintf('%s could not found, you can use one of these(%s)', $mark, $this->join(',', $this->marks)));
             }
         }
@@ -857,6 +908,7 @@ class QueryBuilder
     {
         return $this->orWhere($a, $b, $c, $clean, true);
     }
+
     /**
      * @param $a
      * @param null $b
@@ -891,25 +943,6 @@ class QueryBuilder
         ];
     }
 
-
-    /**
-     * @return string
-     */
-    public function getSelect()
-    {
-        return $this->select;
-    }
-
-    /**
-     * @param select $select
-     * @return Model
-     */
-    public function setSelect($select)
-    {
-        $this->select = $select;
-        return $this;
-    }
-
     /**
      * @return string
      */
@@ -920,129 +953,11 @@ class QueryBuilder
 
     /**
      * @param string $table
-     * @return Model
+     * @return $this
      */
     public function setTable($table)
     {
         $this->table = $table;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getLimit()
-    {
-        return $this->limit;
-    }
-
-    /**
-     * @param array $limit
-     * @return Model
-     */
-    public function setLimit($limit)
-    {
-        $this->limit = $limit;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGroupBy()
-    {
-        return $this->groupBy;
-    }
-
-    /**
-     * @param string $groupBy
-     * @return Model
-     */
-    public function setGroupBy($groupBy)
-    {
-        $this->groupBy = $groupBy;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getWhere()
-    {
-        return $this->where;
-    }
-
-    /**
-     * @param array $where
-     * @return Model
-     */
-    public function setWhere($where)
-    {
-        $this->where = $where;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHaving()
-    {
-        return $this->having;
-    }
-
-    /**
-     * @param string $having
-     * @return Model
-     */
-    public function setHaving($having)
-    {
-        $this->having = $having;
-        return $this;
-    }
-
-    /**
-     * @param array $order
-     * @return Model
-     */
-    public function setOrder($order)
-    {
-        $this->order = $order;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getJoin()
-    {
-        return $this->join;
-    }
-
-    /**
-     * @param array $join
-     * @return QueryBuilder
-     */
-    public function setJoin($join)
-    {
-        $this->join = $join;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getOrWhere()
-    {
-        return $this->orWhere;
-    }
-
-    /**
-     * @param array $orWhere
-     * @return QueryBuilder
-     */
-    public function setOrWhere($orWhere)
-    {
-        $this->orWhere = $orWhere;
         return $this;
     }
 
@@ -1065,6 +980,7 @@ class QueryBuilder
     }
 
     /**
+     *
      * @return string
      */
     public function getAs()
@@ -1086,21 +1002,12 @@ class QueryBuilder
     {
         return !empty($this->as);
     }
-
-    /**
-     * @return array
-     */
-    public function getOrder()
-    {
-        return $this->order;
-    }
-
     /**
      * @return array
      */
     public function __sleep()
     {
-        return ['driver','where', 'orWhere'];
+        return ['driver', 'where', 'orWhere'];
     }
 
     /**
@@ -1145,7 +1052,7 @@ class QueryBuilder
      * @param array $args
      * @return \PDOStatement
      */
-    public function query($query, $args=  [])
+    public function query($query, $args = [])
     {
         return $this->prepare($query, $args);
     }
@@ -1153,7 +1060,7 @@ class QueryBuilder
 
     /**
      * @param string $table
-     * @return static
+     * @return $this
      */
     public static function createNewInstance($table = null)
     {
@@ -1313,7 +1220,6 @@ class QueryBuilder
         $this->lastQueryString = $lastQueryString;
         return $this;
     }
-
 
 
 }

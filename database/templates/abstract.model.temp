@@ -3,9 +3,11 @@ namespace Models\Abstraction;
 
 use Sagi\Database\Model;
 /**
- * @class Users
+ * @class {{name}}
  *
+{{property}}
+{{fake_methods}}
+{{methods}}
  */
 abstract class {{name}} extends Model{
-{{methods}}
 }

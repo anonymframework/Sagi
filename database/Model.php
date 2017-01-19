@@ -103,6 +103,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @var array
      */
     protected $saveBefore = [];
+
     /**
      * Model constructor.
      * @param array $attributes
@@ -361,7 +362,9 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         if (is_array($conditions) && !empty($conditions)) {
             foreach ($conditions as $item) {
-                $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
+                if (is_array($item)) {
+                    $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
+                }
             }
 
         } elseif (is_string($conditions) || is_integer($conditions)) {
@@ -370,11 +373,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
                 $instance->primaryKey;
 
             $instance->where($primaryKey, $conditions);
-        } elseif (func_num_args() > 1 && is_array($instance->primaryKey)) {
-
-            foreach ($instance->getPrimaryKey() as $index => $primaryKey) {
-                $instance->where($primaryKey, func_get_arg($index));
-            }
         }
 
         return $instance;
@@ -552,7 +550,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function save()
     {
 
-        if (!empty($this->getWhere()) || !empty($this->getOrWhere())) {
+        if (!empty($this->where)) {
 
             $return = $this->update() ? $this : false;
 
@@ -591,16 +589,14 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $entity = $data;
         }
 
-
-
         if (!empty($this->saveBefore)) {
-            foreach ($this->saveBefore as $item){
+            foreach ($this->saveBefore as $item) {
                 if ($this->hasAttribute($item)) {
                     $attr = $this->attribute($item);
 
                     $save = $attr->save();
 
-                    if(!$save){
+                    if (!$save) {
                         throw new QueryException(sprintf('%s could not save. Error message : %s', $item, $attr->error()[2]));
                     }
 
@@ -608,16 +604,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
 
                     $entity->datas[$item] = $primaryValue;
-                }else{
+                } else {
                     throw new AttributeNotFoundException(sprintf('%s attribute could not found, we cant save it', $item));
                 }
             }
-        }
-
-
-
-        if (empty($data)) {
-            $data = $this->getAttributes();
         }
 
         if (parent::create($entity)) {
@@ -868,7 +858,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $value = json_encode($value);
         } elseif ($this->isArray($key) && is_object($value) || is_array($value)) {
             $value = serialize($value);
-        }elseif($value instanceof Model){
+        } elseif ($value instanceof Model) {
             $this->saveBefore[] = $key;
         }
 
@@ -876,6 +866,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         if ($mutator !== false) {
             call_user_func([$this, $mutator], $value);
+        }else{
+            $this->attributes[$key] = $value;
         }
     }
 
@@ -884,8 +876,9 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string $key
      * @return bool
      */
-    private function hasMutator($key){
-        $mutator = 'set'.MigrationManager::prepareClassName($key).'Attribute';
+    private function hasMutator($key)
+    {
+        $mutator = 'set' . MigrationManager::prepareClassName($key) . 'Attribute';
 
         return method_exists($this, $mutator) ? $mutator : false;
     }
@@ -898,11 +891,29 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function __call($name, $arguments)
     {
         if (substr($name, 0, 3) === "get") {
-            $name = lcfirst(substr($name, 2, strlen($name) - 3));
+            $name = substr($name, 3, strlen($name));
 
-            if (method_exists($this, $name)) {
-                return call_user_func_array([$this, $name], $arguments);
+            $column = MigrationManager::parseCamelCase($name);
+
+            return $this->{$column};
+
+        } elseif (substr($name, 0, 3) === "set") {
+            $name = substr($name, 3, strlen($name));
+            $column = MigrationManager::parseCamelCase($name);
+
+
+
+            if (count($arguments) > 0) {
+                return $this->setAttribute($column, $arguments[0]);
             }
+        } elseif (substr($name, 0, 8) === "filterBy") {
+            $name = substr($name, 8, strlen($name));
+
+            $column = MigrationManager::parseCamelCase($name);
+
+            array_unshift($arguments, $column);
+
+            return call_user_func_array([$this, 'where'], $arguments);
         } else {
             throw new \BadMethodCallException(sprintf('%s method not found', $name));
         }
@@ -949,40 +960,24 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param $key
      * @return bool|string
      */
-    private function hasAccesor($key){
-        $accesor = "get".MigrationManager::prepareClassName($key).'Attribute';
+    private function hasAccesor($key)
+    {
+        $accesor = "get" . MigrationManager::prepareClassName($key) . 'Attribute';
 
         return method_exists($this, $accesor) ? $accesor : false;
     }
-    /**
-     * @param $value
-     * @return ValueContainer
-     */
-    public function getValueContainer($value)
-    {
-        return new ValueContainer($value);
-    }
+
 
     /**
      * @return EventDispatcher
      */
-    public function getEventManager()
+    protected function getEventManager()
     {
         if (!$this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
 
         return $this->eventManager;
-    }
-
-    /**
-     * @param EventDispatcher $eventManager
-     * @return Model
-     */
-    public function setEventManager($eventManager)
-    {
-        $this->eventManager = $eventManager;
-        return $this;
     }
 
 
@@ -1071,7 +1066,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         if (is_array($var)) {
             return Singleton::load(static::className())->setAttributes($var);
-        }else{
+        } else {
             return $var;
         }
     }

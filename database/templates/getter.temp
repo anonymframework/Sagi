@@ -1,7 +1,0 @@
-    /**
-     *
-     * @return {{type}}
-     */
-     public function {{methodName}}() {
-          return {{method}};
-     }

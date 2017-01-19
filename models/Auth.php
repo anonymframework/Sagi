@@ -3,7 +3,7 @@ namespace Models;
 
 use Models\Abstraction\AuthAbstract;
 /**
- * @class Users
+ * @class Auth
  *
  */
 class Auth extends AuthAbstract

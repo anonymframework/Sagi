@@ -51,10 +51,10 @@ trait Cache
      */
     protected function prepareCacheKey()
     {
-        $limit = (array)$this->getLimit();
-        $order = (array)$this->getOrder();
+        $limit = (array) $this->limit;
+        $order = (array) $this->order;
 
-        $merged = array_merge($this->getWhere(), $this->getOrWhere(), $limit, $order);
+        $merged = array_merge($this->where, $limit, $order);
 
 
         return substr(md5(json_encode($this->getTable() . serialize($merged))), 0, 22);

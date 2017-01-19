@@ -56,8 +56,11 @@ class CreateModelCommand extends Command
             'abstract' => $abstract = $name . 'Abstract',
         ]);
 
+        $setter = $this->prepareModelSetters($tableName);
         $abstractContent = TemplateManager::prepareContent('abstract.model', [
-            'methods' => $this->prepareModelSetters($tableName),
+            'methods' => $setter[0],
+            'property' => $setter[1],
+            'fake_methods' => $setter[2],
             'name' => $abstract
         ]);
 
@@ -134,6 +137,9 @@ class CreateModelCommand extends Command
     {
 
         $string = '';
+        $pp = '';
+        $method = '';
+
         $tables = new TableMapper();
 
         $table = $tables->mapTable([$name]);
@@ -145,7 +151,8 @@ class CreateModelCommand extends Command
 
             $type = $column->type;
 
-            if ($type === "tinyint" || $type === "bigint") {
+
+            if ($type === "tinyint" || $type === "bigint" || $type === "int") {
                 $type = "int";
             } elseif ($type === "decimal" || $type === "float") {
                 $type = "float";
@@ -153,31 +160,69 @@ class CreateModelCommand extends Command
                 $type = "string";
             }
 
+            $methodName = 'filterBy' . MigrationManager::prepareClassName($column->name);
+            $method .= $this->addMethod($methodName, $column->name, $type);
+            $pp .= $this->addProperty($column->name, $type);
             $string .= $this->prepareSetterMethod($setterMethodName, $column->name, $type);
-            $string .= $this->prepareGetterMethod($getterMethodName, $column->name, $type);
+            $string .= $this->prepareGetterMethod($getterMethodName, $type);
         }
 
-        return $string;
+        $method = rtrim($method, PHP_EOL);
+        $pp = rtrim($pp, PHP_EOL);
+
+        if ($pp === '') {
+            $pp = '*';
+        }
+
+        if ($method === '') {
+            $method = '';
+        }
+
+        return [$string, $pp, $method];
     }
 
+    /**
+     * @param $method
+     * @param $column
+     * @param $type
+     * @return string
+     */
+    private function addMethod($method, $column, $type)
+    {
+        return ' *@method $this ' . $method . '(' . $type . ' $' . $column . ')' . PHP_EOL;
+    }
+
+    /**
+     * @param $column
+     * @param $type
+     * @return string
+     */
+    private function addProperty($column, $type)
+    {
+        return ' *@property $' . $column . ' ' . $type . PHP_EOL;
+    }
+
+    /**
+     * @param $methodName
+     * @param $column
+     * @param $type
+     * @return string
+     */
     private function prepareSetterMethod($methodName, $column, $type)
     {
-        return TemplateManager::prepareContent('setter', [
-            'methodName' => $methodName,
-            'column' => $column,
-            'type' => $type
-        ]);
+        return ' *@method $this ' . $methodName . '(' . $type . ' $' . $column . ')' . PHP_EOL;
     }
 
-    private function prepareGetterMethod($methodName, $column, $type)
+    /**
+     * @param $methodName
+     * @param $column
+     * @param $type
+     * @return string
+     */
+    private function prepareGetterMethod($methodName, $type)
     {
-        $method = '$this->' . $column;
+        return ' *@method ' . $type . ' ' . $methodName . '()' . PHP_EOL;
 
-        return TemplateManager::prepareContent('getter', [
-            'method' => $method,
-            'methodName' => $methodName,
-            'type' => $type
-        ]);
     }
 
     private function prepareOne($table, $tarCol, $ourCol, $many = false)

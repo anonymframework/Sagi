@@ -216,6 +216,13 @@ class MigrationManager extends Schema
         return $name;
     }
 
+    public static function parseCamelCase($camel){
+        return implode("_", array_map(function($value){
+            return mb_convert_case($value, MB_CASE_LOWER);
+        },preg_split('/(?<=[a-z])(?=[A-Z])|(?=[A-Z][a-z])/',
+            $camel, -1, PREG_SPLIT_NO_EMPTY)));
+    }
+
     /**
      * @param $value
      * @return mixed

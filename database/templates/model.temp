@@ -3,7 +3,7 @@ namespace Models;
 
 use Models\Abstraction\{{abstract}};
 /**
- * @class Users
+ * @class {{name}}
  *
  */
 class {{name}} extends {{abstract}}
