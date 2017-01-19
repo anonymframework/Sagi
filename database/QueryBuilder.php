@@ -103,19 +103,6 @@ class QueryBuilder
         'NOT IN' => 'notin'
     ];
 
-    /**
-     * @var array
-     */
-    private $drivers = [
-        'mysql' => 'Sagi\Database\Drivers\MysqlDriver',
-        'sqlite' => 'Sagi\Database\Drivers\SqliteDriver',
-        'pqsql' => 'Sagi\Database\Drivers\PorteqsqlDriver',
-    ];
-
-    /**
-     * @var Driver
-     */
-    protected $driver;
 
 
     /**
@@ -360,15 +347,14 @@ class QueryBuilder
 
     protected function prepareWhereQuery($where)
     {
-        $string = '';
+        $string = 'WHERE ';
 
         if (!empty($where)) {
-            $string .= $this->handleWhereQuery($where);
-        }
+            $prepared = $this->handleWhereQuery($where);
 
-
-        if ($string !== '') {
-            $string = 'WHERE ' . $string;
+            if ($prepared !== '') {
+                $string .= $prepared;
+            }
         }
 
         return $string;
