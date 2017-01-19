@@ -99,5 +99,4 @@ class Loggable implements LoggerAwareInterface
                 break;
         }
     }
-
 }
