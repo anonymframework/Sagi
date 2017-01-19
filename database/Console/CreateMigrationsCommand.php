@@ -8,7 +8,6 @@ namespace Sagi\Database\Console;
 
 use Sagi\Database\Mapping\Column;
 use Sagi\Database\MigrationManager;
-use Sagi\Database\QueryBuilder;
 use Sagi\Database\TableMapper;
 use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,7 +46,7 @@ class CreateMigrationsCommand extends Command
 
                 if ($column->type === "varchar") {
                     $type = "string";
-                } elseif ($column->primaryKey == true) {
+                } elseif ($column->primaryKey === true) {
                     $type = "pk";
                 }
 
@@ -66,7 +65,7 @@ class CreateMigrationsCommand extends Command
                         $create .= '->defaultValue("' . $column->default . '")';
                     }
                 } else {
-                    if ($column->nullable == true) {
+                    if ($column->nullable === true) {
                         $create .= "->null()";
                     } else {
                         $create .= "->notNull()";

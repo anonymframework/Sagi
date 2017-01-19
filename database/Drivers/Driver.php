@@ -3,7 +3,6 @@
 namespace Sagi\Database\Drivers;
 
 use Sagi\Database\Mapping\Group;
-use Sagi\Database\QueryBuilder;
 
 /**
  * Class Driver
@@ -23,10 +22,10 @@ class Driver
             return "";
         }
 
-        $s = "LIMIT $limit[0] ";
-
         if (isset($limit[1])) {
-            $s .= 'OFFSET ' . $limit[1];
+            $s = 'LIMIT'.$limit[1]. 'OFFSET ' . $limit[0];
+        }else{
+            $s = "LIMIT $limit[0] ";
         }
 
         return $s;

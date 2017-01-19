@@ -4,10 +4,8 @@ namespace Sagi\Database\Console;
 
 
 use Sagi\Database\MigrationManager;
-use Sagi\Database\Schema;
 use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -37,7 +35,7 @@ class MigrationAuthCommand extends Command
         if (!file_exists($fileName)) {
 
             if (touch($fileName)) {
-                $put = file_put_contents($fileName, $content = TemplateManager::prepareContent('auth', []));
+                $put = file_put_contents($fileName, TemplateManager::prepareContent('auth', []));
 
                 if ($put) {
                     $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');

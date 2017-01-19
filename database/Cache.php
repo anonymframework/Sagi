@@ -82,8 +82,6 @@ trait Cache
 
     public function serializeResults()
     {
-        $class = get_called_class();
-
         $result = $this->get()->fetchAll(\PDO::FETCH_ASSOC);
 
         return $result;

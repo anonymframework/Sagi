@@ -8,8 +8,6 @@
 
 namespace Sagi\Database;
 
-use Anonym\Components\Event\EventDispatcher;
-
 trait AttachManager
 {
     public function bootAttachManager()

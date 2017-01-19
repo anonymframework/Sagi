@@ -2,7 +2,6 @@
 namespace Sagi\Database;
 
 
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Seeder
@@ -37,7 +36,7 @@ class Seeder
         if (is_string($name)) {
             $file = $this->prepareSeedFile($name);
 
-            if (file_exists($file) == false) {
+            if (file_exists($file) === false) {
                 throw new SeederException(sprintf('%s file could not found', $file));
             }
 

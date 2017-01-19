@@ -92,11 +92,6 @@ class QueryBuilder
      */
     private $as;
 
-    /**
-     * @var bool
-     */
-    private $prepareValues = true;
-
     protected $marks = [
         '=' => 'equal',
         '>' => 'bigger',
@@ -582,7 +577,7 @@ class QueryBuilder
      */
     public function limit($limit)
     {
-        if (is_string($limit) or is_numeric($limit)) {
+        if (is_string($limit) || is_numeric($limit)) {
             $this->setLimit([$limit]);
         } else {
             $this->setLimit($limit);

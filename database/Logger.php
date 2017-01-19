@@ -162,7 +162,7 @@ CONTENT;
         if ($level === 1) {
             file_put_contents($fullPath, $content);
 
-            exit();
+            return;
         }
     }
 

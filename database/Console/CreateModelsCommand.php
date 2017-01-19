@@ -2,9 +2,7 @@
 namespace Sagi\Database\Console;
 
 use Symfony\Component\Console\Input\InputArgument;
-use Sagi\Database\MigrationManager;
 use Sagi\Database\QueryBuilder;
-use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;

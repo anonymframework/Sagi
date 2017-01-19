@@ -2,7 +2,6 @@
 
 namespace Sagi\Database\Console;
 
-use Sagi\Database\ColumnMapper;
 use Sagi\Database\ConfigManager;
 use Sagi\Database\Model;
 use Sagi\Database\QueryBuilder;
@@ -52,7 +51,7 @@ class CreateModelCommand extends Command
             'relations' => ConfigManager::get('prepare_relations',
                 true) === true ? $this->prepareRelations($name) . $this->prepareRelationsMany($name) : '',
             'name' => $name = MigrationManager::prepareClassName($name),
-            'primary' => $primary = $this->findPrimaryKey($columns),
+            'primary' => $this->findPrimaryKey($columns),
             'timestamps' => $timestamps,
             'abstract' => $abstract = $name . 'Abstract',
         ]);
@@ -186,7 +185,7 @@ class CreateModelCommand extends Command
         $class = MigrationManager::prepareClassName($table);
 
 
-        $command = $many == false ? '$this->hasOne' : '$this->hasMany';
+        $command = $many === false ? '$this->hasOne' : '$this->hasMany';
         return <<<CODE
      /**
       * 
@@ -233,7 +232,8 @@ CODE;
                         }, $val);
                     }, $field);
 
-                    for ($i = 0; $i < count($field[0]); $i++) {
+                    $count = count($field[0]);
+                    for ($i = 0; $i < $count; $i++) {
                         $ourCol = $field[0][$i];
                         $table = $field[1][$i];
                         $tarCol = $field[2][$i];

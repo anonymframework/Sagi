@@ -3,7 +3,6 @@
 namespace Sagi\Database\Console;
 
 use Sagi\Database\TemplateManager;
-use Sagi\Database\MigrationManager;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,7 +29,7 @@ class CreatePolicyCommand extends Command
         if (!file_exists($fileName)) {
 
             if (touch($fileName)) {
-                $put = file_put_contents($fileName, $content = TemplateManager::prepareContent('policy', ['name' => $name, 'model' => $file, 'variable' => mb_strtolower($file)]));
+                $put = file_put_contents($fileName, TemplateManager::prepareContent('policy', ['name' => $name, 'model' => $file, 'variable' => mb_strtolower($file)]));
                 if ($put) {
                     $output->writeln('<info>' . $fileName . ' : policy created successfully</info>');
                 } else {

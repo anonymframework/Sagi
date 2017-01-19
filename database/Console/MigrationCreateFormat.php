@@ -1,10 +1,7 @@
 <?php
-
 namespace Sagi\Database\Console;
 
-
 use Sagi\Database\MigrationManager;
-use Sagi\Database\Schema;
 use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -39,7 +36,7 @@ class MigrationCreateFormat extends Command
         if (!file_exists($fileName)) {
 
             if (touch($fileName)) {
-                $put = file_put_contents($fileName, $content = TemplateManager::prepareContent('migration', [
+                $put = file_put_contents($fileName, TemplateManager::prepareContent('migration', [
                     'name' => MigrationManager::prepareClassName($file),
                     'up' => '',
                     'down' => ''

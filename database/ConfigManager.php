@@ -53,8 +53,6 @@ class ConfigManager
      */
     public static function get($key, $default = null)
     {
-        $results = [];
-
         $array = static::getConfigs();
 
         if (isset($array[$key])) {

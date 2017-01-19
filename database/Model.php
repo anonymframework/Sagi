@@ -188,7 +188,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function isFillable($key)
     {
-        return !isset($this->guarded[$key]) or !$this->totallyGuarded;
+        return !isset($this->guarded[$key]) || !$this->totallyGuarded;
     }
 
     /**
@@ -314,8 +314,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function all()
     {
-        $class = get_called_class();
-
         if ($this->isCacheUsed()) {
             return $this->cacheAll();
         } else {
@@ -555,7 +553,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function save()
     {
 
-        if (!empty($this->getWhere()) or !empty($this->getOrWhere())) {
+        if (!empty($this->getWhere()) || !empty($this->getOrWhere())) {
 
             $return = $this->update() ? $this : false;
 
@@ -623,7 +621,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $data = $this->getAttributes();
         }
 
-        if ($created = parent::create($entity)) {
+        if (parent::create($entity)) {
             if (!empty($this->primaryKey) && !is_array($this->primaryKey) && $entity->multipile === false) {
                 $return = static::findOne($this->getPdo()->lastInsertId());
             }
