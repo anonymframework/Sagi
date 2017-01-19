@@ -254,7 +254,7 @@ class QueryBuilder
         }
 
         if (isset($limit[1])) {
-            $s = 'LIMIT'.$limit[1]. 'OFFSET ' . $limit[0];
+            $s = 'LIMIT '.$limit[1]. 'OFFSET ' . $limit[0];
         }else{
             $s = "LIMIT $limit[0] ";
         }
