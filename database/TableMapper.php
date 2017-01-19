@@ -20,13 +20,13 @@ class TableMapper implements MapperInterface
      */
     public function map()
     {
-        $tables = QueryBuilder::createNewInstance()->query('SHOW TABLES')->fetchAll();
+        $tables = QueryBuilder::createNewInstance()->prepare('SHOW TABLES', [])->fetchAll();
 
         $mapper = new ColumnMapper();
 
         $mapped = [];
 
-        if (count($tables > 0)) {
+        if (count($tables) > 0) {
             foreach ($tables as $table) {
                 $instance = new Table();
                 $instance->name = $table[0];

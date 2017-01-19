@@ -1,12 +1,12 @@
 <?php
 namespace Models;
 
-use Sagi\Database\Model;
+use Models\Abstraction\{{abstract}};
 /**
  * @class Users
  *
  */
-class {{name}} extends Model
+class {{name}} extends {{abstract}}
 {
 
     /**

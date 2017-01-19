@@ -356,7 +356,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
     /**
      * @param array|int $conditions
-     * @return Model
+     * @return $this
      */
     public static function find($conditions = [])
     {
@@ -394,7 +394,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
     /**
      * @param int $id
-     * @return Model
+     * @return $this
      */
     public static function findOne($id)
     {
@@ -465,7 +465,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string|Model $class
      * @param array $link
      * @param string $alias
-     * @return RelationShip
+     * @return mixed
      */
     public function hasMany($class, array $link, $alias = null)
     {
@@ -494,7 +494,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param string|Model $class
      * @param array $link
      * @param string $alias
-     * @return RelationShip
+     * @return mixed
      */
     public function hasOne($class, array $link, $alias = null)
     {
@@ -710,7 +710,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     private function setUpdatedAt()
     {
         if ($this->hasTimestamp($updated = static::UPDATED_AT)) {
-            $this->attributes[$updated] = date($this->timestampFormat(), $this->getCurrentTime());
+            $this->attributes[$updated] = date($this->timestampFormat(), time());
         }
 
         return $this;
@@ -719,7 +719,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     /**
      * @return string
      */
-    public function timestampFormat()
+    protected function timestampFormat()
     {
         return 'Y-m-d H:i:s';
     }
@@ -732,14 +732,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function isProtected($name)
     {
         return isset($this->protected[$name]);
-    }
-
-    /**
-     * @return int
-     */
-    public function getCurrentTime()
-    {
-        return time();
     }
 
     /**

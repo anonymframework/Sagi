@@ -6,6 +6,7 @@ use Sagi\Database\ColumnMapper;
 use Sagi\Database\ConfigManager;
 use Sagi\Database\Model;
 use Sagi\Database\QueryBuilder;
+use Sagi\Database\TableMapper;
 use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,6 +38,7 @@ class CreateModelCommand extends Command
         $this->relations = json_decode(file_get_contents(dirname(__DIR__) . '/relations.json'));
 
         $name = $input->getArgument('name');
+        $tableName = $name;
 
         $columns = QueryBuilder::createNewInstance()->query("SHOW COLUMNS FROM `$name`")->fetchAll();
 
@@ -45,10 +47,6 @@ class CreateModelCommand extends Command
 
         $timestamps = $this->findTimestamps($fields);
 
-        $mapper = new ColumnMapper();
-        $mapped = $mapper->map($name);
-
-
         $content = TemplateManager::prepareContent('model', [
             'table' => $name,
             'relations' => ConfigManager::get('prepare_relations',
@@ -56,19 +54,30 @@ class CreateModelCommand extends Command
             'name' => $name = MigrationManager::prepareClassName($name),
             'primary' => $primary = $this->findPrimaryKey($columns),
             'timestamps' => $timestamps,
+            'abstract' => $abstract = $name . 'Abstract',
         ]);
 
+        $abstractContent = TemplateManager::prepareContent('abstract.model', [
+            'methods' => $this->prepareModelSetters($tableName),
+            'name' => $abstract
+        ]);
 
         $path = 'models/' . $name . '.php';
+        $abstractPath = 'models/Abstraction/' . $abstract . '.php';
+
         $force = $input->getArgument('force');
 
 
         if (file_exists($path) && $force == "force") {
             unlink($path);
+
+            if (file_exists($abstractPath)) {
+                unlink($abstractPath);
+            }
         }
 
         if (!file_exists($path)) {
-            if (file_put_contents($path, $content)) {
+            if (file_put_contents($path, $content) && file_put_contents($abstractPath, $abstractContent)) {
                 $output->writeln("<info>" . $name . ' created successfully in ' . $path . "</info>");
             } else {
                 $output->writeln("<error>" . $name . ' couldnt create in ' . $path . "</error>");
@@ -98,10 +107,14 @@ class CreateModelCommand extends Command
         return empty($timestamps) ? 'false' : '[' . join(',', $timestamps) . ']';
     }
 
+    /**
+     * @param $name
+     * @return string
+     */
     private function prepareRelationsMany($name)
     {
         if (isset($this->relations->many->$name)) {
-            $relate = (array) $this->relations->many->$name;
+            $relate = (array)$this->relations->many->$name;
 
             $table = array_keys($relate)[0];
 
@@ -118,6 +131,56 @@ class CreateModelCommand extends Command
 
     }
 
+    private function prepareModelSetters($name)
+    {
+
+        $string = '';
+        $tables = new TableMapper();
+
+        $table = $tables->mapTable([$name]);
+
+        foreach ($table->columns as $column) {
+
+            $setterMethodName = "set" . MigrationManager::prepareClassName($column->name);
+            $getterMethodName = "get" . MigrationManager::prepareClassName($column->name);
+
+            $type = $column->type;
+
+            if ($type === "tinyint" || $type === "bigint") {
+                $type = "int";
+            } elseif ($type === "decimal" || $type === "float") {
+                $type = "float";
+            } else {
+                $type = "string";
+            }
+
+            $string .= $this->prepareSetterMethod($setterMethodName, $column->name, $type);
+            $string .= $this->prepareGetterMethod($getterMethodName, $column->name, $type);
+        }
+
+        return $string;
+    }
+
+    private function prepareSetterMethod($methodName, $column, $type)
+    {
+        return TemplateManager::prepareContent('setter', [
+            'methodName' => $methodName,
+            'column' => $column,
+            'type' => $type
+        ]);
+    }
+
+    private function prepareGetterMethod($methodName, $column, $type)
+    {
+        $method = '$this->' . $column;
+
+        return TemplateManager::prepareContent('getter', [
+            'method' => $method,
+            'methodName' => $methodName,
+            'type' => $type
+        ]);
+    }
+
     private function prepareOne($table, $tarCol, $ourCol, $many = false)
     {
         $class = MigrationManager::prepareClassName($table);
@@ -127,7 +190,7 @@ class CreateModelCommand extends Command
         return <<<CODE
      /**
       * 
-      * @return mixed
+      * @return $class
       */
       public function $table(){
           return $command($class::className(), ['$ourCol', '$tarCol']);       
@@ -141,7 +204,7 @@ CODE;
         $ret = '';
 
         if (isset($this->relations->one->$name)) {
-            $relate = (array) $this->relations->one->$name;
+            $relate = (array)$this->relations->one->$name;
 
             $table = array_keys($relate)[0];
 

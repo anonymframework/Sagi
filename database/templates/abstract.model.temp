@@ -1,0 +1,11 @@
+<?php
+namespace Models\Abstraction;
+
+use Sagi\Database\Model;
+/**
+ * @class Users
+ *
+ */
+abstract class {{name}} extends Model{
+{{methods}}
+}

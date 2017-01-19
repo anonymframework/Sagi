@@ -1,0 +1,8 @@
+      /**
+       *
+       * @param {{type}} $value
+       * @return $this
+       */
+       public function {{methodName}}($value){
+            return $this->setAttribute('$column', $value);
+       }

@@ -1,12 +1,12 @@
 <?php
 namespace Models;
 
-use Sagi\Database\Model;
+use Models\Abstraction\AuthAbstract;
 /**
  * @class Users
  *
  */
-class Auth extends Model
+class Auth extends AuthAbstract
 {
 
     /**
