@@ -2,7 +2,7 @@
 
 namespace Sagi\Database;
 
-use Anonym\Components\Event\EventDispatcher;
+use Sagi\Database\Event\EventDispatcher;
 use PDO;
 use Sagi\Database\Mapping\Entity;
 

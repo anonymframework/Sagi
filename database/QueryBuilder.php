@@ -254,15 +254,15 @@ class QueryBuilder
         }
 
         if (isset($limit[1])) {
-            $s = 'LIMIT '.$limit[1]. 'OFFSET ' . $limit[0];
+            $s = sprintf('LIMIT %d OFFSET %d', $limit[1], $limit[0]);
         }else{
-            $s = "LIMIT $limit[0] ";
+            $s = sprintf('LIMIT %d', $limit[0]);
         }
 
         return $s;
     }
 
-    public function prepareOrderQuery($order)
+    private function prepareOrderQuery($order)
     {
         if (empty($order)) {
             return "";
@@ -278,7 +278,7 @@ class QueryBuilder
     /**
      * @return string
      */
-    public function prepareGroupQuery(Group $group = null)
+    private function prepareGroupQuery(Group $group = null)
     {
 
         if (is_null($group)) {
@@ -294,7 +294,7 @@ class QueryBuilder
      * @param $having
      * @return mixed
      */
-    public function prepareHavingQuery($having)
+    private function prepareHavingQuery($having)
     {
         return $having;
     }
@@ -1128,6 +1128,7 @@ class QueryBuilder
         if (!$this->pdo instanceof PDO) {
             $this->prepareConnection();
         }
+
 
         $prepared = $this->pdo->prepare($query);
 
