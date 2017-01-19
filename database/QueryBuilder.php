@@ -98,7 +98,9 @@ class QueryBuilder
         '<' => 'smaller',
         '!=' => 'diffrent',
         '>=' => 'ebigger',
-        '=<' => 'esmaller'
+        '=<' => 'esmaller',
+        'IN' => 'in',
+        'NOT IN' => 'notin'
     ];
 
     /**
@@ -124,11 +126,6 @@ class QueryBuilder
         return $this->error;
     }
 
-    public function __construct()
-    {
-        $this->prepareDriver();
-    }
-
     /**
      *
      */
@@ -141,25 +138,6 @@ class QueryBuilder
 
        return $this->pdo;
     }
-
-
-    protected function prepareDriver()
-    {
-        if ($driver = ConfigManager::get('driver')) {
-            if (isset($this->drivers[$driver])) {
-                $driver = $this->drivers[$driver];
-
-                $this->driver = new $driver;
-
-            } else {
-                throw new Exception(sprintf('%s driver not found', $driver));
-            }
-
-        } else {
-            throw new Exception('We need to your host,dbname,username and password informations for make a successfull connection ');
-        }
-    }
-
 
     /**
      * @return PDOStatement
@@ -277,6 +255,62 @@ class QueryBuilder
         return $s;
     }
 
+
+    /**
+     * @return string
+     */
+    public function prepareLimitQuery($limit)
+    {
+
+        if (empty($limit)) {
+            return "";
+        }
+
+        if (isset($limit[1])) {
+            $s = 'LIMIT'.$limit[1]. 'OFFSET ' . $limit[0];
+        }else{
+            $s = "LIMIT $limit[0] ";
+        }
+
+        return $s;
+    }
+
+    public function prepareOrderQuery($order)
+    {
+        if (empty($order)) {
+            return "";
+        }
+
+        $id = isset($order[0]) ? $order[0] : 'id';
+        $type = isset($order[1]) ? $order[1] : "DESC";
+
+        return "ORDER BY {$id} {$type}";
+    }
+
+
+    /**
+     * @return string
+     */
+    public function prepareGroupQuery(Group $group = null)
+    {
+
+        if (is_null($group)) {
+            return "";
+        }
+
+        $group = join(',', $group->group);
+
+        return "GROUP BY $group";
+    }
+
+    /**
+     * @param $having
+     * @return mixed
+     */
+    public function prepareHavingQuery($having)
+    {
+        return $having;
+    }
     /**
      * @return string
      */
@@ -284,10 +318,11 @@ class QueryBuilder
     {
 
         $group = $this->getGroupBy();
-        $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
 
         if ($group instanceof Group) {
             $pattern = 'SELECT :select FROM :from :join :where :group :having :order :limit';
+        }else{
+            $pattern = 'SELECT :select FROM :from :join :group :having :where :order :limit';
         }
 
 
@@ -295,11 +330,11 @@ class QueryBuilder
             ':select' => $this->prepareSelectQuery($this->getSelect()),
             ':from' => $this->getTable(),
             ':join' => $this->prepareJoinQuery($this->getJoin(), $this->getTable()),
-            ':group' => $this->driver->prepareGroupQuery($group),
-            ':having' => $this->driver->prepareHavingQuery($this->getHaving()),
+            ':group' => $this->prepareGroupQuery($group),
+            ':having' => $this->prepareHavingQuery($this->getHaving()),
             ':where' => $this->prepareWhereQuery($this->getWhere()),
-            ':order' => $this->driver->prepareOrderQuery($this->getOrder()),
-            ':limit' => $this->driver->prepareLimitQuery($this->getLimit())
+            ':order' => $this->prepareOrderQuery($this->getOrder()),
+            ':limit' => $this->prepareLimitQuery($this->getLimit())
         ]);
 
         return $handled;
@@ -317,8 +352,8 @@ class QueryBuilder
             ':select' => 'COUNT(*) as row_count',
             ':from' => $this->getTable(),
             ':where' => $this->prepareWhereQuery($this->getWhere()),
-            ':order' => $this->driver->prepareOrderQuery($this->getOrder()),
-            ':limit' => $this->driver->prepareLimitQuery($this->getLimit())
+            ':order' => $this->prepareOrderQuery($this->getOrder()),
+            ':limit' => $this->prepareLimitQuery($this->getLimit())
         ]);
         return $handled;
     }
@@ -353,7 +388,10 @@ class QueryBuilder
             /**
              * @var Where $item
              */
-            $this->checkWhereItem($item);
+
+            if (!$item instanceof Where) {
+                throw new WhereException(sprintf('Wrong where query'));
+            }
 
             if (is_callable($item->query) || is_array($item->query)) {
                 $prepared = $this->prepareInQuery($item->query);
@@ -493,21 +531,10 @@ class QueryBuilder
         if (is_array($datas)) {
             $inQuery = '[' . implode(',', $datas) . ']';
         } elseif (is_callable($datas)) {
-            $inQuery = $this->prepareSubQuery($datas, static::createNewInstance());
+            $inQuery = $this->prepareSubQuery($datas, Singleton::load(get_called_class()));
         }
 
         return is_array($inQuery) ? $inQuery : [$inQuery, []];
-    }
-
-    /**
-     * @param $item
-     * @throws WhereException
-     */
-    private function checkWhereItem($item)
-    {
-        if (!$item instanceof Where) {
-            throw new WhereException(sprintf('Wrong where query'));
-        }
     }
 
     /**
@@ -683,15 +710,6 @@ class QueryBuilder
         return $this->orWhere([$column, $like, $type]);
     }
 
-    /**
-     * @param $bool
-     * @return $this
-     */
-    public function prepareValues($bool)
-    {
-        $this->driver->prepareValues = $bool;
-        return $this;
-    }
 
     /**
      * @param string $column

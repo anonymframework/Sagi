@@ -111,7 +111,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function __construct(array $attributes = [])
     {
-        parent::__construct();
         $this->usedModules = $traits = class_uses(static::className());
 
         $this->bootTraits($traits);
@@ -797,15 +796,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
                 'alias',
                 'hide',
             ]);
-    }
-
-
-    /**
-     *
-     */
-    public function __wakeup()
-    {
-        $this->prepareDriver();
     }
 
 
