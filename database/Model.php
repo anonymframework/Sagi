@@ -892,7 +892,22 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $this->saveBefore[] = $key;
         }
 
-        $this->attributes[$key] = $value;
+        $mutator = $this->hasMutator($key);
+
+        if ($mutator !== false) {
+            call_user_func([$this, $mutator], $value);
+        }
+    }
+
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    private function hasMutator($key){
+        $mutator = 'set'.MigrationManager::prepareClassName($key).'Attribute';
+
+        return method_exists($this, $mutator) ? $mutator : false;
     }
 
     /**
@@ -921,11 +936,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function __get($name)
     {
-        if (method_exists($this, $n = "get" . ucfirst($name))) {
-            return call_user_func_array([$this, $n], []);
-        }
-
-
         if (empty($this->attributes)) {
             $this->one();
         }
@@ -948,9 +958,22 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $value = unserialize($value);
         }
 
+        if ($acc = $this->hasAccesor($name)) {
+            return call_user_func([$this, $acc], $value);
+        }
+
         return isset($this->timestamps[$name]) ? new ValueContainer($value) : $value;
     }
 
+    /**
+     * @param $key
+     * @return bool|string
+     */
+    private function hasAccesor($key){
+        $accesor = "get".MigrationManager::prepareClassName($key).'Attribute';
+
+        return method_exists($this, $accesor) ? $accesor : false;
+    }
     /**
      * @param $value
      * @return ValueContainer

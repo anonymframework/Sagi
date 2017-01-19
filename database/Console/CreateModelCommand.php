@@ -125,11 +125,11 @@ class CreateModelCommand extends Command
 
         $command = $many == false ? '$this->hasOne' : '$this->hasMany';
         return <<<CODE
-/**
+     /**
       * 
       * @return mixed
       */
-      function $table(){
+      public function $table(){
           return $command($class::className(), ['$ourCol', '$tarCol']);       
        }
 

@@ -210,7 +210,6 @@ class MigrationManager extends Schema
             $name = join('', $exp);
         } else {
             $name = mb_convert_case($name, MB_CASE_TITLE);
-
         }
 
 

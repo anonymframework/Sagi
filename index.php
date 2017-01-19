@@ -9,14 +9,16 @@ $old = memory_get_usage(true);
 
 $posts = \Models\Posts::findAll();
 
-
+foreach ($posts as $post){
+    echo $post->title;
+}
 
 
 echo convert(memory_get_usage(true)-$old);
 
 function convert($size){
     if ($size == 0) {
-        return ;
+        return;
     }
     $unit = array('b', 'kb', 'mb', 'gb', 'tr');
     return @round($size/pow(1024,
