@@ -906,8 +906,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $name = substr($name, 3, strlen($name));
             $column = MigrationManager::parseCamelCase($name);
 
-
-
             if (count($arguments) > 0) {
                 return $this->setAttribute($column, $arguments[0]);
             }
@@ -1054,10 +1052,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function rewind()
     {
-        if (empty($this->attributes)) {
-            $this->attributes = $this->all();
-        }
-
         reset($this->attributes);
     }
 
@@ -1067,7 +1061,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function current()
     {
         $var = current($this->attributes);
-
 
         if (is_array($var)) {
             return Singleton::load(static::className())->setAttributes($var);

@@ -327,7 +327,7 @@ class QueryBuilder
     public function prepareGetQuery()
     {
 
-        $group = $this->getGroupBy();
+        $group = $this->groupBy;
 
         if ($group instanceof Group) {
             $pattern = 'SELECT :select FROM :from :join :where :group :having :order :limit';
@@ -337,7 +337,7 @@ class QueryBuilder
 
 
         $handled = $this->handlePattern($pattern, [
-            ':select' => $this->prepareSelectQuery($this->getSelect()),
+            ':select' => $this->prepareSelectQuery($this->select),
             ':from' => $this->getTable(),
             ':join' => $this->prepareJoinQuery($this->join, $this->getTable()),
             ':group' => $this->prepareGroupQuery($group),
@@ -378,6 +378,8 @@ class QueryBuilder
             if ($prepared !== '') {
                 $string .= $prepared;
             }
+        }else{
+            $string = '';
         }
 
         return $string;
