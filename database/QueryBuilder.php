@@ -1222,6 +1222,4 @@ class QueryBuilder
         $this->lastQueryString = $lastQueryString;
         return $this;
     }
-
-
 }

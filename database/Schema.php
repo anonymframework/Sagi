@@ -140,6 +140,4 @@ class Schema
     {
         return join('', $this->commands);
     }
-
-
 }

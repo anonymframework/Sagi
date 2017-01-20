@@ -7,7 +7,4 @@
 namespace Sagi\Database;
 
 
-class QueryException extends \Exception
-{
-
-}
+class QueryException extends \Exception{}

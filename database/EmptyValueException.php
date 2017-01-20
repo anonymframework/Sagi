@@ -9,5 +9,5 @@ namespace Sagi\Database;
 
 class EmptyValueException extends \Exception
 {
-
 }
+

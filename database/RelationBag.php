@@ -117,5 +117,4 @@ class RelationBag
 
         static::$preparedRelatives[static::getPreparedName($name, $type)] = $model;
     }
-
 }

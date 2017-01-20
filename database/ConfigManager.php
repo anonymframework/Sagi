@@ -101,6 +101,4 @@ class ConfigManager
     {
         self::$configs = $configs;
     }
-
-
 }

@@ -29,7 +29,4 @@ abstract class SeedManager
         $this->output = $output;
         return $this;
     }
-
-
-
 }

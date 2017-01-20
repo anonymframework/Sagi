@@ -52,6 +52,4 @@ class Connector
     {
         static::$connection = $connection;
     }
-
-
 }

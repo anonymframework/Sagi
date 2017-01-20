@@ -96,6 +96,4 @@ trait Authorization
     {
         return Auth::find($this->{$this->getPrimaryKey()})->delete();
     }
-
-
 }

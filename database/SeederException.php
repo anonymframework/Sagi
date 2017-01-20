@@ -2,7 +2,4 @@
 namespace Sagi\Database;
 
 
-class SeederException extends \Exception
-{
-
-}
+class SeederException extends \Exception{}

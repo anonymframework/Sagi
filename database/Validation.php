@@ -607,6 +607,4 @@ trait Validation
         $this->datas = $datas;
         return $this;
     }
-
-
 }
