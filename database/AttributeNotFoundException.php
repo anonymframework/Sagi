@@ -6,8 +6,6 @@
 
 namespace Sagi\Database;
 
-
 class AttributeNotFoundException extends \Exception
 {
-
 }
