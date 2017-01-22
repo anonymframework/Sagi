@@ -312,11 +312,9 @@ CODE;
             }
         }
 
-        $pattern = $count === 1 ? '%s' : '[%s]';
+        $pattern = $count === 1 ? '%s' : $count > 1 ?  '[%s]' : '';
 
         $pri = rtrim($pri, ',');
-
-        $pri === '' ?: "'id'";
 
         return sprintf($pattern, $pri);
     }

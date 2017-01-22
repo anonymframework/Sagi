@@ -266,7 +266,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @return $this
      * @throws \Exception
      */
-    public function attach(Model $model, $targetAlias = '', $homeAlias = '')
+    public function attach(Model $model,  $homeAlias = '', $targetAlias = '')
     {
         if (!$model->hasPrimaryKey()) {
             throw new \Exception('Your model class have a primary key to use attach method');
@@ -545,27 +545,35 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
-     * @return Model|false
+     *
+     * @throws QueryException
+     * @return Model|bool
      */
     public function save()
     {
 
         if (!empty($this->where)) {
 
-            $return = $this->update() ? $this : false;
+            if ($this->update() === false) {
+                throw new QueryException(sprintf('update query has been failed, error message from database :%s', $this->error()[2]));
+            }
+
+            return $this;
+        } else {
+
+            if ($return  = $this->create() === false) {
+                throw new QueryException(sprintf('create query has been failed, error message from database :%s', $this->error()[2]));
+            }
 
             return $return;
-        } else {
-            $return = $this->create();
-
         }
-
-        return $return;
     }
 
     /**
-     * @param Entity $data
-     * @return Model|bool
+     * @param null $data
+     * @return bool|Model
+     * @throws AttributeNotFoundException
+     * @throws QueryException
      */
     public function create($data = null)
     {
@@ -597,7 +605,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
                     $save = $attr->save();
 
                     if (!$save) {
-                        throw new QueryException(sprintf('%s could not save. Error message : %s', $item, $attr->error()[2]));
+                        throw new QueryException(sprintf('%s could not create. Error message : %s', $item, $attr->error()[2]));
                     }
 
                     $primaryValue = $save->attribute($save->getPrimaryKey());
@@ -613,6 +621,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         if (parent::create($entity)) {
             if (!empty($this->primaryKey) && !is_array($this->primaryKey) && $entity->multipile === false) {
                 $return = static::findOne($this->lastInsertId());
+            }else{
+                $return = $this;
             }
 
         } else {
@@ -680,11 +690,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
     /**
      * @param $method
-     * @throws \Exception
+     * @throws PolicyException
      */
     private function throwPolicyException($method)
     {
-        throw new \Exception(sprintf('You cannot use %s method', $method));
+        throw new PolicyException(sprintf('You cannot use %s method', $method));
     }
 
     /**
@@ -911,7 +921,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             }
         } elseif (substr($name, 0, 8) === "filterBy") {
             $name = substr($name, 8, strlen($name));
-
             $column = MigrationManager::parseCamelCase($name);
 
             array_unshift($arguments, $column);

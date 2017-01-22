@@ -42,5 +42,4 @@ class ValueContainer
 
         return $date->format($format);
     }
-
 }

@@ -1,1 +1,1 @@
-{"one":{"posts":{"category":["category_id","id"]},"post_images":{"posts":["post_id","id"]},"comments":{"posts":["post_id","id"]}},"many":{"posts":{"comments":["id","post_id"]}}}
+{"one":{"auth":{"users":["user_id","id"]},"sub_roles":{"roles":["role_id","id"]},"users":{"auth":["id","user_id"]}},"many":{"roles":{"sub_roles":["id","rbg_id"]}}}

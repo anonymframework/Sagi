@@ -26,6 +26,7 @@ class CreateAuthTable extends Schema implements MigrationInterface
             $row->string('role');
             $row->timestamps();
         });
+
     }
 
     /**
