@@ -40,7 +40,7 @@ class Seeder
                 throw new SeederException(sprintf('%s file could not found', $file));
             }
 
-            include $file;
+            \Composer\Autoload\includeFile($file);
 
             $className = MigrationManager::prepareClassName($this->prepareSeedName($name));
 
@@ -96,6 +96,7 @@ class Seeder
     }
 
     /**
+     *
      * @param string $seedPath
      * @return Seeder
      */
