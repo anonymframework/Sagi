@@ -100,10 +100,10 @@ trait Validation
      */
     protected function handleFilterXss($data)
     {
-        return $this->clean_input($data, 0);
+        return $this->cleanInput($data, 0);
     }
 
-    private function clean_input($input, $safe_level = 0)
+    private function cleanInput($input, $safe_level = 0)
     {
         $output = $input;
         do {
@@ -111,11 +111,11 @@ trait Validation
             $input = $output;
 
             // Remove unwanted tags
-            $output = $this->strip_tags($input);
-            $output = $this->strip_encoded_entities($output);
+            $output = $this->stripTags($input);
+            $output = $this->stripEncodedEntities($output);
             // Use 2nd input param if not empty or '0'
             if ($safe_level !== 0) {
-                $output = $this->strip_base64($output);
+                $output = $this->stripBase64($output);
             }
         } while ($output !== $input);
 
@@ -129,7 +129,7 @@ trait Validation
      * @param   string  $input  Content to be cleaned. It MAY be modified in output
      * @return  string  $input  Modified $input string
      */
-    private function strip_encoded_entities($input)
+    private function stripEncodedEntities($input)
     {
 
 
@@ -159,7 +159,7 @@ trait Validation
      * @param   string  $input  Content to be cleaned. It MAY be modified in output
      * @return  string  $input  Modified $input string
      */
-    private function strip_tags($input)
+    private function stripTags($input)
     {
 
         $input = preg_replace('#</*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|i(?:frame|layer)|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|title|xml)[^>]*+>#i', '', $input);
@@ -178,11 +178,11 @@ trait Validation
      * @param   string  $input      Maybe Base64 encoded string
      * @return  string  $output     Modified & re-encoded $input string
      */
-    private function strip_base64($input)
+    private function stripBase64($input)
     {
         $decoded = base64_decode($input);
-        $decoded = $this->strip_tags($decoded);
-        $decoded = $this->strip_encoded_entities($decoded);
+        $decoded = $this->stripTags($decoded);
+        $decoded = $this->stripEncodedEntities($decoded);
         $output = base64_encode($decoded);
         return $output;
     }
@@ -191,7 +191,7 @@ trait Validation
      * @param $data
      * @return string
      */
-    protected function handleFilterStrip_tags($data)
+    protected function handleFilterStripTags($data)
     {
         return strip_tags(htmlentities(htmlspecialchars($data)));
     }
