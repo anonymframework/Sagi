@@ -19,5 +19,4 @@ class Group
      * @var array
      */
     public $group;
-
 }

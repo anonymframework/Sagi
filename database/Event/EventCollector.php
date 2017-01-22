@@ -63,6 +63,5 @@ class EventCollector
         }else{
             static::$listeners[$name] = array_merge(static::$listeners[$name], $listener);
         }
-
     }
 }

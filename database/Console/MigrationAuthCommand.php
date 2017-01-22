@@ -50,9 +50,5 @@ class MigrationAuthCommand extends Command
             $output->writeln('<error>' . $fileName . ' : already exists</error>');
 
         }
-
-
     }
-
-
 }

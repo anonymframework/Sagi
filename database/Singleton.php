@@ -29,5 +29,4 @@ class Singleton
 
         return static::$instance[$class];
     }
-
 }
