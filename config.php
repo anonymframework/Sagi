@@ -11,8 +11,17 @@ return [
     ],
 
     'cache' => [
-        'host' => '127.0.0.1',
-        'port' => 11211
+
+        'driver' => 'memcache', // also supports redis
+
+        'memcache' => [
+            'host' => '127.0.0.1',
+            'port' => 11211
+        ],
+
+        'redis' => [
+
+        ]
     ],
 
     'logging' => [

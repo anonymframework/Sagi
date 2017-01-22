@@ -2,6 +2,7 @@
 namespace Sagi\Database;
 
 use Memcached;
+use Sagi\Database\Cache\DriverInterface;
 
 /**
  * Class Cache
@@ -9,23 +10,22 @@ use Memcached;
  */
 trait Cache
 {
-
     /**
-     * @var \Memcached
+     * @var DriverInterface
      */
-    private static $memcache;
-
+    private static $driver;
 
     public function bootCache()
     {
         $configs = ConfigManager::get('cache');
 
-        if (class_exists('Memcached') === false) {
-            throw new \Exception('Memcache extension could not found');
-        }
-        static::$memcache = new Memcached();
+        $driverName = isset($configs['driver']) ? $configs['driver'] : 'memcache';
 
-        static::$memcache->addServer($configs['host'], $configs['port']);
+        $driver = new $driverName;
+
+
+        $driver->boot(ConfigManager::get('cache.'.$driverName, []));
+
     }
 
     /**
@@ -67,7 +67,7 @@ trait Cache
      */
     public function getCache($key)
     {
-        return gzuncompress(static::$memcache->get($key));
+        return gzuncompress(static::$driver->get($key));
     }
 
     /**
@@ -77,9 +77,12 @@ trait Cache
      */
     public function setCache($key, $value)
     {
-        return static::$memcache->set($key, gzcompress($value), $this->expiration);
+        return static::$driver->set($key, gzcompress($value), $this->getExpiration());
     }
 
+    /**
+     * @return mixed
+     */
     public function serializeResults()
     {
         $result = $this->get()->fetchAll(\PDO::FETCH_ASSOC);
