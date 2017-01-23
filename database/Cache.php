@@ -131,25 +131,6 @@ trait Cache
     }
 
     /**
-     * @return array
-     */
-    public function getCacheMode()
-    {
-        return $this->cacheMode;
-    }
-
-    /**
-     * @param array $cacheMode
-     * @return Cache
-     */
-    public function setCacheMode($cacheMode)
-    {
-        $this->cacheMode = $cacheMode;
-        return $this;
-    }
-
-
-    /**
      * @return int
      */
     public function getExpiration()
