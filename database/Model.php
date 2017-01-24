@@ -72,6 +72,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @var bool
      */
     protected $totallyGuarded = false;
+
     /**
      * @var mixed
      */
@@ -103,6 +104,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @var array
      */
     protected $saveBefore = [];
+
 
     /**
      * Model constructor.
@@ -397,6 +399,29 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
+     * @param int $id
+     * @return Model
+     * @throws NotFoundException
+     */
+    public static function findOrFail($id)
+    {
+        if (is_string($id)) {
+            $id = intval($id);
+        }
+
+        $finded = static::findOne($id);
+
+        if (empty($finded->getAttributes())) {
+            throw new NotFoundException(sprintf('%d %s could not found in %s', $id, $finded->getPrimaryKey(), $finded->getTable()));
+        }
+
+        return $finded;
+    }
+
+
+    
+
+    /**
      * @param $a
      * @param null $b
      * @param null $c
@@ -486,6 +511,37 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
+     * @param $model
+     * @param string $foreignKey
+     * @parma callable $callback
+     * @return mixed|Model
+     */
+    public function belongsTo($model, $foreignKey = '', $callback = null){
+        $model = $model::createNewInstance();
+
+
+        /**
+         * @var Model $model
+         */
+
+        if ($foreignKey === '') {
+            $foreignKey = $model->getTable().'_id';
+        }
+
+        if ($callback === null) {
+
+            $app = $this;
+            $callback = function () use ($app) {
+                return $app->select($app->getPrimaryKey());
+            };
+        }
+
+        $model->in($foreignKey, $callback);
+
+        return $model;
+    }
+
+    /**
      * @param string|Model $class
      * @param array $link
      * @param string $alias
@@ -560,12 +616,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
             return $this;
         } else {
-
-            if ($return  = $this->create() === false) {
-                throw new QueryException(sprintf('create query has been failed, error message from database :%s', $this->error()[2]));
-            }
-
-            return $return;
+            return  $this->create();
         }
     }
 
@@ -604,10 +655,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
                     $save = $attr->save();
 
-                    if (!$save) {
-                        throw new QueryException(sprintf('%s could not create. Error message : %s', $item, $attr->error()[2]));
-                    }
-
                     $primaryValue = $save->attribute($save->getPrimaryKey());
 
 
@@ -624,11 +671,9 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             }else{
                 $return = $this;
             }
-
         } else {
-            $return = false;
+            throw new QueryException(sprintf('Query has been failed, error message: %s', $this->error()[2]));
         }
-
 
         $this->eventManager->hasListiner('after_create')
             ? $this->eventManager->fire('after_create', [$return, $this]) : null;

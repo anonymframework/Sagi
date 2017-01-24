@@ -60,13 +60,6 @@ class QueryBuilder
     protected $where = [];
 
     /**
-     * or where query
-     *
-     * @var array
-     */
-    protected $orWhere = [];
-
-    /**
      * @var array
      */
     private $order;
@@ -405,6 +398,7 @@ class QueryBuilder
             }
 
             if (is_callable($item->query) || is_array($item->query)) {
+
                 $prepared = $this->prepareInQuery($item->query);
 
                 $preparedQuery = $prepared[0];
@@ -527,8 +521,6 @@ class QueryBuilder
 
         if ($builder->hasAs()) {
             $query .= ' AS ' . $builder->getAs();
-        }else{
-            throw new Exception('You must set AS statement with setAs method in subqueries');
         }
 
         return [$query, $builder->getArgs()];
@@ -543,6 +535,7 @@ class QueryBuilder
         if (is_array($datas)) {
             $inQuery = '[' . implode(',', $datas) . ']';
         } elseif (is_callable($datas)) {
+
             $inQuery = $this->prepareSubQuery($datas, Singleton::load(get_called_class()));
         }
 

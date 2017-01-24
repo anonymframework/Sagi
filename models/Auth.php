@@ -12,7 +12,7 @@ class Auth extends AuthAbstract
     /**
      * @var string
      */
-    public $primaryKey = ['user_id'];
+    public $primaryKey = 'user_id';
 
     /**
      * @var array|bool
@@ -24,4 +24,15 @@ class Auth extends AuthAbstract
       * @var string
       */
     protected $table = 'auth';
+
+
+         /**
+      * 
+      * @return Users
+      */
+      public function users(){
+          return $this->hasOne(Users::className(), ['id', 'user_id']);       
+       }
+
+
 }

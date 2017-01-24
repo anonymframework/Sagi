@@ -312,8 +312,14 @@ CODE;
             }
         }
 
-        $pattern = $count === 1 ? '%s' : $count > 1 ?  '[%s]' : '';
 
+        $pattern = '';
+
+        if ($count === 1) {
+            $pattern = '%s';
+        }elseif($count > 1){
+            $pattern = '[%s]';
+        }
         $pri = rtrim($pri, ',');
 
         return sprintf($pattern, $pri);
