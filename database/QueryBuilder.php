@@ -5,6 +5,7 @@ use Exception;
 use Sagi\Database\Mapping\Entity;
 use Sagi\Database\Mapping\Group;
 use Sagi\Database\Mapping\Join;
+use Sagi\Database\Mapping\Match;
 use Sagi\Database\Mapping\Where;
 use PDO;
 
@@ -14,6 +15,10 @@ use PDO;
 class QueryBuilder
 {
 
+    /**
+     * @var array
+     */
+    protected $counters = [];
 
     /**
      * @var array
@@ -832,12 +837,37 @@ class QueryBuilder
     }
 
     /**
+     * @param $columns
+     * @param $values
+     * @param string $mode
+     * @return $this
+     */
+    public function match($columns, $values, $mode = 'BOOLEAN_MODE', $type= 'AND'){
+        $match = new Match($columns, $values, $mode, $type);
+
+        $this->where[] = $match;
+
+        return $this;
+    }
+
+    /**
+     * @param $columns
+     * @param $values
+     * @param $mode
+     * @return QueryBuilder
+     */
+    public function orMatch($columns, $values, $mode){
+        return $this->match($columns, $values, $mode, 'OR');
+    }
+
+    /**
      * @param $a
      * @param null $b
      * @param null $c
      * @param string $type
      * @param bool $clean
      * @param bool $spec
+     * @throws Exception
      * @return QueryBuilder
      */
     public function where($a, $b = null, $c = null, $type = 'AND', $clean = true, $spec = false)
@@ -929,8 +959,16 @@ class QueryBuilder
         $s = '';
         $arr = [];
         foreach ($set->datas as $key => $value) {
-            $s .= "$key = ?,";
-            $arr[] = $value;
+
+            if (!isset($this->counters[$key])) {
+                $s .= "$key = ?,";
+                $arr[] = $value;
+            }else{
+                $value = $this->counters[$value];
+
+                $s = "$key = $key + $value";
+            }
+
         }
         return [
             'content' => rtrim($s, ","),

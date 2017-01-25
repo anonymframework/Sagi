@@ -2,6 +2,7 @@
 
 namespace Sagi\Database;
 
+use Carbon\Carbon;
 use Sagi\Database\Event\EventDispatcher;
 use PDO;
 use Sagi\Database\Mapping\Entity;
@@ -18,6 +19,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
+    const DELETED_AT = 'deleted_at';
 
     /**
      * @var int
@@ -32,6 +34,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @var array
      */
     protected $usedModules = [];
+
+    /**
+     * @var array
+     */
+    protected $with = [];
     /**
      * @var string
      */
@@ -87,11 +94,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @var Loggable
      */
     protected $logging;
-
-    /**
-     * @var array
-     */
-    protected $attach;
 
     /**
      * @var array
@@ -262,39 +264,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
 
     /**
-     * @param Model $model
-     * @param string $targetAlias
-     * @param string $homeAlias
-     * @return $this
-     * @throws \Exception
-     */
-    public function attach(Model $model,  $homeAlias = '', $targetAlias = '')
-    {
-        if (!$model->hasPrimaryKey()) {
-            throw new \Exception('Your model class have a primary key to use attach method');
-        }
-
-        $table = $this->getPrimaryKey();
-
-        if ($targetAlias !== '') {
-            $table = $targetAlias;
-        }
-
-        $home = $model->getPrimaryKey();
-
-        if ($homeAlias !== '') {
-            $home = $homeAlias;
-        }
-
-        $this->attach[Model::className()] = [
-            'attach_by' => [$table, $home],
-            'attach_with' => $model
-        ];
-
-        return $this;
-    }
-
-    /**
      * @param string $method
      * @param array $args
      * @return bool
@@ -328,6 +297,20 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
+     * @return $this
+     * @throws NotFoundException
+     */
+    public function allOrFail(){
+        $this->all();
+
+        if (empty($this->attributes)) {
+            throw new NotFoundException(sprintf('Your query returned empty response, table : %s', $this->table));
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Model
      */
     public function one()
@@ -339,6 +322,20 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $get = $this->get();
 
             $this->setAttributes($get->fetch(PDO::FETCH_ASSOC));
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @throws NotFoundException
+     */
+    public function oneOrFail(){
+        $this->one();
+
+        if (empty($this->attributes)) {
+            throw new NotFoundException(sprintf('Your query returned empty response, table : %s', $this->table));
         }
 
         return $this;
@@ -403,13 +400,9 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @return Model
      * @throws NotFoundException
      */
-    public static function findOrFail($id)
+    public static function findOneOrFail($id)
     {
-        if (is_string($id)) {
-            $id = intval($id);
-        }
-
-        $finded = static::findOne($id);
+        $finded = static::find($id)->oneOrFail();
 
         if (empty($finded->getAttributes())) {
             throw new NotFoundException(sprintf('%d %s could not found in %s', $id, $finded->getPrimaryKey(), $finded->getTable()));
@@ -482,6 +475,14 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
+     * @param $conditions
+     * @return $this
+     */
+    public static function findAllOrFail($conditions){
+        return static::find($conditions)->allOrFail();
+    }
+
+    /**
      * @param string|Model $class
      * @param array $link
      * @param string $alias
@@ -508,37 +509,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         }
 
         return RelationBag::getRelation($name, $this, 'many');
-    }
-
-    /**
-     * @param $model
-     * @param string $foreignKey
-     * @parma callable $callback
-     * @return mixed|Model
-     */
-    public function belongsTo($model, $foreignKey = '', $callback = null){
-        $model = $model::createNewInstance();
-
-
-        /**
-         * @var Model $model
-         */
-
-        if ($foreignKey === '') {
-            $foreignKey = $model->getTable().'_id';
-        }
-
-        if ($callback === null) {
-
-            $app = $this;
-            $callback = function () use ($app) {
-                return $app->select($app->getPrimaryKey());
-            };
-        }
-
-        $model->in($foreignKey, $callback);
-
-        return $model;
     }
 
     /**
@@ -790,9 +760,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         return (is_array($this->timestamps)) ? in_array($value, $this->timestamps) : false;
     }
 
+    /**
+     * @return string
+     */
     public function json()
     {
-        return json_encode($this->getAttributesWithoutHide());
+        return json_encode($this->getAttributes());
     }
 
     /**
@@ -812,6 +785,20 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         }
 
         return $attributes;
+    }
+
+    /**
+     * @param string|array|mixed $with
+     * @return $this
+     */
+    public function with($with){
+        if (!is_array($with)) {
+            $with = func_get_args();
+        }
+
+        $this->with = array_merge($this->with, $with);
+
+        return $this;
     }
 
     /**
@@ -1010,7 +997,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             return call_user_func([$this, $acc], $value);
         }
 
-        return isset($this->timestamps[$name]) ? new ValueContainer($value) : $value;
+        return isset($this->timestamps[$name]) ? new Carbon($value) : $value;
     }
 
     /**
@@ -1063,14 +1050,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function totallyGuarded()
     {
         return $this->setTotallyGuarded(true);
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttach()
-    {
-        return $this->attach;
     }
 
     /**
