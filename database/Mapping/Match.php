@@ -23,7 +23,7 @@ class Match
     /**
      * @var string
      */
-    public $mode = 'BOOLEAN_MODE';
+    public $mode = 'BOOLEAN MODE';
 
     /**
      * @var string
@@ -36,7 +36,7 @@ class Match
      * @param $values
      * @param string $mode
      */
-    public function __construct($columns, $values,$mode = 'BOOLEAN_MODE', $type = 'AND')
+    public function __construct($columns, $values,$mode = 'BOOLEAN MODE', $type = 'AND')
     {
         $this->columns = $columns;
         $this->values = $values;

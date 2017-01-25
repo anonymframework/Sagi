@@ -15,6 +15,7 @@ use PDO;
 class QueryBuilder
 {
 
+    const SUBQUERY = 'sub';
     /**
      * @var array
      */
@@ -98,7 +99,8 @@ class QueryBuilder
         '>=' => 'ebigger',
         '=<' => 'esmaller',
         'IN' => 'in',
-        'NOT IN' => 'notin'
+        'NOT IN' => 'notin',
+        'sub' => 'sub',
     ];
 
     /**
@@ -366,17 +368,17 @@ class QueryBuilder
         return $handled;
     }
 
-    protected function prepareWhereQuery($where)
+    protected function prepareWhereQuery()
     {
         $string = 'WHERE ';
 
-        if (!empty($where)) {
-            $prepared = $this->handleWhereQuery($where);
+        if (!empty($this->where)) {
+            $prepared = $this->handleWhereQuery();
 
             if ($prepared !== '') {
                 $string .= $prepared;
             }
-        }else{
+        } else {
             $string = '';
         }
 
@@ -386,49 +388,69 @@ class QueryBuilder
     /**
      * @return string
      */
-    private function handleWhereQuery($where)
+    private function handleWhereQuery()
     {
 
         $args = [];
         $s = '';
 
-        foreach ($where as $item) {
+        foreach ($this->where as $item) {
 
             /**
              * @var Where $item
              */
 
-            if (!$item instanceof Where) {
+
+            if ($item instanceof Where) {
+                $backed = $item->backet;
+
+                if (is_callable($item->query) || is_array($item->query)) {
+
+
+                    if ($item->backet !== static::SUBQUERY) {
+                        $prepared = $this->prepareInQuery($item->query);
+                    } else {
+                        $prepared = $this->prepareWhereSubQuery($item->query);
+
+                        $backed = '';
+                    }
+
+                    $preparedQuery = $prepared[0];
+                    $args = array_merge($args, $prepared[1]);
+                }
+
+                if ($item->clean === true) {
+                    $query = '?';
+                    $args[] = $item->query;
+                } else {
+                    $query = isset($preparedQuery) ? $preparedQuery : $item->query;
+                }
+
+                $field = $item->field;
+
+                $type = $item->type;
+                if ($s !== '') {
+                    $s .= "$type {$field} $backed $query ";
+                } else {
+                    $s .= "$field $backed $query ";
+                }
+
+            } elseif ($item instanceof Match) {
+                $columns = join(",", array_map(function ($column) {
+                    return "`$column`";
+                }, $item->columns));
+
+                $values = array_map([$this->prepareConnection(), 'quote'], $item->values);
+
+                $type = $item->type;
+
+                if ($s !== '') {
+                    $s .= "$type ";
+                }
+
+                $s .= sprintf('MATCH(%s) AGAINST(%s IN %s)', $columns, join(',', $values), $item->mode);
+            } else {
                 throw new WhereException(sprintf('Wrong where query'));
-            }
-
-            if (is_callable($item->query) || is_array($item->query)) {
-
-                $prepared = $this->prepareInQuery($item->query);
-
-                $preparedQuery = $prepared[0];
-
-                $args = array_merge($args, $prepared[1]);
-            }
-
-
-            if ($item->clean === true) {
-                $query = '?';
-                $args[] = $item->query;
-            } else {
-                $query = isset($preparedQuery) ? $preparedQuery : $item->query;
-            }
-
-            $field = $item->field;
-
-            $type = $item->type;
-
-            $backed = $item->backet;
-
-            if ($s !== '') {
-                $s .= "$type {$field} $backed $query ";
-            } else {
-                $s .= "$field $backed $query ";
             }
         }
 
@@ -436,12 +458,32 @@ class QueryBuilder
 
         $this->args = array_merge($this->args, $args);
 
-
         return $s;
     }
 
+
     /**
-     * @return string
+     * @param callable $callable
+     * @return array
+     * @throws Exception
+     */
+    private function prepareWhereSubQuery(callable $callable)
+    {
+        $app = Singleton::load(get_called_class());
+
+        $call = call_user_func($callable, $app);
+
+        if (!$call instanceof static) {
+            throw new Exception('Subqueries must return a model or querybuilder instance');
+        }
+
+        $query = '(' . $call->handleWhereQuery() . ')';
+
+        return [$query, $call->getArgs()];
+    }
+
+    /**
+     * @return string        $app = Singleton::load(get_called_class());
      */
     protected function prepareJoinQuery($joins, $table)
     {
@@ -790,7 +832,8 @@ class QueryBuilder
     /**
      * @return $this
      */
-    public function beginTransaction(){
+    public function beginTransaction()
+    {
         $this->prepareConnection()->beginTransaction();
 
         return $this;
@@ -799,7 +842,8 @@ class QueryBuilder
     /**
      * @return $this
      */
-    public function commit(){
+    public function commit()
+    {
         $this->prepareConnection()->commit();
 
         return $this;
@@ -809,11 +853,13 @@ class QueryBuilder
     /**
      * @return $this
      */
-    public function rollBack(){
+    public function rollBack()
+    {
         $this->prepareConnection()->rollBack();
 
         return $this;
     }
+
     /**
      * @param $a
      * @param null $b
@@ -836,13 +882,24 @@ class QueryBuilder
         return $this->orWhere($a, $b, $c, 'OR', false);
     }
 
+
+    /**
+     * @param callable $callback
+     * @return QueryBuilder
+     */
+    public function subWhere(callable $callback)
+    {
+        return $this->where('', 'sub', $callback, 'AND', false);
+    }
+
     /**
      * @param $columns
      * @param $values
      * @param string $mode
      * @return $this
      */
-    public function match($columns, $values, $mode = 'BOOLEAN_MODE', $type= 'AND'){
+    public function match($columns, $values, $mode = 'BOOLEAN MODE', $type = 'AND')
+    {
         $match = new Match($columns, $values, $mode, $type);
 
         $this->where[] = $match;
@@ -856,7 +913,8 @@ class QueryBuilder
      * @param $mode
      * @return QueryBuilder
      */
-    public function orMatch($columns, $values, $mode){
+    public function orMatch($columns, $values, $mode = 'BOOLEAN MODE')
+    {
         return $this->match($columns, $values, $mode, 'OR');
     }
 
@@ -889,7 +947,7 @@ class QueryBuilder
 
         $where = new Where();
 
-        if (strpos($field, ".") === false) {
+        if (strpos($field, ".") === false && $type === static::SUBQUERY) {
             $field = $this->getTable() . '.' . $field;
         }
 
@@ -899,10 +957,11 @@ class QueryBuilder
         $where->query = $query;
         $where->type = $type;
 
+        $mark = trim($backet);
+
         if ($spec === true) {
             $this->where[$field] = $where;
-        } else {
-            $mark = trim($backet);
+        } elseif ($mark !== static::SUBQUERY) {
             if (isset($this->marks[$mark])) {
                 $mark = $this->marks[$mark];
                 $name = $field . '.' . $type . '.' . $mark;
@@ -911,6 +970,8 @@ class QueryBuilder
             } else {
                 throw new Exception(sprintf('%s could not found, you can use one of these(%s)', $mark, $this->join(',', $this->marks)));
             }
+        } else {
+            $this->where[] = $where;
         }
 
         return $this;
@@ -963,7 +1024,7 @@ class QueryBuilder
             if (!isset($this->counters[$key])) {
                 $s .= "$key = ?,";
                 $arr[] = $value;
-            }else{
+            } else {
                 $value = $this->counters[$value];
 
                 $s = "$key = $key + $value";
@@ -1035,6 +1096,7 @@ class QueryBuilder
     {
         return !empty($this->as);
     }
+
     /**
      * @return array
      */

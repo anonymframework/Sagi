@@ -768,24 +768,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         return json_encode($this->getAttributes());
     }
 
-    /**
-     * @return array
-     */
-    private function getAttributesWithoutHide()
-    {
-        $attributes = $this->getAttributes();
-
-        if (!empty($this->hide)) {
-            foreach ($this->hide as $key) {
-
-                if (isset($attributes[$key])) {
-                    unset($attributes[$key]);
-                }
-            }
-        }
-
-        return $attributes;
-    }
 
     /**
      * @param string|array|mixed $with

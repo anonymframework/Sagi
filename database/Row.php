@@ -31,7 +31,8 @@ class Row
         'char' => '`%s` CHAR(%d)',
         'primary_key' => 'PRIMARY KEY(%s)',
         'foreign_key' => 'FOREIGN KEY(`%s`) REFERENCES `%s`(`%s`)',
-        'index' => 'INDEX `%s` (`%s`) '
+        'index' => 'INDEX `%s` (`%s`) ',
+        'fulltext' => 'FULLTEXT %s (%s)'
     ];
 
     /**
@@ -306,6 +307,20 @@ class Row
 
 
         return $this->addCommand('foreign_key', [$colOur, $table, $colTarget], 'other');
+    }
+
+
+    /**
+     * @param $index
+     * @param $columns
+     * @return Command
+     */
+    public function fulltext($index, $columns){
+        if (is_array($columns)) {
+            $columns = join(',', $columns);
+        }
+
+        return $this->addCommand('fulltext', [$index, $columns], 'other');
     }
 
     /**
