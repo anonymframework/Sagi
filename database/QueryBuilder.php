@@ -892,6 +892,16 @@ class QueryBuilder
         return $this->where('', 'sub', $callback, 'AND', false);
     }
 
+
+    /**
+     * @param callable $callback
+     * @return QueryBuilder
+     */
+    public function subOrWhere(callable $callback)
+    {
+        return $this->where('', 'sub', $callback, 'OR', false);
+    }
+
     /**
      * @param $columns
      * @param $values
