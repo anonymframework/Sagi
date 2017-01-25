@@ -406,14 +406,7 @@ class QueryBuilder
 
                 if (is_callable($item->query) || is_array($item->query)) {
 
-
-                    if ($item->backet !== static::SUBQUERY) {
-                        $prepared = $this->prepareInQuery($item->query);
-                    } else {
-                        $prepared = $this->prepareWhereSubQuery($item->query);
-
-                        $backed = '';
-                    }
+                    $prepared = $this->prepareInQuery($item->query);
 
                     $preparedQuery = $prepared[0];
                     $args = array_merge($args, $prepared[1]);
@@ -459,27 +452,6 @@ class QueryBuilder
         $this->args = array_merge($this->args, $args);
 
         return $s;
-    }
-
-
-    /**
-     * @param callable $callable
-     * @return array
-     * @throws Exception
-     */
-    private function prepareWhereSubQuery(callable $callable)
-    {
-        $app = Singleton::load(get_called_class());
-
-        $call = call_user_func($callable, $app);
-
-        if (!$call instanceof static) {
-            throw new Exception('Subqueries must return a model or querybuilder instance');
-        }
-
-        $query = '(' . $call->handleWhereQuery() . ')';
-
-        return [$query, $call->getArgs()];
     }
 
     /**
@@ -580,7 +552,9 @@ class QueryBuilder
     private function prepareInQuery($datas)
     {
         if (is_array($datas)) {
-            $inQuery = '[' . implode(',', $datas) . ']';
+
+            $this->args = array_merge($this->args, $datas);
+            $inQuery = '[' . implode(",", array_fill(0, count($datas), '?')) . ']';
         } elseif (is_callable($datas)) {
 
             $inQuery = $this->prepareSubQuery($datas, Singleton::load(get_called_class()));
@@ -889,7 +863,7 @@ class QueryBuilder
      */
     public function subWhere(callable $callback)
     {
-        return $this->where('', 'sub', $callback, 'AND', false);
+
     }
 
 
@@ -899,7 +873,7 @@ class QueryBuilder
      */
     public function subOrWhere(callable $callback)
     {
-        return $this->where('', 'sub', $callback, 'OR', false);
+
     }
 
     /**
