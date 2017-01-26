@@ -555,6 +555,7 @@ class QueryBuilder
 
             $this->args = array_merge($this->args, $datas);
             $inQuery = '[' . implode(",", array_fill(0, count($datas), '?')) . ']';
+
         } elseif (is_callable($datas)) {
 
             $inQuery = $this->prepareSubQuery($datas, Singleton::load(get_called_class()));
