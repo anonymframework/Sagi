@@ -119,6 +119,11 @@ class MigrationManager extends Schema
 
         if ($migration instanceof MigrationInterface) {
             $migration->up();
+
+            if (method_exists($migration, 'relations')) {
+                $migration->relations();
+            }
+
         } else {
             throw new \Exception(get_class($migration) . 'is not a instance of MigrationInterface');
         }
