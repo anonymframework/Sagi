@@ -129,6 +129,16 @@ class QueryBuilder
     }
 
     /**
+     * @param string $database configs.php dosyasında `connections` alıntdaki anahtar ismi
+     * @return $this
+     */
+    public function on($database){
+        $this->database = $database;
+
+        return $this;
+    }
+
+    /**
      *
      */
     public function prepareConnection()
