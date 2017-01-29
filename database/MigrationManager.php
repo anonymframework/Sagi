@@ -104,7 +104,7 @@ class MigrationManager extends Schema
     public function migrateOne($file, $prepared)
     {
         if (!class_exists($prepared)) {
-            include $file;
+            \Composer\Autoload\includeFile($file);
         }
 
         $migration = new $prepared;
