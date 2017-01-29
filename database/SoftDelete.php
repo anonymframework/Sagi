@@ -20,7 +20,7 @@ trait SoftDelete
     {
         $this->setAttribute(Model::DELETED_AT, date($this->timestampFormat()));
 
-        return $this;
+        return $this->save();
     }
 
     /**
