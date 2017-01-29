@@ -1,14 +1,26 @@
 <?php
 
 return [
-    'username' => 'root',
-    'password' => 'sanane123',
-    'dsn' => 'mysql:host=127.0.0.1;dbname=test',
-    'driver' => 'mysql',
 
-    'attr' => [
-        PDO::ATTR_PERSISTENT => true,
+    'connections' => [
+
+        'default' => 'localhost',
+
+        'localhost' => [
+
+            'username' => 'root',
+            'password' => 'sanane123',
+            'dsn' => 'mysql:host=127.0.0.1;dbname=test',
+            'driver' => 'mysql',
+
+            'attr' => [
+                PDO::ATTR_PERSISTENT => true,
+            ],
+
+        ],
+
     ],
+
 
     'cache' => [
 

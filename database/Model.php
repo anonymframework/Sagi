@@ -21,6 +21,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     const UPDATED_AT = 'updated_at';
     const DELETED_AT = 'deleted_at';
 
+
+    /**
+     * @var array
+     */
+    protected $casts;
+
     /**
      * @var int
      */
@@ -973,6 +979,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $value = json_decode($value);
         } elseif ($this->isArray($name)) {
             $value = unserialize($value);
+        }
+
+        if (isset($this->casts[$name])) {
+            settype($value, $this->casts[$name]);
         }
 
         if ($acc = $this->hasAccesor($name)) {

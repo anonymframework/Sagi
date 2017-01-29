@@ -12,11 +12,15 @@ class Connector
     public static $connection;
 
     /**
-     * @param $configs
+     * @param string|null $connection
      */
-    public static function madeConnection()
+    public static function madeConnection($connection = null)
     {
-        $configs = ConfigManager::getConfigs();
+        if ($connection === null) {
+            $connection = ConfigManager::get('connections.default', 'localhost');
+        }
+
+        $configs = ConfigManager::get('connections.'.$connection, []);
 
         try {
             $username = isset($configs['username']) ? $configs['username'] : null;
