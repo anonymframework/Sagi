@@ -39,12 +39,14 @@ class Connector
     }
 
     /**
+     *
+     * @param string $database
      * @return PDO
      */
-    public static function getConnection()
+    public static function getConnection($database = null)
     {
         if (!static::$connection) {
-            static::madeConnection();
+            static::madeConnection($database);
         }
 
         return static::$connection;

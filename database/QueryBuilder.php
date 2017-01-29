@@ -16,6 +16,12 @@ class QueryBuilder
 {
 
     const SUBQUERY = 'sub';
+
+    /**
+     * @var string
+     */
+    protected $database;
+
     /**
      * @var array
      */
@@ -128,8 +134,10 @@ class QueryBuilder
     public function prepareConnection()
     {
         if (is_null($this->pdo)) {
-            Connector::madeConnection();
-            $this->pdo = Connector::getConnection();
+
+            $connection = !empty($this->database) ? $this->database: null;
+
+            $this->pdo = Connector::getConnection($connection);
         }
 
         return $this->pdo;

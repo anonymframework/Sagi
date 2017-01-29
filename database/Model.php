@@ -22,6 +22,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     const DELETED_AT = 'deleted_at';
 
 
+
     /**
      * @var array
      */
@@ -806,6 +807,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         return array_merge($arr,
             [
+                'casts',
+                'database',
                 'expiration',
                 'table',
                 'attributes',
