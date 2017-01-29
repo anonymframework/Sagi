@@ -1188,13 +1188,11 @@ class QueryBuilder
      */
     public function get()
     {
-        $handled = $this->prepareGetQuery();
-
-        return $this->returnPreparedResults($handled);
+        return $this->returnPreparedResults($this->prepareGetQuery());
     }
 
     /**
-     * @return PDOStatement
+     * @return bool|\PDOStatement
      */
     public function delete()
     {
@@ -1204,7 +1202,7 @@ class QueryBuilder
 
     /**
      * @param array $datas
-     * @return bool|PDOStatement
+     * @return bool|\PDOStatement
      */
     public function update($datas = [])
     {
@@ -1216,9 +1214,10 @@ class QueryBuilder
         return $this->returnPreparedResults($this->prepareUpdate($datas), true);
     }
 
+
     /**
-     * @param array|Entity $data
-     * @return PDOStatement
+     * @param null $data
+     * @return bool|\PDOStatement
      */
     public function create($data = null)
     {
