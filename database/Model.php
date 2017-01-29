@@ -903,10 +903,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         $mutator = $this->hasMutator($key);
 
-        if (isset($this->casts[$key])) {
-            settype($value, $this->casts[$key]);
-        }
-
         if ($mutator !== false) {
             call_user_func([$this, $mutator], $value);
         }else{
