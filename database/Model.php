@@ -15,13 +15,9 @@ use Sagi\Database\Mapping\Entity;
  */
 class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 {
-
-
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
     const DELETED_AT = 'deleted_at';
-
-
 
     /**
      * @var array
@@ -417,9 +413,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         return $finded;
     }
-
-
-    
 
     /**
      * @param $a
