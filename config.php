@@ -4,7 +4,7 @@ return [
 
     'connections' => [
 
-        'default' => 'localhost',
+        'default' => 'localhost', // ön tanımlı bağlantı.
 
         'localhost' => [
 

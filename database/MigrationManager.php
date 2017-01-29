@@ -36,10 +36,17 @@ class MigrationManager extends Schema
     protected $migrationTable = 'migrations';
 
     /**
+     * @var string
+     */
+    protected $connection;
+
+    /**
      * MigrationManager constructor.
      */
-    public function __construct()
+    public function __construct($connection = null)
     {
+        $this->connection = $connection;
+
         parent::__construct();
     }
 
