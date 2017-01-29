@@ -103,6 +103,15 @@ class MigrationManager extends Schema
 
     public function migrateOne($file, $prepared)
     {
+        if (!class_exists($prepared)) {
+            include $file;
+        }
+
+        $migration = new $prepared;
+
+        if (method_exists($migration, 'relations')) {
+            $migration->relations(Singleton::load('Sagi\Database\RelationManager'));
+        }
 
         if ($this->checkMigrated($file, $prepared)) {
             return [
@@ -111,18 +120,10 @@ class MigrationManager extends Schema
             ];
         }
 
-        if (!class_exists($prepared)) {
-            include $file;
-        }
-
-        $migration = new $prepared;
 
         if ($migration instanceof MigrationInterface) {
             $migration->up();
 
-            if (method_exists($migration, 'relations')) {
-                $migration->relations();
-            }
 
         } else {
             throw new \Exception(get_class($migration) . 'is not a instance of MigrationInterface');
