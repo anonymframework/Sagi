@@ -1150,7 +1150,9 @@ class QueryBuilder
 
         $exed = $prepared->execute($args);
 
-        $this->error = $prepared->errorInfo();
+        if ($exed === false) {
+            $this->error = $prepared->errorInfo();
+        }
 
         return $execute ? $exed : $prepared;
     }
