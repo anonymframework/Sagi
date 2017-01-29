@@ -900,10 +900,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $this->saveBefore[] = $key;
         }
 
+
+        $mutator = $this->hasMutator($key);
+
         if (isset($this->casts[$key])) {
             settype($value, $this->casts[$key]);
         }
-        $mutator = $this->hasMutator($key);
 
         if ($mutator !== false) {
             call_user_func([$this, $mutator], $value);
