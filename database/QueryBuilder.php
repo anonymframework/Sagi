@@ -132,7 +132,8 @@ class QueryBuilder
      * @param string $database configs.php dosyasında `connections` alıntdaki anahtar ismi
      * @return $this
      */
-    public function on($database){
+    public function on($database)
+    {
         $this->database = $database;
 
         return $this;
@@ -145,7 +146,7 @@ class QueryBuilder
     {
         if (is_null($this->pdo)) {
 
-            $connection = !empty($this->database) ? $this->database: null;
+            $connection = !empty($this->database) ? $this->database : null;
 
             $this->pdo = Connector::getConnection($connection);
         }
@@ -162,7 +163,7 @@ class QueryBuilder
 
         $handled = $this->handlePattern($pattern, array(
             ':from' => $this->getTable(),
-            ':where' => $this->prepareWhereQuery($this->where)
+            ':where' => $this->prepareWhereQuery()
         ));
 
         return $handled;
@@ -183,7 +184,7 @@ class QueryBuilder
         $handled = $this->handlePattern($pattern, [
             ':from' => $this->getTable(),
             ':update' => $setted['content'],
-            ':where' => $this->prepareWhereQuery($this->where)
+            ':where' => $this->prepareWhereQuery()
         ]);
 
         return $handled;
@@ -273,8 +274,9 @@ class QueryBuilder
     /**
      * @return string
      */
-    private function prepareLimitQuery($limit)
+    private function prepareLimitQuery()
     {
+        $limit = $this->limit;
 
         if (empty($limit)) {
             return "";
@@ -299,11 +301,12 @@ class QueryBuilder
     }
 
     /**
-     * @param $order
      * @return string
      */
-    private function prepareOrderQuery($order)
+    private function prepareOrderQuery()
     {
+        $order = $this->order;
+
         if (empty($order)) {
             return "";
         }
@@ -318,8 +321,9 @@ class QueryBuilder
     /**
      * @return string
      */
-    private function prepareGroupQuery(Group $group = null)
+    private function prepareGroupQuery()
     {
+        $group = $this->groupBy;
 
         if (is_null($group)) {
             return "";
@@ -331,12 +335,11 @@ class QueryBuilder
     }
 
     /**
-     * @param $having
      * @return mixed
      */
-    private function prepareHavingQuery($having)
+    private function prepareHavingQuery()
     {
-        return $having;
+        return $this->having;
     }
 
     /**
@@ -358,11 +361,11 @@ class QueryBuilder
             ':select' => $this->prepareSelectQuery($this->select),
             ':from' => $this->getTable(),
             ':join' => $this->prepareJoinQuery($this->join, $this->getTable()),
-            ':group' => $this->prepareGroupQuery($group),
-            ':having' => $this->prepareHavingQuery($this->having),
-            ':where' => $this->prepareWhereQuery($this->where),
-            ':order' => $this->prepareOrderQuery($this->order),
-            ':limit' => $this->prepareLimitQuery($this->limit)
+            ':group' => $this->prepareGroupQuery(),
+            ':having' => $this->prepareHavingQuery(),
+            ':where' => $this->prepareWhereQuery(),
+            ':order' => $this->prepareOrderQuery(),
+            ':limit' => $this->prepareLimitQuery()
         ]);
 
         return $handled;
@@ -379,9 +382,9 @@ class QueryBuilder
         $handled = $this->handlePattern($pattern, [
             ':select' => 'COUNT(*) as row_count',
             ':from' => $this->getTable(),
-            ':where' => $this->prepareWhereQuery($this->where),
-            ':order' => $this->prepareOrderQuery($this->order),
-            ':limit' => $this->prepareLimitQuery($this->limit)
+            ':where' => $this->prepareWhereQuery(),
+            ':order' => $this->prepareOrderQuery(),
+            ':limit' => $this->prepareLimitQuery()
         ]);
         return $handled;
     }
@@ -475,8 +478,11 @@ class QueryBuilder
     /**
      * @return string        $app = Singleton::load(get_called_class());
      */
-    protected function prepareJoinQuery($joins, $table)
+    protected function prepareJoinQuery()
     {
+        $joins = $this->join;
+        $table = $this->getTable();
+
         if (empty($joins)) {
             return '';
         }
@@ -511,8 +517,9 @@ class QueryBuilder
     /**
      * @return string
      */
-    private function prepareSelectQuery($select)
+    private function prepareSelectQuery()
     {
+        $select = $this->select;
 
         if (empty($select)) {
             $select = ["*"];
@@ -632,11 +639,13 @@ class QueryBuilder
     /**
      * @param $column
      * @param string $type
-     * @return QueryBuilder
+     * @return $this
      */
     public function order($column, $type = 'DESC')
     {
-        return $this->setOrder([$column, $type]);
+        $this->order = [$column, $type];
+
+        return $this;
     }
 
     /**
@@ -646,9 +655,9 @@ class QueryBuilder
     public function limit($limit)
     {
         if (is_string($limit) || is_numeric($limit)) {
-            $this->setLimit([$limit]);
+            $this->limit = [$limit];
         } else {
-            $this->setLimit($limit);
+            $this->limit = $limit;
         }
 
         return $this;
@@ -676,7 +685,9 @@ class QueryBuilder
         $groupBy->group = $group;
         $groupBy->isMultipile = $multipile;
 
-        return $this->setGroupBy($groupBy);
+        $this->groupBy = $groupBy;
+
+        return $this;
     }
 
     /**
