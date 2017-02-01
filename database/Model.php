@@ -181,7 +181,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } else {
-                throw new \Exception(sprintf('You cannot set any value on %s attributes', $key));
+                throw new ProtectedAttributeException(sprintf('You cannot set any value on %s attributes', $key));
             }
         }
 
