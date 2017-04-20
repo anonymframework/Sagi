@@ -49,6 +49,23 @@ trait Cache
                 static::$driver = $driver;
             }
         }
+
+        $this->getEventManager()->listen('after_update', function ($return) {
+
+            if ($return instanceof Model) {
+                $attributes = $return->getAttributes();
+
+                $this->setCache($this->prepareCacheKey(), $attributes);
+            }
+        });
+    }
+
+    /**
+     * @param DriverInterface $driver
+     */
+    public static function setCacheDriver(DriverInterface $driver)
+    {
+        static::$driver = $driver;
     }
 
     /**
@@ -89,11 +106,12 @@ trait Cache
     /**
      * @param $key
      * @param $value
+     * @param $expiration
      * @return bool
      */
-    public function setCache($key, $value)
+    public function setCache($key, $value, $expiration = false)
     {
-        return static::$driver->set($key, gzcompress($value), $this->getExpiration());
+        return static::$driver->set($key, gzcompress($value), is_int($expiration) ? $expiration : $this->getExpiration());
     }
 
     /**

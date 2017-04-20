@@ -125,7 +125,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         $this->eventManager = new EventDispatcher();
 
-
         if ($policy = ConfigManager::get('policies.' . get_called_class())) {
             if (is_string($policy)) {
                 $this->policy(new $policy);
