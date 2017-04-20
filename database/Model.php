@@ -283,11 +283,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
+     * @param  $useCache bool if caching is enable, result will come from cache, if is not, results will come from db
      * @return Model
      */
-    public function all()
+    public function all($useCache = true)
     {
-        if ($this->isCacheUsed() && $this->useCache === true) {
+        if ($useCache === true && $this->isCacheUsed()) {
             return $this->cacheAll();
         } else {
             $fetched = $this->get()->fetchAll(PDO::FETCH_ASSOC);
@@ -313,12 +314,13 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
+     * @param  $useCache bool if caching is enable, result will come from cache, if is not, results will come from db
      * @return Model
      */
-    public function one()
+    public function one($useCache = true)
     {
 
-        if ($this->isCacheUsed() && $this->useCache === true) {
+        if ($useCache === true && $this->isCacheUsed()) {
             $this->cacheOne();
         } else {
             $get = $this->get();
@@ -330,11 +332,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     }
 
     /**
+     * @param  $useCache bool if caching is enable, result will come from cache, if is not, results will come from db
      * @return $this
      * @throws NotFoundException
      */
-    public function oneOrFail(){
-        $this->one();
+    public function oneOrFail($useCache = true){
+        $this->one($useCache);
 
         if (empty($this->attributes)) {
             throw new NotFoundException(sprintf('Your query returned empty response, table : %s', $this->table));
