@@ -14,6 +14,14 @@ use Sagi\Database\MigrationInterface;
  */
 class {{name}} extends Schema implements MigrationInterface{
 
+   /**
+    *
+    * @param RelationManager $relationManager
+    */
+    public function relations(RelationManager $relationManager){
+        // do something
+    }
+
     /**
      * includes createTable functions
      *

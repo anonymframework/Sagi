@@ -34,6 +34,10 @@ class RelationManager
         return $this->makeRelation('many', $table, $ourCol, $tarCol);
     }
 
+    public function makeManyManyRelation($table, $our, $tar){
+
+    }
+
     /**
      * @param string $type
      * @param $table

@@ -25,13 +25,18 @@ class MemcacheDriver implements DriverInterface
     public function boot($configs)
     {
 
-        if (class_exists('Memcached') === false) {
-            throw new \Exception('Memcache extension could not found');
+        if (is_array($configs)) {
+            if (class_exists('Memcached') === false) {
+                throw new \Exception('Memcache extension could not found');
+            }
+
+            static::$memcache = new Memcached();
+
+            static::$memcache->addServer($configs['host'], $configs['port']);
+        }elseif($configs instanceof Memcached){
+            static::$memcache = $configs;
         }
 
-        static::$memcache = new Memcached();
-
-        static::$memcache->addServer($configs['host'], $configs['port']);
     }
 
     /**

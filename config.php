@@ -27,14 +27,25 @@ return [
         'driver' => 'memcache', // also supports redis
 
         'memcache' => [
-            'host' => '127.0.0.1',
-            'port' => 11211
+
+            'default' => 'default_driver',
+
+            'default_driver' => [
+                'host' => '127.0.0.1',
+                'port' => 11211
+            ]
         ],
 
         'redis' => [
-            'scheme' => 'tcp',
-            'host'   => '127.0.0.1',
-            'port'   => 6379,
+
+            'default' => 'default_driver',
+
+            'default_driver' => [
+                'scheme' => 'tcp',
+                'host'   => '127.0.0.1',
+                'port'   => 6379,
+            ]
+
         ]
     ],
 

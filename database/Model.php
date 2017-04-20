@@ -288,7 +288,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function all()
     {
-        if ($this->isCacheUsed()) {
+        if ($this->isCacheUsed() && $this->useCache === true) {
             return $this->cacheAll();
         } else {
             $fetched = $this->get()->fetchAll(PDO::FETCH_ASSOC);
@@ -319,7 +319,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function one()
     {
 
-        if ($this->isCacheUsed()) {
+        if ($this->isCacheUsed() && $this->useCache === true) {
             $this->cacheOne();
         } else {
             $get = $this->get();

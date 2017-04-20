@@ -15,34 +15,50 @@ trait Cache
      */
     private static $driver;
 
+    /**
+     * @var bool
+     */
+    protected $useCache = true;
+
     public function bootCache()
     {
         $configs = ConfigManager::get('cache');
 
-        $driverName = isset($configs['driver']) ? $configs['driver'] : 'memcache';
+        $selectedDriver = isset($configs['driver']) ? $configs['driver'] : 'memcache';
+
+        if ($selectedDriver === 'memcache') {
+            $driverName = 'MemcacheDriver';
+        } else {
+            $driverName = 'RedisDriver';
+        }
+
+        $driverName = __NAMESPACE__ . '\\Cache\\' . $driverName;
+
 
         $driver = new $driverName;
 
 
-        $driver->boot(ConfigManager::get('cache.'.$driverName, []));
+        $defaultConfig = ConfigManager::get('cache.' . $selectedDriver . '.default', false);
 
+        if ($defaultConfig) {
+            $selectedConfigs = ConfigManager::get('cache.' . $selectedDriver . $defaultConfig, []);
+
+            if (!empty($selectedConfigs)) {
+                $driver->boot(ConfigManager::get('cache.' . $selectedDriver . $driverName, []));
+
+                static::$driver = $driver;
+            }
+        }
     }
 
     /**
-     * @return Memcached
+     * @param bool $use
+     * @return $this
      */
-    public function getMemcache()
+    public function useCache($use = true)
     {
-        return static::$memcache;
-    }
+        $this->useCache = $use;
 
-    /**
-     * @param Memcached $memcache
-     * @return Cache
-     */
-    public function setMemcache($memcache)
-    {
-        static::$memcache = $memcache;
         return $this;
     }
 
@@ -51,8 +67,8 @@ trait Cache
      */
     protected function prepareCacheKey()
     {
-        $limit = (array) $this->limit;
-        $order = (array) $this->order;
+        $limit = (array)$this->limit;
+        $order = (array)$this->order;
 
         $merged = array_merge($this->where, $limit, $order);
 
