@@ -11,7 +11,7 @@ class Entity
 {
 
     /**
-     * @var string
+     * @var array
      */
     public $datas;
 

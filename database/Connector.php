@@ -3,60 +3,158 @@ namespace Sagi\Database;
 
 use PDOException;
 use PDO;
+use Sagi\Database\Exceptions\ErrorException;
+use Sagi\Database\Interfaces\ConnectionInferface;
 
 class Connector
 {
     /**
      * @var PDO
      */
-    public static $connection;
+    protected $connection;
+
+
+    private  $callbacks = [
+        'default' => 'buildDefaultConnection',
+        'mysql' => 'buildMysqlConnection'
+    ];
 
     /**
      * @param string|null $connection
      */
-    public static function madeConnection($connection = null)
+    public  function madeConnection($connection = null)
     {
-        if ($connection === null) {
-            $connection = ConfigManager::get('connections.default', 'localhost');
+
+        $configs = $this->findConnectionConfig($connection);
+        $driver = $configs['driver'];
+        $called = $this->callDriver($driver, $configs);
+
+
+        if (!$called instanceof ConnectionInferface) {
+            throw new ConnectionException('%s driver must return an instance of ConnectionInterface', $driver);
         }
 
-        $configs = ConfigManager::get('connections.'.$connection, []);
+        $this->$connection = $called->getConnection();
 
+    }
+
+    /**
+     * @param $configs
+     * @return Connection
+     */
+    protected  function buildDefaultConnection($configs)
+    {
         try {
-            $username = isset($configs['username']) ? $configs['username'] : null;
-            $password = isset($configs['password']) ? $configs['password'] : null;
+            list($username, $password) = $this->getUsernameAndPassword($configs);
 
-            $attributes = ConfigManager::get('connections.'.$connection.'.attr', []);
+            $attributes = isset($configs['attr']) ? $configs['attr'] : [];
 
-            $pdo = new PDO($configs['dsn'], $username, $password, $attributes);
-            $pdo->query(sprintf("SET CHARACTER SET %s", isset($configs['charset']) ? $configs['charset'] : 'utf8'));
+            $pdo = $this->preparePdoInstance($configs, $username, $password, $attributes);
         } catch (PDOException $p) {
             throw new PDOException("Something went wrong, message: " . $p->getMessage());
-
         }
 
-        static::$connection = $pdo;
+
+        return new Connection($pdo);
     }
+
+    /**
+     * @param $connection
+     * @return array
+     */
+    private  function findConnectionConfig($connection)
+    {
+        if ($connection === null) {
+            $configs = ConfigManager::get('connections.default', 'localhost');
+        } else {
+            $configs = ConfigManager::get('connections.' . $connection, []);
+        }
+
+        return $configs;
+    }
+
+    /**
+     * @param string $driver
+     * @param callable $callback
+     * @return Connector
+     */
+    public  function driver($driver, $callback)
+    {
+        $this->callbacks[$driver] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @param string $driver
+     * @param array $configs
+     * @return mixed
+     */
+    private  function callDriver($driver,array $configs){
+        $callback = $this->callbacks[$driver];
+
+
+        if (is_string($callback)) {
+            return $this->$callback($configs);
+        }
+
+        throw new ErrorException(sprintf('%s driver not found', $driver));
+    }
+    /**
+     * @param array $configs
+     * @return Connection
+     */
+    protected function buildMysqlConnection($configs)
+    {
+        return $this->buildDefaultConnection($configs);
+    }
+
+    /**
+     * @param $configs
+     * @param $username
+     * @param $password
+     * @param $attributes
+     * @return PDO
+     */
+    private  function preparePdoInstance($configs, $username, $password, $attributes)
+    {
+        $pdo = new PDO($configs['dsn'], $username, $password, $attributes);
+        $command = sprintf('SET CHARACTER SET %s',
+            isset($configs['charset']) ? $configs['charset'] : 'utf8'
+        );
+
+        $pdo->exec($command);
+
+        return $pdo;
+    }
+
+    /**
+     * @param array $configs
+     * @return array
+     */
+    private  function getUsernameAndPassword($configs)
+    {
+
+        $username = isset($configs['username']) ? $configs['username'] : null;
+        $password = isset($configs['password']) ? $configs['password'] : null;
+
+        return array($username, $password);
+    }
+
 
     /**
      *
      * @param string $database
      * @return PDO
      */
-    public static function getConnection($database = null)
+    public  function getConnection($database = null)
     {
-        if (!static::$connection) {
-            static::madeConnection($database);
+        if (!$this->connection) {
+            $this->madeConnection($database);
         }
 
-        return static::$connection;
+        return $this->connection;
     }
 
-    /**
-     * @param PDO $connection
-     */
-    public static function setConnection($connection)
-    {
-        static::$connection = $connection;
-    }
+   
 }

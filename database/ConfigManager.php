@@ -16,6 +16,17 @@ class ConfigManager
      */
     public static $configFile;
 
+    /**
+     * @return array
+     */
+    public static function returnDefaultConnection()
+    {
+        $connection = self::get('connections.default', []);
+
+
+        return $connection;
+    }
+
 
     public static function loadConfigs()
     {
@@ -28,7 +39,7 @@ class ConfigManager
 
             static::set('root_dir', $rootDir);
         } else {
-            throw new ConfigException(static::$configFile . 'is not exists');
+            throw new Exceptions\ConfigException(static::$configFile . 'is not exists');
         }
     }
 

@@ -4,12 +4,10 @@ return [
 
     'connections' => [
 
-        'default' => 'localhost', // ön tanımlı bağlantı.
-
-        'localhost' => [
+        'default' => [
 
             'username' => 'root',
-            'password' => 'sanane123',
+            'password' => '',
             'dsn' => 'mysql:host=127.0.0.1;dbname=test',
             'driver' => 'mysql',
 
@@ -54,7 +52,16 @@ return [
     ],
 
     'policies' => [
-        //
+        /**
+         *
+         *  'Model::class' => Policy::class,
+         *
+         *  'messages' => [
+         *      'table_name_update' => 'You don't have access this method',
+         *      'table_name_save' => 'You can't save this'.
+         *  ]
+         *
+         */
     ],
 
     'migrations' => [

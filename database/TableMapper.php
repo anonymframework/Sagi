@@ -8,7 +8,7 @@ namespace Sagi\Database;
 
 
 use Sagi\Database\Mapping\Table;
-
+use Sagi\Database\Interfaces\MapperInterface;
 /**
  * Class TableMapper
  * @package Sagi\Database

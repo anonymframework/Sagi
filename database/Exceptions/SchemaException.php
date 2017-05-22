@@ -6,7 +6,7 @@
  * Time: 23:07
  */
 
-namespace Sagi\Database;
+namespace Sagi\Database\Exceptions;
 
 
 /**

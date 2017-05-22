@@ -4,6 +4,7 @@
 namespace Sagi\Database;
 
 use Sagi\Database\Mapping\Entity;
+use Sagi\Database\Interfaces\MigrationInterface;
 
 /**
  * Class MigrationManager

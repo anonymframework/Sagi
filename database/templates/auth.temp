@@ -7,7 +7,7 @@
 
 use Sagi\Database\Schema;
 use Sagi\Database\Row as Table;
-use Sagi\Database\MigrationInterface;
+use Sagi\Database\Interfaces\MigrationInterface;
 
 /**
  * @class CreateAuthTable

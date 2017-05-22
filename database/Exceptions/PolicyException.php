@@ -1,5 +1,5 @@
 <?php
-namespace Sagi\Database;
+namespace Sagi\Database\Exceptions;
 
 
 class PolicyException extends \Exception

@@ -13,7 +13,8 @@
     "php": ">=5.4.0",
     "symfony/console": "2.8",
     "symfony/process": "~2.4",
-    "nesbot/carbon": "~1.21"
+    "nesbot/carbon": "~1.21",
+    "league/pipeline": "dev-master"
   },
   "require-dev": {
      "predis/predis" : "1.1"

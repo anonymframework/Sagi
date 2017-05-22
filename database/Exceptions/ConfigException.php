@@ -1,6 +1,6 @@
 <?php
 
-namespace Sagi\Database;
+namespace Sagi\Database\Exceptions;
 
 
 class ConfigException extends \Exception

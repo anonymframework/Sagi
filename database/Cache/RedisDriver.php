@@ -15,7 +15,7 @@ class RedisDriver implements DriverInterface
     /**
      * @var Client
      */
-    private static $redis;
+    private static $driver;
 
     /**
      * boot cache driver
@@ -25,7 +25,12 @@ class RedisDriver implements DriverInterface
      */
     public function boot($configs)
     {
-        static::$redis = new Client($configs);
+        if (is_array($configs)) {
+            static::$driver = new Client($configs);
+        }else{
+            static::$driver = $configs;
+
+        }
     }
 
     /**
@@ -36,7 +41,7 @@ class RedisDriver implements DriverInterface
      */
     public function set($name, $value, $expiration = 600)
     {
-        static::$redis->setex($name, $value, $expiration);
+        static::$driver->setex($name, $value, $expiration);
     }
 
     /**
@@ -45,6 +50,7 @@ class RedisDriver implements DriverInterface
      */
     public function get($name)
     {
-        static::$redis->get($name);
+        static::$driver->get($name);
     }
+
 }

@@ -19,4 +19,10 @@ class Group
      * @var array
      */
     public $group;
+
+    public function __construct(array $group = [], $multipile = false)
+    {
+        $this->group = $group;
+        $this->isMultipile = $multipile;
+    }
 }

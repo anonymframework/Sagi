@@ -1,6 +1,6 @@
 <?php
 
-namespace Sagi\Database;
+namespace Sagi\Database\Interfaces;
 
 /**
  * Interface PolicyInterface

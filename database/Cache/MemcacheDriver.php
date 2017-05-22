@@ -13,7 +13,7 @@ class MemcacheDriver implements DriverInterface
     /**
      * @var Memcached
      */
-    private static $memcache;
+    private static $driver;
 
     /**
      * boot cache driver
@@ -30,11 +30,11 @@ class MemcacheDriver implements DriverInterface
                 throw new \Exception('Memcache extension could not found');
             }
 
-            static::$memcache = new Memcached();
+            static::$driver = new Memcached();
 
-            static::$memcache->addServer($configs['host'], $configs['port']);
+            static::$driver->addServer($configs['host'], $configs['port']);
         }elseif($configs instanceof Memcached){
-            static::$memcache = $configs;
+            static::$driver = $configs;
         }
 
     }
@@ -47,7 +47,7 @@ class MemcacheDriver implements DriverInterface
      */
     public function set($name, $value, $expiration = 600)
     {
-        return static::$memcache->set($name, $value, $expiration);
+        return static::$driver->set($name, $value, $expiration);
     }
 
     /**
@@ -56,6 +56,6 @@ class MemcacheDriver implements DriverInterface
      */
     public function get($name)
     {
-        return static::$memcache->get($name);
+        return static::$driver->get($name);
     }
 }

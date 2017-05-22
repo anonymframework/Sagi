@@ -14,7 +14,7 @@ namespace Sagi\Database\Mapping;
  */
 class Join
 {
-    public  $type = 'INNER JOIN';
+    public $type = 'INNER JOIN';
 
     /**
      * @var mixed
@@ -32,17 +32,23 @@ class Join
     public $table;
 
     /**
+     * @var string
+     */
+    public $backet;
+
+    /**
      * Join constructor.
      * @param string $type
      * @param string $table
      * @param string $target
      * @param string $home
      */
-    public function __construct($type = 'INNER JOIN',$table = '', $target = '', $home = '')
+    public function __construct($type = 'INNER JOIN', $table = '', $target = '', $home = '', $backet = '=')
     {
         $this->table = $table;
         $this->target = $target;
         $this->home = $home;
         $this->type = $type;
+        $this->backet = $backet;
     }
 }

@@ -2,10 +2,21 @@
 
 namespace Sagi\Database;
 
-use Carbon\Carbon;
-use Sagi\Database\Event\EventDispatcher;
+use League\Pipeline\Pipeline;
 use PDO;
+use Sagi\Database\Exceptions\AttributeNotFoundException;
+use Sagi\Database\Exceptions\NotFoundException;
+use Sagi\Database\Exceptions\QueryException;
+use Iterator;
+use Countable;
+use ArrayAccess;
+use Carbon\Carbon;
+use Sagi\Database\Mapping\Raw;
 use Sagi\Database\Mapping\Entity;
+use Sagi\Database\Builder\Traits\GuardCable;
+use Sagi\Database\Builder\Traits\EventCable;
+use Sagi\Database\Builder\Traits\PolicyCable;
+use Sagi\Database\Builder\Traits\ModuleCable;
 
 /**
  * Created by PhpStorm.
@@ -13,12 +24,14 @@ use Sagi\Database\Mapping\Entity;
  * Date: 23.08.2016
  * Time: 17:23
  */
-class Model extends QueryBuilder implements \Iterator, \ArrayAccess
+class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
 {
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
     const DELETED_AT = 'deleted_at';
 
+
+    use ModuleCable, GuardCable, EventCable, PolicyCable;
     /**
      * @var array
      */
@@ -29,14 +42,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     protected $expiration = 600;
 
-    /**
-     * @var EventDispatcher
-     */
-    protected $eventManager;
-    /**
-     * @var array
-     */
-    protected $usedModules = [];
 
     /**
      * @var array
@@ -54,11 +59,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
 
     /**
-     * @var mixed
-     */
-    protected $policy;
-
-    /**
      * @var array
      */
     protected $protected = [];
@@ -73,15 +73,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     protected $array = [];
 
-    /**
-     * @var array
-     */
-    protected $guarded = [];
-
-    /**
-     * @var bool
-     */
-    protected $totallyGuarded = false;
 
     /**
      * @var mixed
@@ -110,6 +101,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     protected $saveBefore = [];
 
+    /**
+     * @var Pipeline
+     */
+    protected $pipeline;
 
     /**
      * Model constructor.
@@ -119,46 +114,24 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function __construct(array $attributes = [])
     {
-        $this->usedModules = $traits = class_uses(static::className());
-
-        $this->bootTraits($traits);
-
-        $this->eventManager = new EventDispatcher();
-
-        if ($policy = ConfigManager::get('policies.' . get_called_class())) {
-            if (is_string($policy)) {
-                $this->policy(new $policy);
-            } else {
-                throw new \Exception('Policy names must be an string');
-            }
-        }
-
+        $this->bootTraits();
         $this->select('*');
 
         if (!empty($attributes)) {
-
             if (!is_array($attributes)) {
                 $attributes = (array)$attributes;
             }
             $this->fill($attributes);
         }
 
-
-        $this->bootLogging();
-
-
+        $this->bootPipeline();
+        parent::__construct();
     }
 
-    /**
-     * boot traits
-     */
-    private function bootLogging()
-    {
-        $logging = ConfigManager::get('logging', ['open' => false]);
 
-        if ($logging['open'] === true) {
-            $this->logging = Singleton::load('Sagi\Database\Loggable');
-        }
+    private function bootPipeline(){
+        $this->pipeline = new Pipeline();
+
     }
 
     /**
@@ -180,7 +153,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } else {
-                throw new ProtectedAttributeException(sprintf('You cannot set any value on %s attributes', $key));
+                throw new Exceptions\ProtectedAttributeException(sprintf('You cannot set any value on %s attributes', $key));
             }
         }
 
@@ -188,99 +161,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         return $this;
     }
 
-    /**
-     * @param string $key
-     * @return bool
-     */
-    public function isFillable($key)
-    {
-        return !isset($this->guarded[$key]) || !$this->totallyGuarded;
-    }
-
-    /**
-     * @param array $traits
-     */
-    private function bootTraits(array $traits)
-    {
-        foreach ($traits as $trait) {
-            if (method_exists($this, $method = 'boot' . $this->classBaseName($trait))) {
-                call_user_func_array([$this, $method], []);
-            }
-        }
-    }
-
-    /**
-     * @param string $class
-     * @return string
-     */
-    private function classBaseName($class)
-    {
-        $class = is_object($class) ? get_class($class) : $class;
-        return basename(str_replace('\\', '/', $class));
-    }
-
-    /**
-     * @return bool
-     */
-    public function isValidationUsed()
-    {
-        return $this->isModuleUsed('Sagi\Database\Validation');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAuthorizationUsed()
-    {
-        return $this->isModuleUsed('Sagi\Database\Authorization');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCacheUsed()
-    {
-        return $this->isModuleUsed('Sagi\Database\Cache');
-    }
-
-    /**
-     * @param string $module
-     * @return bool
-     */
-    public function isModuleUsed($module)
-    {
-        return in_array($module, $this->usedModules);
-    }
-
-
-    /**
-     * @param PolicyInterface $policy
-     * @return $this
-     */
-    public function policy(PolicyInterface $policy)
-    {
-        $this->policy = $policy;
-
-        return $this;
-    }
-
-
-    /**
-     * @param string $method
-     * @param array $args
-     * @return bool
-     */
-    public function can($method = 'get', array $args = [])
-    {
-        if (!$this->policy instanceof PolicyInterface) {
-            return true;
-        }
-
-        array_unshift($args, $this);
-
-
-        return call_user_func_array([$this->policy, $method], $args) !== false ? true : false;
-    }
 
     /**
      * @param  $useCache bool if caching is enable, result will come from cache, if is not, results will come from db
@@ -301,9 +181,10 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
     /**
      * @return $this
-     * @throws NotFoundException
+     * @throws Exceptions\NotFoundException
      */
-    public function allOrFail(){
+    public function allOrFail()
+    {
         $this->all();
 
         if (empty($this->attributes)) {
@@ -336,11 +217,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @return $this
      * @throws NotFoundException
      */
-    public function oneOrFail($useCache = true){
+    public function oneOrFail($useCache = true)
+    {
         $this->one($useCache);
 
         if (empty($this->attributes)) {
-            throw new NotFoundException(sprintf('Your query returned empty response, table : %s', $this->table));
+            throw new Exceptions\NotFoundException(sprintf('Your query returned empty response, table : %s', $this->table));
         }
 
         return $this;
@@ -365,13 +247,13 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         $instance = static::createNewInstance();
 
         if (is_array($conditions) && !empty($conditions)) {
-            foreach ($conditions as $item) {
+            foreach ((array) $conditions as $item) {
                 if (is_array($item)) {
                     $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
                 }
             }
 
-        } elseif (is_string($conditions) || is_integer($conditions)) {
+        } elseif (is_string($conditions) || is_int($conditions)) {
             $primaryKey = is_array($instance->primaryKey) ?
                 $instance->primaryKey[0] :
                 $instance->primaryKey;
@@ -409,63 +291,15 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     {
         $finded = static::find($id)->oneOrFail();
 
-        if (empty($finded->getAttributes())) {
-            throw new NotFoundException(sprintf('%d %s could not found in %s', $id, $finded->getPrimaryKey(), $finded->getTable()));
+        $attributes = $finded->getAttributes();
+
+        if (empty($attributes)) {
+            throw new Exceptions\NotFoundException(sprintf('%d %s could not found in %s', $id, $finded->getPrimaryKey(), $finded->getTable()));
         }
 
         return $finded;
     }
 
-    /**
-     * @param $a
-     * @param null $b
-     * @param null $c
-     * @param string $type
-     * @param bool $clean
-     * @param  bool $spec
-     * @return $this
-     */
-    public function where($a, $b = null, $c = null, $type = 'AND', $clean = true, $spec = false)
-    {
-        $name = is_array($a) ? $a[0] : $a;
-
-        $value = is_array($a) ? $a[2] : $c;
-
-        if (
-
-        $this->can(
-            $name . 'Where',
-            array(
-                $value
-            ))
-        ) {
-            parent::where($a, $b, $c, $type, $clean, $spec);
-
-            return $this;
-        } else {
-            $this->throwPolicyException('where');
-        }
-    }
-
-    /**
-     * @param $a
-     * @param null $b
-     * @param null $c
-     * @param bool $clean
-     * @param bool $spec
-     * @return $this
-     */
-    public function orWhere($a, $b = null, $c = null, $clean = true, $spec = false)
-    {
-        if ($this->can('orWhere')) {
-            parent::orWhere($a, $b, $c, $clean, $spec);
-
-            return $this;
-        } else {
-            $this->throwPolicyException('or where');
-        }
-
-    }
 
     /**
      * @param array $conditions
@@ -480,7 +314,8 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      * @param $conditions
      * @return $this
      */
-    public static function findAllOrFail($conditions){
+    public static function findAllOrFail($conditions)
+    {
         return static::find($conditions)->allOrFail();
     }
 
@@ -560,22 +395,9 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         return in_array($name, $this->array);
     }
 
-
     /**
-     * @param  callable $callback
-     * @return $this
-     */
-    public function beforeAttach(callable $callback)
-    {
-        $this->beforeAttach[] = $callback;
-
-        return $this;
-    }
-
-    /**
-     *
+     * @return $this|bool|Model
      * @throws QueryException
-     * @return Model|bool
      */
     public function save()
     {
@@ -583,12 +405,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         if (!empty($this->where)) {
 
             if ($this->update() === false) {
-                throw new QueryException(sprintf('update query has been failed, error message from database :%s', $this->error()[2]));
+                throw new QueryException(sprintf('update query has been failed, error message from database1 :%s', $this->error()[2]));
             }
 
             return $this;
         } else {
-            return  $this->create();
+            return $this->create();
         }
     }
 
@@ -600,9 +422,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function create($data = null)
     {
-        if ($this->can('create') === false) {
-            $this->throwPolicyException('create');
-        }
+        $this->callEvent('before_create', $this);
 
         if (empty($data)) {
             $data = $this->getAttributes();
@@ -640,15 +460,14 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         if (parent::create($entity)) {
             if (!empty($this->primaryKey) && !is_array($this->primaryKey) && $entity->multipile === false) {
                 $return = static::findOne($this->lastInsertId());
-            }else{
+            } else {
                 $return = $this;
             }
         } else {
-            throw new QueryException(sprintf('Query has been failed, error message: %s', $this->error()[2]));
+            throw new Exceptions\QueryException(sprintf('Query has been failed, error message: %s', $this->error()[2]));
         }
 
-        $this->eventManager->hasListiner('after_create')
-            ? $this->eventManager->fire('after_create', [$return, $this]) : null;
+        $this->callEvent('after_create', [$return, $this]);
 
         return $return;
     }
@@ -656,9 +475,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     /**
      * @return int
      */
-    public function lastInsertId(){
+    public function lastInsertId()
+    {
         return $this->prepareConnection()->lastInsertId();
     }
+
     /**
      * @param array $datas
      * @return PDOStatement
@@ -666,13 +487,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function update($datas = [])
     {
 
-        if (!$this->can('update')) {
-            $this->throwPolicyException('update');
-        }
-
-
-        $this->eventManager->hasListiner('before_update')
-            ? $this->eventManager->fire('before_update', [$this, $datas]) : null;
+        $this->callEvent('before_update', [$this]);
 
         $this->setUpdatedAt();
 
@@ -682,9 +497,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
 
         $return = parent::update($datas);
 
-        $this->eventManager->hasListiner('after_update')
-            ? $this->eventManager->fire('after_update', [$return, $this]) : null;
-
+        $this->callEvent('after_update', [$return, $this]);
         return $return;
     }
 
@@ -693,26 +506,13 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function delete()
     {
-        $this->eventManager->hasListiner('before_delete')
-            ? $this->eventManager->fire('before_delete', [$this]) : null;
-
+        $this->callEvent('before_delete', [$this]);
         $return = parent::delete();
+        $this->callEvent('after_delete', [$return, $this]);
 
-        $this->eventManager->hasListiner('after_delete')
-            ? $this->eventManager->fire('after_delete', [$return, $this]) : null;
-
-        $this->eventManager = null;
         return $this;
     }
 
-    /**
-     * @param $method
-     * @throws PolicyException
-     */
-    private function throwPolicyException($method)
-    {
-        throw new PolicyException(sprintf('You cannot use %s method', $method));
-    }
 
     /**
      * @param $datas
@@ -770,55 +570,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         return json_encode($this->getAttributes());
     }
 
-
-    /**
-     * @param string|array|mixed $with
-     * @return $this
-     */
-    public function with($with){
-        if (!is_array($with)) {
-            $with = func_get_args();
-        }
-
-        $this->with = array_merge($this->with, $with);
-
-        return $this;
-    }
-
     /**
      * @return string
      */
     public function __toString()
     {
         return serialize($this->getAttributes());
-    }
-
-    /**
-     * @return array
-     */
-    public function __sleep()
-    {
-        $arr = parent::__sleep();
-
-        return array_merge($arr,
-            [
-                'casts',
-                'database',
-                'expiration',
-                'table',
-                'attributes',
-                'eventManager',
-                'primaryKey',
-                'usedModules',
-                'policy',
-                'protected',
-                'json',
-                'array',
-                'guarded',
-                'totallyGuarded',
-                'alias',
-                'hide',
-            ]);
     }
 
 
@@ -840,6 +597,15 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
                 $this->attribute($this->primaryKey[0])
                 : $this->attribute($this->primaryKey)
             : false;
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        return $this->hasAttribute($name);
     }
 
     /**
@@ -887,6 +653,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     public function setAttribute($key, $value)
     {
+
         if ($this->isJson($key) && is_object($value) || is_array($value)) {
             $value = json_encode($value);
         } elseif ($this->isArray($key) && is_object($value) || is_array($value)) {
@@ -894,13 +661,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         } elseif ($value instanceof Model) {
             $this->saveBefore[] = $key;
         }
-
-
         $mutator = $this->hasMutator($key);
 
         if ($mutator !== false) {
-            call_user_func([$this, $mutator], $value);
-        }else{
+            $this->$mutator($value);
+        } else {
             $this->attributes[$key] = $value;
         }
     }
@@ -912,9 +677,58 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     private function hasMutator($key)
     {
-        $mutator = 'set' . MigrationManager::prepareClassName($key) . 'Attribute';
+        $mutator = 'set' . $this->prepareMethodName($key) . 'Attribute';
 
         return method_exists($this, $mutator) ? $mutator : false;
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    private function prepareColumnName($name)
+    {
+        return implode('_', array_map(function ($value) {
+            return mb_convert_case($value, MB_CASE_LOWER);
+        }, preg_split('/(?=[A-Z])/',
+            $name, -1, PREG_SPLIT_NO_EMPTY)));
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    private function callMagicGetMethods($name)
+    {
+        $column = $this->prepareColumnName($name);
+
+        return $this->{$column};
+    }
+
+    /**
+     * @param string $name
+     * @param $arguments
+     */
+    private function callMagicSetMethod($name, $arguments)
+    {
+        $column = $this->prepareColumnName($name);
+
+        if (count($arguments) > 0) {
+            return $this->setAttribute($column, $arguments[0]);
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param string $arguments
+     * @return mixed
+     */
+    private function callMagicFilterByMethods($name, $arguments)
+    {
+        $column = $this->prepareColumnName($name);
+        array_unshift($arguments, $column);
+
+        return call_user_func_array([$this, 'where'], $arguments);
     }
 
     /**
@@ -925,26 +739,11 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     public function __call($name, $arguments)
     {
         if (substr($name, 0, 3) === "get") {
-            $name = substr($name, 3, strlen($name));
-
-            $column = MigrationManager::parseCamelCase($name);
-
-            return $this->{$column};
-
+            return $this->callMagicGetMethods($name);
         } elseif (substr($name, 0, 3) === "set") {
-            $name = substr($name, 3, strlen($name));
-            $column = MigrationManager::parseCamelCase($name);
-
-            if (count($arguments) > 0) {
-                return $this->setAttribute($column, $arguments[0]);
-            }
+            return $this->callMagicSetMethod($name, $arguments);
         } elseif (substr($name, 0, 8) === "filterBy") {
-            $name = substr($name, 8, strlen($name));
-            $column = MigrationManager::parseCamelCase($name);
-
-            array_unshift($arguments, $column);
-
-            return call_user_func_array([$this, 'where'], $arguments);
+            $this->callMagicFilterByMethods($name, $arguments);
         } else {
             throw new \BadMethodCallException(sprintf('%s method not found', $name));
         }
@@ -962,15 +761,20 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
             $this->one();
         }
 
-
         if (false === $this->attributes) {
-            throw new \PDOException(sprintf('Your query has been failed, message: %s', $this->error()[2]));
+            throw new \PDOException(
+                sprintf(
+                    'Your query has been failed, message: %s',
+                    $this->error()[2])
+            );
         }
 
         if ($this->hasAttribute($name)) {
             $value = $this->attribute($name);
         } else {
-            throw new \Exception(sprintf('%s attribute could not found', $name));
+            throw new AttributeNotFoundException(
+                sprintf('%s attribute could not found', $name)
+            );
         }
 
 
@@ -985,7 +789,7 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         }
 
         if ($acc = $this->hasAccesor($name)) {
-            return call_user_func([$this, $acc], $value);
+            return $this->$acc($value);
         }
 
         return isset($this->timestamps[$name]) ? new Carbon($value) : $value;
@@ -997,52 +801,32 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
      */
     private function hasAccesor($key)
     {
-        $accesor = "get" . MigrationManager::prepareClassName($key) . 'Attribute';
+        $accesor = 'get' . $this->prepareMethodName($key) . 'Attribute';
 
         return method_exists($this, $accesor) ? $accesor : false;
     }
 
-
     /**
-     * @return EventDispatcher
+     * @param $name
+     * @return mixed|string
      */
-    protected function getEventManager()
+    private function prepareMethodName($name)
     {
-        if (!$this->eventManager instanceof EventDispatcher) {
-            $this->eventManager = new EventDispatcher();
+        if (strpos($name, '_')) {
+            $name = implode('', array_map(function ($value) {
+                $ucfirst = mb_convert_case($value, MB_CASE_TITLE);
+
+                return $ucfirst;
+            }, explode('_', $name)));
+
+        } else {
+            $name = mb_convert_case($name, MB_CASE_TITLE);
         }
-
-        return $this->eventManager;
+        return $name;
     }
 
 
-    /**
-     * @return boolean
-     */
-    public function isTotallyGuarded()
-    {
-        return $this->totallyGuarded;
-    }
-
-    /**
-     * @param boolean $totallyGuarded
-     * @return Model
-     */
-    public function setTotallyGuarded($totallyGuarded)
-    {
-        $this->totallyGuarded = $totallyGuarded;
-        return $this;
-    }
-
-
-    /**
-     * @return Model
-     */
-    public function totallyGuarded()
-    {
-        return $this->setTotallyGuarded(true);
-    }
-
+    /*
     /**
      * @return string
      */
@@ -1070,7 +854,6 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         return $this->attributes[$name];
     }
 
-
     /**
      *
      */
@@ -1091,6 +874,12 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
         } else {
             return $var;
         }
+    }
+
+
+    public static function raw($query)
+    {
+        return new Raw($query);
     }
 
     /**
@@ -1183,4 +972,5 @@ class Model extends QueryBuilder implements \Iterator, \ArrayAccess
     {
         unset($this->attributes[$offset]);
     }
+
 }

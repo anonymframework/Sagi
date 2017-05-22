@@ -19,7 +19,7 @@ class CreateMigrationsCommand extends Command
 
     protected function configure()
     {
-        $this->setName('migration:all')->setDescription('creates migrations file from your database');
+        $this->setName('migration:all')->setDescription('creates migrations file from your database1');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

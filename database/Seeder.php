@@ -37,7 +37,7 @@ class Seeder
             $file = $this->prepareSeedFile($name);
 
             if (file_exists($file) === false) {
-                throw new SeederException(sprintf('%s file could not found', $file));
+                throw new Exceptions\SeederException(sprintf('%s file could not found', $file));
             }
 
             \Composer\Autoload\includeFile($file);
@@ -51,18 +51,18 @@ class Seeder
             if ($class instanceof SeedManager) {
                 $class->setOutput($this->output);
             } else {
-                throw new SeederException(sprintf('%s class must have SeedManager parent', $className));
+                throw new Exceptions\SeederException(sprintf('%s class must have SeedManager parent', $className));
             }
 
             if (!class_exists($className)) {
-                throw new SeederException(sprintf('%s class could not found in %s path', $className, $file));
+                throw new Exceptions\SeederException(sprintf('%s class could not found in %s path', $className, $file));
             }
 
 
             if (method_exists($class, "seed")) {
                 $class->seed();
             } else {
-                throw new SeederException(sprintf("seed method could not found in %s file %s class", $file, $className));
+                throw new Exceptions\SeederException(sprintf("seed method could not found in %s file %s class", $file, $className));
             }
 
         }

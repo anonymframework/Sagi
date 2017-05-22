@@ -10,6 +10,9 @@
 
 namespace Sagi\Database\Event;
 
+use Sagi\Database\Exceptions\EventNameException;
+use Sagi\Database\Event\EventListenerException;
+
 use Sagi\Database\Event\Event as EventDispatch;
 use Sagi\Database\Event\EventCollector;
 use Sagi\Database\Event\EventListener;
@@ -22,6 +25,7 @@ use Closure;
  */
 class EventDispatcher
 {
+
     /**
      * store the list of fired events
      *

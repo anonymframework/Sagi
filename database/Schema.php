@@ -96,7 +96,7 @@ class Schema
         if ($prepare) {
             return true;
         } else {
-            throw new SchemaException(json_encode(Connector::getConnection()->errorInfo())." On Query : $query");
+            throw new Exceptions\SchemaException(json_encode(Connector::getConnection()->errorInfo())." On Query : $query");
         }
     }
 
