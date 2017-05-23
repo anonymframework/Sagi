@@ -86,6 +86,7 @@ class Schema
         $prepare = QueryBuilder::createNewInstance()->prepare($query = $this->prepareSchema(), []);
         $this->checkResult($prepare, $query);
     }
+
     /**
      * @param \PDOStatement $prepare
      * @return bool
@@ -96,7 +97,9 @@ class Schema
         if ($prepare) {
             return true;
         } else {
-            throw new Exceptions\SchemaException(json_encode(Connector::getConnection()->errorInfo())." On Query : $query");
+            throw new Exceptions\SchemaException(
+                json_encode(Connector::getConnection()->errorInfo())." On Query : $query"
+            );
         }
     }
 
@@ -120,7 +123,7 @@ class Schema
      */
     private function addCommand($type, $variables)
     {
-        if (!empty($variables)) {
+        if ( ! empty($variables)) {
             array_unshift($variables, $this->patterns[$type]);
 
             $command = call_user_func_array('sprintf', $variables);

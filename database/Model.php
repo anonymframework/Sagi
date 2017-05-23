@@ -2,21 +2,21 @@
 
 namespace Sagi\Database;
 
-use League\Pipeline\Pipeline;
-use PDO;
-use Sagi\Database\Exceptions\AttributeNotFoundException;
-use Sagi\Database\Exceptions\NotFoundException;
-use Sagi\Database\Exceptions\QueryException;
-use Iterator;
-use Countable;
 use ArrayAccess;
 use Carbon\Carbon;
-use Sagi\Database\Mapping\Raw;
-use Sagi\Database\Mapping\Entity;
-use Sagi\Database\Builder\Traits\GuardCable;
+use Countable;
+use PDO;
 use Sagi\Database\Builder\Traits\EventCable;
-use Sagi\Database\Builder\Traits\PolicyCable;
+use Sagi\Database\Builder\Traits\GuardCable;
 use Sagi\Database\Builder\Traits\ModuleCable;
+use Sagi\Database\Builder\Traits\PolicyCable;
+use Sagi\Database\Exceptions\AttributeNotFoundException;
+use Sagi\Database\Exceptions\NotFoundException;
+use Sagi\Database\Exceptions\ProtectedAttributeException;
+use Sagi\Database\Exceptions\QueryException;
+use Sagi\Database\Mapping\Entity;
+use Sagi\Database\Mapping\Raw;
+use Iterator;
 
 /**
  * Created by PhpStorm.
@@ -73,7 +73,6 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
      */
     protected $array = [];
 
-
     /**
      * @var mixed
      */
@@ -84,10 +83,6 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
      */
     protected $alias;
 
-    /**
-     * @var Loggable
-     */
-    protected $logging;
 
     /**
      * @var array
@@ -102,11 +97,6 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     protected $saveBefore = [];
 
     /**
-     * @var Pipeline
-     */
-    protected $pipeline;
-
-    /**
      * Model constructor.
      * @param array $attributes
      * @param bool $single
@@ -115,24 +105,15 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     public function __construct(array $attributes = [])
     {
         $this->bootTraits();
-        $this->select('*');
 
-        if (!empty($attributes)) {
-            if (!is_array($attributes)) {
+        if ( ! empty($attributes)) {
+            if ( ! is_array($attributes)) {
                 $attributes = (array)$attributes;
             }
             $this->fill($attributes);
         }
-
-        $this->bootPipeline();
-        parent::__construct();
     }
 
-
-    private function bootPipeline(){
-        $this->pipeline = new Pipeline();
-
-    }
 
     /**
      * @return array
@@ -153,7 +134,9 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } else {
-                throw new Exceptions\ProtectedAttributeException(sprintf('You cannot set any value on %s attributes', $key));
+                throw new ProtectedAttributeException(
+                    sprintf('You cannot set any value on %s attributes', $key)
+                );
             }
         }
 
@@ -175,6 +158,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
 
 
             $this->setAttributes($fetched);
+
             return $this;
         }
     }
@@ -222,7 +206,9 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
         $this->one($useCache);
 
         if (empty($this->attributes)) {
-            throw new Exceptions\NotFoundException(sprintf('Your query returned empty response, table : %s', $this->table));
+            throw new Exceptions\NotFoundException(
+                sprintf('Your query returned empty response, table : %s', $this->table)
+            );
         }
 
         return $this;
@@ -246,8 +232,8 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     {
         $instance = static::createNewInstance();
 
-        if (is_array($conditions) && !empty($conditions)) {
-            foreach ((array) $conditions as $item) {
+        if (is_array($conditions) && ! empty($conditions)) {
+            foreach ((array)$conditions as $item) {
                 if (is_array($item)) {
                     $instance->where($item[0], $item[1], isset($item[2]) ? $item[2] : null);
                 }
@@ -270,7 +256,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
      */
     public function hasPrimaryKey()
     {
-        return !empty($this->primaryKey);
+        return ! empty($this->primaryKey);
     }
 
     /**
@@ -294,7 +280,9 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
         $attributes = $finded->getAttributes();
 
         if (empty($attributes)) {
-            throw new Exceptions\NotFoundException(sprintf('%d %s could not found in %s', $id, $finded->getPrimaryKey(), $finded->getTable()));
+            throw new Exceptions\NotFoundException(
+                sprintf('%d %s could not found in %s', $id, $finded->getPrimaryKey(), $finded->getTable())
+            );
         }
 
         return $finded;
@@ -336,11 +324,11 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
         }
 
 
-        $append = '#' . $link[0] . ':' . $this->__get($link[0]);
+        $append = '#'.$link[0].':'.$this->__get($link[0]);
 
         $name .= $append;
 
-        if (!RelationBag::isPreparedBefore($name, 'many')) {
+        if ( ! RelationBag::isPreparedBefore($name, 'many')) {
 
             RelationBag::addRelative($name, $class, $link, 'many');
         }
@@ -364,11 +352,11 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
             $name = $class->getTable();
         }
 
-        $append = '#' . $link[0] . ':' . $this->__get($link[0]);
+        $append = '#'.$link[0].':'.$this->__get($link[0]);
 
         $name .= $append;
 
-        if (!RelationBag::isPreparedBefore($name, 'one')) {
+        if ( ! RelationBag::isPreparedBefore($name, 'one')) {
 
             RelationBag::addRelative($name, $class, $link, 'one');
         }
@@ -402,10 +390,12 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     public function save()
     {
 
-        if (!empty($this->where)) {
+        if ( ! empty($this->where)) {
 
             if ($this->update() === false) {
-                throw new QueryException(sprintf('update query has been failed, error message from database1 :%s', $this->error()[2]));
+                throw new QueryException(
+                    sprintf('update query has been failed, error message from database1 :%s', $this->error()[2])
+                );
             }
 
             return $this;
@@ -428,7 +418,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
             $data = $this->getAttributes();
         }
 
-        if (!$data instanceof Entity) {
+        if ( ! $data instanceof Entity) {
             $entity = new Entity();
 
             $entity->datas = $data;
@@ -440,7 +430,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
             $entity = $data;
         }
 
-        if (!empty($this->saveBefore)) {
+        if ( ! empty($this->saveBefore)) {
             foreach ($this->saveBefore as $item) {
                 if ($this->hasAttribute($item)) {
                     $attr = $this->attribute($item);
@@ -452,13 +442,15 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
 
                     $entity->datas[$item] = $primaryValue;
                 } else {
-                    throw new AttributeNotFoundException(sprintf('%s attribute could not found, we cant save it', $item));
+                    throw new AttributeNotFoundException(
+                        sprintf('%s attribute could not found, we cant save it', $item)
+                    );
                 }
             }
         }
 
         if (parent::create($entity)) {
-            if (!empty($this->primaryKey) && !is_array($this->primaryKey) && $entity->multipile === false) {
+            if ( ! empty($this->primaryKey) && ! is_array($this->primaryKey) && $entity->multipile === false) {
                 $return = static::findOne($this->lastInsertId());
             } else {
                 $return = $this;
@@ -498,6 +490,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
         $return = parent::update($datas);
 
         $this->callEvent('after_update', [$return, $this]);
+
         return $return;
     }
 
@@ -677,7 +670,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
      */
     private function hasMutator($key)
     {
-        $mutator = 'set' . $this->prepareMethodName($key) . 'Attribute';
+        $mutator = 'set'.$this->prepareMethodName($key).'Attribute';
 
         return method_exists($this, $mutator) ? $mutator : false;
     }
@@ -688,10 +681,20 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
      */
     private function prepareColumnName($name)
     {
-        return implode('_', array_map(function ($value) {
-            return mb_convert_case($value, MB_CASE_LOWER);
-        }, preg_split('/(?=[A-Z])/',
-            $name, -1, PREG_SPLIT_NO_EMPTY)));
+        return implode(
+            '_',
+            array_map(
+                function ($value) {
+                    return mb_convert_case($value, MB_CASE_LOWER);
+                },
+                preg_split(
+                    '/(?=[A-Z])/',
+                    $name,
+                    -1,
+                    PREG_SPLIT_NO_EMPTY
+                )
+            )
+        );
     }
 
     /**
@@ -765,7 +768,8 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
             throw new \PDOException(
                 sprintf(
                     'Your query has been failed, message: %s',
-                    $this->error()[2])
+                    $this->error()[2]
+                )
             );
         }
 
@@ -801,7 +805,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
      */
     private function hasAccesor($key)
     {
-        $accesor = 'get' . $this->prepareMethodName($key) . 'Attribute';
+        $accesor = 'get'.$this->prepareMethodName($key).'Attribute';
 
         return method_exists($this, $accesor) ? $accesor : false;
     }
@@ -813,15 +817,22 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     private function prepareMethodName($name)
     {
         if (strpos($name, '_')) {
-            $name = implode('', array_map(function ($value) {
-                $ucfirst = mb_convert_case($value, MB_CASE_TITLE);
+            $name = implode(
+                '',
+                array_map(
+                    function ($value) {
+                        $ucfirst = mb_convert_case($value, MB_CASE_TITLE);
 
-                return $ucfirst;
-            }, explode('_', $name)));
+                        return $ucfirst;
+                    },
+                    explode('_', $name)
+                )
+            );
 
         } else {
             $name = mb_convert_case($name, MB_CASE_TITLE);
         }
+
         return $name;
     }
 
@@ -842,6 +853,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     public function setPrimaryKey($primaryKey)
     {
         $this->primaryKey = $primaryKey;
+
         return $this;
     }
 
@@ -889,6 +901,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     {
 
         $var = key($this->attributes);
+
         return $var;
     }
 
@@ -898,6 +911,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     public function next()
     {
         $var = next($this->attributes);
+
         return $var;
     }
 
@@ -908,6 +922,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     {
         $key = key($this->attributes);
         $var = ($key !== null && $key !== false);
+
         return $var;
     }
 

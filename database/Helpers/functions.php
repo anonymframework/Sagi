@@ -2,6 +2,7 @@
 use Sagi\Database\Model;
 use Sagi\Database\ModelManager;
 use Sagi\Database\QueryBuilder;
+
 /**
  * @param string $table
  * @return Model|QueryBuilder
@@ -47,7 +48,7 @@ function orWhere($table, $field, $backet, $value)
  */
 function raw($query)
 {
- return Model::raw($query);
+    return Model::raw($query);
 }
 
 /**
@@ -55,7 +56,8 @@ function raw($query)
  * @param string $from
  * @return QueryBuilder
  */
-function select($select, $from = ''){
+function select($select, $from = '')
+{
     return ModelManager::createModelInstanceIfExists($from)
         ->select($select);
 }

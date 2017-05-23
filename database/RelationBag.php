@@ -1,4 +1,5 @@
 <?php
+
 namespace Sagi\Database;
 
 /**
@@ -14,7 +15,7 @@ class RelationBag
      */
     public static $relations = [
         'one' => [],
-        'many' => []
+        'many' => [],
     ];
 
     /**
@@ -47,7 +48,7 @@ class RelationBag
     {
         static::$relations[$type][$name] = [
             'instance' => $model,
-            'propeties' => $propeties
+            'propeties' => $propeties,
         ];
     }
 
@@ -59,7 +60,7 @@ class RelationBag
      */
     public static function getRelation($name, Model $our, $type)
     {
-        if (!static::isPreparedBefore($name)) {
+        if ( ! static::isPreparedBefore($name)) {
             static::prepareRelation($name, $our, $type);
         }
 
@@ -75,7 +76,7 @@ class RelationBag
      */
     public static function getPreparedName($name, $type)
     {
-        return $name . "::" . $type;
+        return $name."::".$type;
     }
 
     /**

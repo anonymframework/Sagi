@@ -15,7 +15,7 @@ class MigrationManager extends Schema
 
     public static $systemMigrations = [
         'auth',
-        'migrations'
+        'migrations',
     ];
 
     /**
@@ -23,7 +23,7 @@ class MigrationManager extends Schema
      */
     public static $migrationRelations = [
         'one' => [],
-        'many' => []
+        'many' => [],
     ];
 
     /**
@@ -54,11 +54,11 @@ class MigrationManager extends Schema
 
     public function migrate()
     {
-        if (!$this->checkMigrationTable()) {
+        if ( ! $this->checkMigrationTable()) {
             $this->createMigrationsTable();
         }
 
-        $glob = glob(static::$migrationDir . '/*');
+        $glob = glob(static::$migrationDir.'/*');
 
         $files = [];
 
@@ -67,7 +67,7 @@ class MigrationManager extends Schema
         foreach ($glob as $file) {
             $class = explode('__', $file);
 
-            if (!isset($class[1])) {
+            if ( ! isset($class[1])) {
                 continue;
             }
 
@@ -93,7 +93,7 @@ class MigrationManager extends Schema
         $files = array_merge($files, $this->runMigrations($migrations));
 
         if (count(static::$migrationRelations['one']) || count(static::$migrationRelations['many'])) {
-            file_put_contents(__DIR__ . '/relations.json', json_encode(static::$migrationRelations));
+            file_put_contents(__DIR__.'/relations.json', json_encode(static::$migrationRelations));
         }
 
         return $files;
@@ -111,7 +111,7 @@ class MigrationManager extends Schema
 
     public function migrateOne($file, $prepared)
     {
-        if (!class_exists($prepared)) {
+        if ( ! class_exists($prepared)) {
             \Composer\Autoload\includeFile($file);
         }
 
@@ -124,7 +124,7 @@ class MigrationManager extends Schema
         if ($this->checkMigrated($file, $prepared)) {
             return [
                 'name' => $file,
-                'status' => 2
+                'status' => 2,
             ];
         }
 
@@ -134,23 +134,27 @@ class MigrationManager extends Schema
 
 
         } else {
-            throw new \Exception(get_class($migration) . 'is not a instance of MigrationInterface');
+            throw new \Exception(get_class($migration).'is not a instance of MigrationInterface');
         }
 
-        QueryBuilder::createNewInstance()->setTable('migrations')->create(new Entity([
-            'filename' => $prepared,
-            'path' => $file
-        ]));
+        QueryBuilder::createNewInstance()->setTable('migrations')->create(
+            new Entity(
+                [
+                    'filename' => $prepared,
+                    'path' => $file,
+                ]
+            )
+        );
 
         return [
             'name' => $file,
-            'status' => 1
+            'status' => 1,
         ];
     }
 
     public function down()
     {
-        if (!$this->checkMigrationTable()) {
+        if ( ! $this->checkMigrationTable()) {
             throw new \Exception('You did not migrate anything yet');
         }
 
@@ -163,7 +167,7 @@ class MigrationManager extends Schema
             $name = $migrate->filename;
 
 
-            if (!file_exists($path)) {
+            if ( ! file_exists($path)) {
                 continue;
             }
             include $path;
@@ -173,8 +177,10 @@ class MigrationManager extends Schema
             if ($class instanceof MigrationInterface) {
                 $class->down();
 
-                $builder = QueryBuilder::createNewInstance($this->migrationTable)->where('path',
-                    $path)->where('filename', $name);
+                $builder = QueryBuilder::createNewInstance($this->migrationTable)->where(
+                    'path',
+                    $path
+                )->where('filename', $name);
 
                 if ($builder->exists()) {
                     $builder->delete();
@@ -199,8 +205,10 @@ class MigrationManager extends Schema
      */
     public function checkMigrated($file, $class)
     {
-        $builder = QueryBuilder::createNewInstance()->setTable($this->migrationTable)->where('filename',
-            $class)->where('path', $file);
+        $builder = QueryBuilder::createNewInstance()->setTable($this->migrationTable)->where(
+            'filename',
+            $class
+        )->where('path', $file);
 
         return $builder->exists();
     }
@@ -214,11 +222,14 @@ class MigrationManager extends Schema
         if (strpos($name, "_")) {
             $exp = explode("_", $name);
 
-            $exp = array_map(function ($value) {
-                $ucfirst = mb_convert_case($value, MB_CASE_TITLE);
+            $exp = array_map(
+                function ($value) {
+                    $ucfirst = mb_convert_case($value, MB_CASE_TITLE);
 
-                return $ucfirst;
-            }, $exp);
+                    return $ucfirst;
+                },
+                $exp
+            );
 
 
             $name = join('', $exp);
@@ -230,11 +241,22 @@ class MigrationManager extends Schema
         return $name;
     }
 
-    public static function parseCamelCase($camel){
-        return implode("_", array_map(function($value){
-            return mb_convert_case($value, MB_CASE_LOWER);
-        },preg_split('/(?<=[a-z])(?=[A-Z])|(?=[A-Z][a-z])/',
-            $camel, -1, PREG_SPLIT_NO_EMPTY)));
+    public static function parseCamelCase($camel)
+    {
+        return implode(
+            "_",
+            array_map(
+                function ($value) {
+                    return mb_convert_case($value, MB_CASE_LOWER);
+                },
+                preg_split(
+                    '/(?<=[a-z])(?=[A-Z])|(?=[A-Z][a-z])/',
+                    $camel,
+                    -1,
+                    PREG_SPLIT_NO_EMPTY
+                )
+            )
+        );
     }
 
     /**
@@ -260,11 +282,14 @@ class MigrationManager extends Schema
 
     public function createMigrationsTable()
     {
-        $this->createTable($this->migrationTable, function (Row $row) {
-            $row->pk('id');
-            $row->string('filename')->notNull();
-            $row->string('path')->notNull();
-        });
+        $this->createTable(
+            $this->migrationTable,
+            function (Row $row) {
+                $row->pk('id');
+                $row->string('filename')->notNull();
+                $row->string('path')->notNull();
+            }
+        );
     }
 
     /**
@@ -281,7 +306,7 @@ class MigrationManager extends Schema
      */
     public static function migrationPath($name)
     {
-        return static::$migrationDir . '/migration_file' . date('y_m_d_h_m') . '__' . $name . '.php';
+        return static::$migrationDir.'/migration_file'.date('y_m_d_h_m').'__'.$name.'.php';
 
     }
 }

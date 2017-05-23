@@ -15,7 +15,8 @@ class ModifyTable
     private $sql;
 
 
-    public function alterTable($table){
+    public function alterTable($table)
+    {
         $this->sql .= 'ALTER TABLE '.$table;
     }
 
@@ -25,14 +26,15 @@ class ModifyTable
      * @param array $values
      * @return $this
      */
-    public function addColumn($column, $type,array $values = array()){
-        if (!empty($values)) {
+    public function addColumn($column, $type, array $values = array())
+    {
+        if ( ! empty($values)) {
             $values = $this->prepareValues($values);
         }
 
         $this->compileType($type, $values);
 
-        $this->sql .=  "ADD ($column $type{$values})";
+        $this->sql .= "ADD ($column $type{$values})";
 
         return $this;
     }
@@ -42,7 +44,8 @@ class ModifyTable
      * @param $values
      * @return string
      */
-    private function prepareValues($values){
+    private function prepareValues($values)
+    {
         return '('.rtrim(',', implode(',', $values)).')';
     }
 
@@ -50,7 +53,8 @@ class ModifyTable
      * @param $table
      * @return ModifyTable
      */
-    public static function table($table){
+    public static function table($table)
+    {
         $self = new self();
 
         $self->alterTable($table);
@@ -62,7 +66,8 @@ class ModifyTable
     /**
      * @return string
      */
-    public function sql(){
+    public function sql()
+    {
         return $this->sql;
     }
 }

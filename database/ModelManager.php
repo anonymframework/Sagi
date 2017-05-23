@@ -36,7 +36,7 @@ class ModelManager
      */
     public static function prepareModelClass($model)
     {
-        return static::getNamespace() . '\\' . mb_convert_case($model, MB_CASE_TITLE);
+        return static::getNamespace().'\\'.mb_convert_case($model, MB_CASE_TITLE);
     }
 
     public static function prepareModelPath($model)
@@ -54,12 +54,15 @@ class ModelManager
         $model = static::prepareModelClass($model);
 
         $reflection = new \ReflectionClass($model);
+
         return $reflection->newInstance();
     }
 
-    public static function checkModelIsExists($model){
+    public static function checkModelIsExists($model)
+    {
         return class_exists(static::prepareModelClass($model), true);
     }
+
     /**
      * @param string $model
      * @return Model|QueryBuilder

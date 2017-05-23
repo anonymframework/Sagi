@@ -19,9 +19,10 @@ class SubWhere
 
     public $type;
 
-    public function __construct($subQuery, $type){
-       $this->setQuery($subQuery);
-       $this->type = $type;
+    public function __construct($subQuery, $type)
+    {
+        $this->setQuery($subQuery);
+        $this->type = $type;
     }
 
     /**
@@ -39,6 +40,7 @@ class SubWhere
     public function setQuery($query)
     {
         $this->query = $query;
+
         return $this;
     }
 

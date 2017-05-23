@@ -30,16 +30,16 @@ class ConfigManager
 
     public static function loadConfigs()
     {
-        $rootDir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
+        $rootDir = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR;
 
-        static::$configFile = $rootDir . "config.php";
+        static::$configFile = $rootDir."config.php";
 
         if (file_exists(static::$configFile)) {
             static::$configs = include static::$configFile;
 
             static::set('root_dir', $rootDir);
         } else {
-            throw new Exceptions\ConfigException(static::$configFile . 'is not exists');
+            throw new Exceptions\ConfigException(static::$configFile.'is not exists');
         }
     }
 
@@ -48,7 +48,7 @@ class ConfigManager
      */
     public static function getConfigs()
     {
-        if (!static::$configs) {
+        if ( ! static::$configs) {
             static::loadConfigs();
         }
 
@@ -71,7 +71,7 @@ class ConfigManager
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (!is_array($array) || !array_key_exists($segment, $array)) {
+            if ( ! is_array($array) || ! array_key_exists($segment, $array)) {
                 return $default;
             }
 
@@ -93,7 +93,7 @@ class ConfigManager
             // If the key doesn't exist at this depth, we will just create an empty array
             // to hold the next value, allowing us to create the arrays to hold final
             // values at the correct depth. Then we'll keep digging into the array.
-            if (!isset($array[$key]) || !is_array($array[$key])) {
+            if ( ! isset($array[$key]) || ! is_array($array[$key])) {
                 $array[$key] = [];
             }
 

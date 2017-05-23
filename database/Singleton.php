@@ -12,7 +12,7 @@ class Singleton
     /**
      * @var array
      */
-    protected static  $instance;
+    protected static $instance;
 
     /**
      * @param $class
@@ -21,8 +21,8 @@ class Singleton
      */
     public static function load($class, $parameters = [])
     {
-        if (!isset(static::$instance[$class]) || !static::$instance[$class] instanceof $class) {
-            $reflectionClass= new \ReflectionClass($class);
+        if ( ! isset(static::$instance[$class]) || ! static::$instance[$class] instanceof $class) {
+            $reflectionClass = new \ReflectionClass($class);
 
             static::$instance[$class] = $reflectionClass->newInstanceArgs($parameters);
         }

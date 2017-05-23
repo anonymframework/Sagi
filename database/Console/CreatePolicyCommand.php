@@ -3,10 +3,10 @@
 namespace Sagi\Database\Console;
 
 use Sagi\Database\TemplateManager;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 
 class CreatePolicyCommand extends Command
 {
@@ -22,25 +22,31 @@ class CreatePolicyCommand extends Command
     {
         $file = $input->getArgument('file');
 
-        $name = $file . 'Policy';
+        $name = $file.'Policy';
 
-        $fileName = 'policies' . DIRECTORY_SEPARATOR . $name . '.php';
+        $fileName = 'policies'.DIRECTORY_SEPARATOR.$name.'.php';
 
-        if (!file_exists($fileName)) {
+        if ( ! file_exists($fileName)) {
 
             if (touch($fileName)) {
-                $put = file_put_contents($fileName, TemplateManager::prepareContent('policy', ['name' => $name, 'model' => $file, 'variable' => mb_strtolower($file)]));
+                $put = file_put_contents(
+                    $fileName,
+                    TemplateManager::prepareContent(
+                        'policy',
+                        ['name' => $name, 'model' => $file, 'variable' => mb_strtolower($file)]
+                    )
+                );
                 if ($put) {
-                    $output->writeln('<info>' . $fileName . ' : policy created successfully</info>');
+                    $output->writeln('<info>'.$fileName.' : policy created successfully</info>');
                 } else {
-                    $output->writeln('<error>' . $fileName . ' : policy could not created</error>');
+                    $output->writeln('<error>'.$fileName.' : policy could not created</error>');
 
                 }
             } else {
-                $output->writeln('<error>' . $fileName . ' : policy could not created</error>');
+                $output->writeln('<error>'.$fileName.' : policy could not created</error>');
             }
         } else {
-            $output->writeln('<error>' . $fileName . ' : already exists</error>');
+            $output->writeln('<error>'.$fileName.' : already exists</error>');
 
         }
     }

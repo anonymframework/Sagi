@@ -26,14 +26,16 @@ trait SoftDelete
     /**
      * @return mixed
      */
-    public function onlyTrashed(){
-        return $this->where(Model::DELETED_AT, '!=' ,'');
+    public function onlyTrashed()
+    {
+        return $this->where(Model::DELETED_AT, '!=', '');
     }
 
     /**
      * @return $this
      */
-    public function restore(){
+    public function restore()
+    {
         $this->setAttribute(Model::DELETED_AT, '');
 
         return $this->save();

@@ -8,13 +8,13 @@
 
 namespace Sagi\Database\Builder;
 
+use Sagi\Database\Exceptions\WhereException;
 use Sagi\Database\Mapping\Match;
 use Sagi\Database\Mapping\Raw;
 use Sagi\Database\Mapping\SubWhere;
 use Sagi\Database\Mapping\Where;
 use Sagi\Database\QueryBuilder;
 use Sagi\Database\Singleton;
-use Sagi\Database\Exceptions\WhereException;
 
 class WhereBuilder extends Builder
 {
@@ -58,6 +58,7 @@ class WhereBuilder extends Builder
     public function setSubWhere($subWhere)
     {
         $this->subWhere = $subWhere;
+
         return $this;
     }
 
@@ -77,6 +78,7 @@ class WhereBuilder extends Builder
     public function setArgs($args)
     {
         $this->args = $args;
+
         return $this;
     }
 
@@ -95,6 +97,7 @@ class WhereBuilder extends Builder
     public function setİnstance($instance)
     {
         $this->instance = $instance;
+
         return $this;
     }
 
@@ -104,13 +107,13 @@ class WhereBuilder extends Builder
 
         $string = '';
 
-        if (!$this->isSubWhere()) {
+        if ( ! $this->isSubWhere()) {
             $string .= 'WHERE ';
         }
 
         $where = $this->instance->getWhere();
 
-        if (!empty($where)) {
+        if ( ! empty($where)) {
             $prepared = $this->handleWhereQuery($where);
 
             if ($prepared !== '') {
@@ -178,7 +181,7 @@ class WhereBuilder extends Builder
 
 
             $builder = new WhereBuilder($returned, [], true);
-            $query = sprintf(' %s (%s)', $item->type,  $builder->build());
+            $query = sprintf(' %s (%s)', $item->type, $builder->build());
             $args = array_merge($args, $builder->getArgs());
 
             return $query;
@@ -193,55 +196,6 @@ class WhereBuilder extends Builder
 
     }
 
-    /**
-     * @param Where $item
-     * @param $args
-     * @param $preparedQuery
-     * @return string
-     */
-    private function prepareStandartQuery(Where $item, &$args, &$preparedQuery)
-    {
-        $type = $item->type;
-        $args[] = $item->query;
-
-        $this->cleanIsNeeded($item->query);
-        $query = $item->query;
-
-
-        $preparedQuery = sprintf(' %s %s %s %s', $type, $item->field, $item->backet, $query);
-    }
-
-    /**
-     * @param $query
-     */
-    private function cleanIsNeeded(&$query)
-    {
-        if (!is_callable($query) && !$query instanceof Raw && !is_array($query)) {
-            $query = '?';
-        }
-
-        if ($query instanceof Raw) {
-            $query = $query->getQuery();
-        }
-    }
-
-    /**
-     * @param Where $item
-     * @param $args
-     * @return string
-     */
-    private function buildStandartWhereQuery(Where $item, &$args)
-    {
-        $preparedQuery = '';
-
-        if (is_callable($item->query) || is_array($item->query)) {
-            $this->prepareInQuery($item, $args, $preparedQuery);
-        } else {
-            $this->prepareStandartQuery($item, $args, $preparedQuery);
-        }
-
-        return $preparedQuery;
-    }
 
 
     private function prepareInQuery($item, &$args, &$query)
@@ -250,7 +204,7 @@ class WhereBuilder extends Builder
 
         if (is_array($datas)) {
             $args = $datas;
-            $query = '[' . implode(",", array_fill(0, count($datas), '?')) . ']';
+            $query = '['.implode(",", array_fill(0, count($datas), '?')).']';
         } else {
             $sub =
                 $this->prepareSubQuery($datas, Singleton::load(get_class($this->instance)));
@@ -260,35 +214,11 @@ class WhereBuilder extends Builder
         $query = sprintf(' %s %s IN (%s)', $item->type, $item->field, $query);
     }
 
-    /**
-     * @param Match $item
-     * @return string
-     */
-    private function buildMatchWhere(Match $item)
-    {
-        $s = '';
 
-
-        $columns = implode(",", array_map(function ($column) {
-            return "`$column`";
-        }, $item->columns));
-
-        $values = array_map([$this->instance->prepareConnection(), 'quote'], $item->values);
-
-        $type = $item->type;
-
-        if ($s !== '') {
-            $s .= "$type ";
-        }
-
-        $s .= sprintf('MATCH(%s) AGAINST(%s IN %s) ', $columns, implode(',', $values), $item->mode);
-
-        return $s;
-    }
 
     /**
      * @param $callback
-     * @return string
+     * @return array
      */
     public function prepareSubQuery($callback, $instance)
     {
@@ -296,6 +226,7 @@ class WhereBuilder extends Builder
          *  returns a new subquery
          */
         $builder = new SubQuery($callback, $instance);
+
         return $builder->build();
     }
 }

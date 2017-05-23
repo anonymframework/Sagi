@@ -10,4 +10,6 @@ namespace Sagi\Database\Exceptions;
  * Class ProtectedAttributeException
  * @package Sagi\Database
  */
-class ProtectedAttributeException extends \Exception{}
+class ProtectedAttributeException extends \Exception
+{
+}

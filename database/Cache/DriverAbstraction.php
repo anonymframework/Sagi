@@ -17,7 +17,8 @@ class DriverAbstraction
     /**
      * @return mixed
      */
-    public function getDriver(){
+    public function getDriver()
+    {
         return static::$driver;
     }
 }

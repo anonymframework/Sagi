@@ -15,20 +15,20 @@ interface GrammerInterface
     /**
      * @return string
      */
-    public function returnGetQuery();
+    public function getReadQuery();
 
     /**
      * @return string
      */
-    public function returnInsertQuery();
+    public function getInsertQuery();
 
     /**
      * @return string
      */
-    public function returnUpdateQuery();
+    public function getUpdateQuery();
 
     /**
      * @return string
      */
-    public function returnDeleteQuery();
+    public function getDeleteQuery();
 }

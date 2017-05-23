@@ -1,7 +1,7 @@
 <?php
+
 namespace Sagi\Database;
 
-use Memcached;
 use Sagi\Database\Cache\DriverInterface;
 
 /**
@@ -32,32 +32,35 @@ trait Cache
             $driverName = 'RedisDriver';
         }
 
-        $driverName = __NAMESPACE__ . '\\Cache\\' . $driverName;
+        $driverName = __NAMESPACE__.'\\Cache\\'.$driverName;
 
 
         $driver = new $driverName;
 
 
-        $defaultConfig = ConfigManager::get('cache.' . $selectedDriver . '.default', false);
+        $defaultConfig = ConfigManager::get('cache.'.$selectedDriver.'.default', false);
 
         if ($defaultConfig) {
-            $selectedConfigs = ConfigManager::get('cache.' . $selectedDriver . $defaultConfig, []);
+            $selectedConfigs = ConfigManager::get('cache.'.$selectedDriver.$defaultConfig, []);
 
-            if (!empty($selectedConfigs)) {
-                $driver->boot(ConfigManager::get('cache.' . $selectedDriver . $driverName, []));
+            if ( ! empty($selectedConfigs)) {
+                $driver->boot(ConfigManager::get('cache.'.$selectedDriver.$driverName, []));
 
                 static::$driver = $driver;
             }
         }
 
-        $this->getEventManager()->listen('after_update', function ($return) {
+        $this->getEventManager()->listen(
+            'after_update',
+            function ($return) {
 
-            if ($return instanceof Model) {
-                $attributes = $return->getAttributes();
+                if ($return instanceof Model) {
+                    $attributes = $return->getAttributes();
 
-                $this->setCache($this->prepareCacheKey(), $attributes);
+                    $this->setCache($this->prepareCacheKey(), $attributes);
+                }
             }
-        });
+        );
     }
 
     /**
@@ -90,7 +93,7 @@ trait Cache
         $merged = array_merge($this->where, $limit, $order);
 
 
-        return substr(md5(json_encode($this->getTable() . serialize($merged))), 0, 22);
+        return substr(md5(json_encode($this->getTable().serialize($merged))), 0, 22);
     }
 
 
@@ -111,7 +114,11 @@ trait Cache
      */
     public function setCache($key, $value, $expiration = false)
     {
-        return static::$driver->set($key, gzcompress($value), is_int($expiration) ? $expiration : $this->getExpiration());
+        return static::$driver->set(
+            $key,
+            gzcompress($value),
+            is_int($expiration) ? $expiration : $this->getExpiration()
+        );
     }
 
     /**
@@ -154,9 +161,11 @@ trait Cache
 
         } else {
             $this->setCache(
-                $key, serialize(
-                $get = $this->serializeResults()
-            ));
+                $key,
+                serialize(
+                    $get = $this->serializeResults()
+                )
+            );
 
             $result = $this->setAttributes($get);
         }
@@ -179,6 +188,7 @@ trait Cache
     public function setExpiration($expiration)
     {
         $this->expiration = $expiration;
+
         return $this;
     }
 }

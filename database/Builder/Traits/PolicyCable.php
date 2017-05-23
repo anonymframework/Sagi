@@ -10,7 +10,6 @@ namespace Sagi\Database\Builder\Traits;
 
 use Sagi\Database\ConfigManager;
 use Sagi\Database\Exceptions\PolicyException;
-use Sagi\Database\Model;
 use Sagi\Database\Interfaces\PolicyInterface;
 
 
@@ -39,12 +38,12 @@ trait PolicyCable
      */
     public function getPolicy()
     {
-        if (!$this->policy instanceof PolicyInterface) {
-            if ($policy = ConfigManager::get('policies.' . get_called_class())) {
-                if (!is_string($policy) || !class_exists($policy)) {
+        if ( ! $this->policy instanceof PolicyInterface) {
+            if ($policy = ConfigManager::get('policies.'.get_called_class())) {
+                if ( ! is_string($policy) || ! class_exists($policy)) {
                     throw new PolicyException('Policy does not exists');
                 }
-            } elseif (!empty($this->policy)) {
+            } elseif ( ! empty($this->policy)) {
                 $policy = $this->policy;
             }
 

@@ -1,9 +1,11 @@
 <?php
+
 namespace Sagi\Database\Helpers;
 
 use Sagi\Database\Validation as ValidationBase;
 
-class Validaton{
+class Validaton
+{
 
     use ValidationBase;
 

@@ -31,7 +31,7 @@ class TemplateManager
 
             if (is_array($params)) {
                 foreach ($params as $key => $value) {
-                    $content = str_replace("{{" . $key . "}}", $value, $content);
+                    $content = str_replace("{{".$key."}}", $value, $content);
                 }
             }
 
@@ -56,7 +56,7 @@ class TemplateManager
      */
     public static function prepareTempPath($file)
     {
-        return static::$tempDir . $file . static::$tempExt;
+        return static::$tempDir.$file.static::$tempExt;
     }
 
     /**

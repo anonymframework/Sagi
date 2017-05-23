@@ -27,7 +27,7 @@ class RedisDriver implements DriverInterface
     {
         if (is_array($configs)) {
             static::$driver = new Client($configs);
-        }else{
+        } else {
             static::$driver = $configs;
 
         }

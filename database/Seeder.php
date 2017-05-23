@@ -1,4 +1,5 @@
 <?php
+
 namespace Sagi\Database;
 
 
@@ -23,7 +24,7 @@ class Seeder
      */
     public function __construct(OutputInterface $output)
     {
-        $this->seedPath = ConfigManager::get('root_path') . $this->seedPath;
+        $this->seedPath = ConfigManager::get('root_path').$this->seedPath;
         $this->output = $output;
     }
 
@@ -54,7 +55,7 @@ class Seeder
                 throw new Exceptions\SeederException(sprintf('%s class must have SeedManager parent', $className));
             }
 
-            if (!class_exists($className)) {
+            if ( ! class_exists($className)) {
                 throw new Exceptions\SeederException(sprintf('%s class could not found in %s path', $className, $file));
             }
 
@@ -62,7 +63,9 @@ class Seeder
             if (method_exists($class, "seed")) {
                 $class->seed();
             } else {
-                throw new Exceptions\SeederException(sprintf("seed method could not found in %s file %s class", $file, $className));
+                throw new Exceptions\SeederException(
+                    sprintf("seed method could not found in %s file %s class", $file, $className)
+                );
             }
 
         }
@@ -75,7 +78,7 @@ class Seeder
      */
     public function prepareSeedName($name)
     {
-        return "seed_file__" . $name;
+        return "seed_file__".$name;
     }
 
     /**
@@ -84,7 +87,7 @@ class Seeder
      */
     public function prepareSeedFile($name)
     {
-        return $this->seedPath . DIRECTORY_SEPARATOR . $this->prepareSeedName($name).'.php';
+        return $this->seedPath.DIRECTORY_SEPARATOR.$this->prepareSeedName($name).'.php';
     }
 
     /**
@@ -103,6 +106,7 @@ class Seeder
     public function setSeedPath($seedPath)
     {
         $this->seedPath = $seedPath;
+
         return $this;
     }
 

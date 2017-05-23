@@ -1,1 +1,30 @@
-{"one":{"auth":{"users":["user_id","id"]},"sub_roles":{"roles":["role_id","id"]},"users":{"auth":["id","user_id"]}},"many":{"roles":{"sub_roles":["id","rbg_id"]}}}
+{
+  "one": {
+    "auth": {
+      "users": [
+        "user_id",
+        "id"
+      ]
+    },
+    "sub_roles": {
+      "roles": [
+        "role_id",
+        "id"
+      ]
+    },
+    "users": {
+      "auth": [
+        "id",
+        "user_id"
+      ]
+    }
+  },
+  "many": {
+    "roles": {
+      "sub_roles": [
+        "id",
+        "rbg_id"
+      ]
+    }
+  }
+}

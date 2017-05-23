@@ -26,8 +26,9 @@ trait ModuleCable
     protected $bootedModules = [];
 
 
-    protected function getUsedModules(){
-         $traits = class_uses(static::className());
+    protected function getUsedModules()
+    {
+        $traits = class_uses(static::className());
 
 
         $modelModules = class_uses(Model::className());
@@ -35,6 +36,7 @@ trait ModuleCable
 
         return $this->usedModules = $traits = array_merge($modelModules, $traits);
     }
+
     /**
      *
      */
@@ -43,7 +45,7 @@ trait ModuleCable
         $traits = $this->getUsedModules();
 
         foreach ($traits as $trait) {
-            if (method_exists($this, $method = 'boot' . $this->classBaseName($trait))) {
+            if (method_exists($this, $method = 'boot'.$this->classBaseName($trait))) {
 
                 $this->bootedModules[] = $trait;
                 call_user_func_array([$this, $method], []);
@@ -55,7 +57,8 @@ trait ModuleCable
      * @param $name
      * @return bool
      */
-    protected function isCableBooted($name){
+    protected function isCableBooted($name)
+    {
         $name = __NAMESPACE__.'\\'.$name.'Cable';
 
 
@@ -69,6 +72,7 @@ trait ModuleCable
     private function classBaseName($class)
     {
         $class = is_object($class) ? get_class($class) : $class;
+
         return basename(str_replace('\\', '/', $class));
     }
 

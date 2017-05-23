@@ -3,15 +3,15 @@
 namespace Sagi\Database\Console;
 
 use Sagi\Database\ConfigManager;
+use Sagi\Database\MigrationManager;
 use Sagi\Database\Model;
 use Sagi\Database\QueryBuilder;
 use Sagi\Database\TableMapper;
 use Sagi\Database\TemplateManager;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
-use Sagi\Database\MigrationManager;
 
 class CreateModelCommand extends Command
 {
@@ -34,7 +34,7 @@ class CreateModelCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
-        $this->relations = json_decode(file_get_contents(dirname(__DIR__) . '/relations.json'));
+        $this->relations = json_decode(file_get_contents(dirname(__DIR__).'/relations.json'));
 
         $name = $input->getArgument('name');
         $tableName = $name;
@@ -46,26 +46,34 @@ class CreateModelCommand extends Command
 
         $timestamps = $this->findTimestamps($fields);
 
-        $content = TemplateManager::prepareContent('model', [
-            'table' => $name,
-            'relations' => ConfigManager::get('prepare_relations',
-                true) === true ? $this->prepareRelations($name) . $this->prepareRelationsMany($name) : '',
-            'name' => $name = MigrationManager::prepareClassName($name),
-            'primary' => $this->findPrimaryKey($columns),
-            'timestamps' => $timestamps,
-            'abstract' => $abstract = $name . 'Abstract',
-        ]);
+        $content = TemplateManager::prepareContent(
+            'model',
+            [
+                'table' => $name,
+                'relations' => ConfigManager::get(
+                    'prepare_relations',
+                    true
+                ) === true ? $this->prepareRelations($name).$this->prepareRelationsMany($name) : '',
+                'name' => $name = MigrationManager::prepareClassName($name),
+                'primary' => $this->findPrimaryKey($columns),
+                'timestamps' => $timestamps,
+                'abstract' => $abstract = $name.'Abstract',
+            ]
+        );
 
         $setter = $this->prepareModelSetters($tableName);
-        $abstractContent = TemplateManager::prepareContent('abstract.model', [
-            'methods' => $setter[0],
-            'property' => $setter[1],
-            'fake_methods' => $setter[2],
-            'name' => $abstract
-        ]);
+        $abstractContent = TemplateManager::prepareContent(
+            'abstract.model',
+            [
+                'methods' => $setter[0],
+                'property' => $setter[1],
+                'fake_methods' => $setter[2],
+                'name' => $abstract,
+            ]
+        );
 
-        $path = 'models/' . $name . '.php';
-        $abstractPath = 'models/Abstraction/' . $abstract . '.php';
+        $path = 'models/'.$name.'.php';
+        $abstractPath = 'models/Abstraction/'.$abstract.'.php';
 
         $force = $input->getArgument('force');
 
@@ -78,15 +86,15 @@ class CreateModelCommand extends Command
             }
         }
 
-        if (!file_exists($path)) {
+        if ( ! file_exists($path)) {
             if (file_put_contents($path, $content) && file_put_contents($abstractPath, $abstractContent)) {
-                $output->writeln("<info>" . $name . ' created successfully in ' . $path . "</info>");
+                $output->writeln("<info>".$name.' created successfully in '.$path."</info>");
             } else {
-                $output->writeln("<error>" . $name . ' couldnt create in ' . $path . "</error>");
+                $output->writeln("<error>".$name.' couldnt create in '.$path."</error>");
 
             }
         } else {
-            $output->writeln("<error>" . $name . ' already exists in ' . $path . "</error>");
+            $output->writeln("<error>".$name.' already exists in '.$path."</error>");
         }
     }
 
@@ -106,7 +114,7 @@ class CreateModelCommand extends Command
             $timestamps[] = "'updated_at'";
         }
 
-        return empty($timestamps) ? 'false' : '[' . join(',', $timestamps) . ']';
+        return empty($timestamps) ? 'false' : '['.join(',', $timestamps).']';
     }
 
     /**
@@ -146,8 +154,8 @@ class CreateModelCommand extends Command
 
         foreach ($table->columns as $column) {
 
-            $setterMethodName = "set" . MigrationManager::prepareClassName($column->name);
-            $getterMethodName = "get" . MigrationManager::prepareClassName($column->name);
+            $setterMethodName = "set".MigrationManager::prepareClassName($column->name);
+            $getterMethodName = "get".MigrationManager::prepareClassName($column->name);
 
             $type = $column->type;
 
@@ -160,7 +168,7 @@ class CreateModelCommand extends Command
                 $type = "string";
             }
 
-            $methodName = 'filterBy' . MigrationManager::prepareClassName($column->name);
+            $methodName = 'filterBy'.MigrationManager::prepareClassName($column->name);
             $method .= $this->addMethod($methodName, $column->name, $type);
             $pp .= $this->addProperty($column->name, $type);
             $string .= $this->prepareSetterMethod($setterMethodName, $column->name, $type);
@@ -189,7 +197,7 @@ class CreateModelCommand extends Command
      */
     private function addMethod($method, $column, $type)
     {
-        return ' *@method $this ' . $method . '(' . $type . ' $' . $column . ')' . PHP_EOL;
+        return ' *@method $this '.$method.'('.$type.' $'.$column.')'.PHP_EOL;
     }
 
     /**
@@ -199,7 +207,7 @@ class CreateModelCommand extends Command
      */
     private function addProperty($column, $type)
     {
-        return ' *@property $' . $column . ' ' . $type . PHP_EOL;
+        return ' *@property $'.$column.' '.$type.PHP_EOL;
     }
 
     /**
@@ -210,7 +218,7 @@ class CreateModelCommand extends Command
      */
     private function prepareSetterMethod($methodName, $column, $type)
     {
-        return ' *@method $this ' . $methodName . '(' . $type . ' $' . $column . ')' . PHP_EOL;
+        return ' *@method $this '.$methodName.'('.$type.' $'.$column.')'.PHP_EOL;
     }
 
     /**
@@ -221,7 +229,7 @@ class CreateModelCommand extends Command
      */
     private function prepareGetterMethod($methodName, $type)
     {
-        return ' *@method ' . $type . ' ' . $methodName . '()' . PHP_EOL;
+        return ' *@method '.$type.' '.$methodName.'()'.PHP_EOL;
 
     }
 
@@ -231,6 +239,7 @@ class CreateModelCommand extends Command
 
 
         $command = $many === false ? '$this->hasOne' : '$this->hasMany';
+
         return <<<CODE
      /**
       * 
@@ -271,11 +280,17 @@ CODE;
 
                     array_shift($field);
 
-                    $field = array_map(function ($val) {
-                        return array_map(function ($value) {
-                            return str_replace(['`', "'", '"'], '', $value);
-                        }, $val);
-                    }, $field);
+                    $field = array_map(
+                        function ($val) {
+                            return array_map(
+                                function ($value) {
+                                    return str_replace(['`', "'", '"'], '', $value);
+                                },
+                                $val
+                            );
+                        },
+                        $field
+                    );
 
                     $count = count($field[0]);
                     for ($i = 0; $i < $count; $i++) {
@@ -317,7 +332,7 @@ CODE;
 
         if ($count === 1) {
             $pattern = '%s';
-        }elseif($count > 1){
+        } elseif ($count > 1) {
             $pattern = '[%s]';
         }
         $pri = rtrim($pri, ',');

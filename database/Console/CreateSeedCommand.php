@@ -2,13 +2,13 @@
 
 namespace Sagi\Database\Console;
 
+use Sagi\Database\MigrationManager;
 use Sagi\Database\Seeder;
 use Sagi\Database\TemplateManager;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
-use Sagi\Database\MigrationManager;
 
 class CreateSeedCommand extends Command
 {
@@ -32,19 +32,22 @@ class CreateSeedCommand extends Command
 
         $path = $seeder->prepareSeedFile($name);
 
-        $content = TemplateManager::prepareContent('seed', [
-            'name' => MigrationManager::prepareClassName($seeder->prepareSeedName($name))
-        ]);
+        $content = TemplateManager::prepareContent(
+            'seed',
+            [
+                'name' => MigrationManager::prepareClassName($seeder->prepareSeedName($name)),
+            ]
+        );
 
-        if (!file_exists($path)) {
+        if ( ! file_exists($path)) {
             if (file_put_contents($path, $content)) {
-                $output->writeln("<info>" . $name . ' created successfully in ' . $path . "</info>");
+                $output->writeln("<info>".$name.' created successfully in '.$path."</info>");
             } else {
-                $output->writeln("<error>" . $name . ' couldnt create in ' . $path . "</error>");
+                $output->writeln("<error>".$name.' couldnt create in '.$path."</error>");
 
             }
         } else {
-            $output->writeln("<error>" . $name . ' already exists in ' . $path . "</error>");
+            $output->writeln("<error>".$name.' already exists in '.$path."</error>");
         }
     }
 }

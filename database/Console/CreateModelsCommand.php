@@ -1,12 +1,13 @@
 <?php
+
 namespace Sagi\Database\Console;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Sagi\Database\QueryBuilder;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 
 class CreateModelsCommand extends Command
 {
@@ -21,22 +22,25 @@ class CreateModelsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!is_dir('models')) {
+        if ( ! is_dir('models')) {
             mkdir('models', 0777);
         }
 
         $tables = QueryBuilder::createNewInstance()->query("SHOW TABLES LIKE ''")->fetchAll();
 
-        $tables = array_map(function ($value) {
-            $value = array_values($value)[0];
+        $tables = array_map(
+            function ($value) {
+                $value = array_values($value)[0];
 
-            return $value;
-        }, $tables);
+                return $value;
+            },
+            $tables
+        );
 
         $force = $input->getArgument('force');
 
 
-        if($force !== 'force'){
+        if ($force !== 'force') {
             $force = 'standart';
         }
 
@@ -47,7 +51,10 @@ class CreateModelsCommand extends Command
                 continue;
             }
 
-            $this->getApplication()->find('model:create')->run(new ArrayInput(array('name' => $table, 'force' => $force)), $output);
+            $this->getApplication()->find('model:create')->run(
+                new ArrayInput(array('name' => $table, 'force' => $force)),
+                $output
+            );
         }
     }
 

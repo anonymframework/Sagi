@@ -9,6 +9,7 @@
 
 
 namespace Sagi\Database\Event;
+
 use Exception;
 
 
@@ -16,17 +17,4 @@ use Exception;
  * Class EventListenerException
  * @package Sagi\Database\Event
  */
-class EventListenerException extends Exception
-{
-
-    /**
-     * Sınıfı başlatır ve istisnayı oluşturur
-     *
-     * @param string $message
-     */
-    public function __construct($message = '')
-    {
-        $this->message = $message;
-    }
-
-}
+class EventListenerException extends Exception{}

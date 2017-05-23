@@ -34,7 +34,8 @@ class RelationManager
         return $this->makeRelation('many', $table, $ourCol, $tarCol);
     }
 
-    public function makeManyManyRelation($table, $our, $tar){
+    public function makeManyManyRelation($table, $our, $tar)
+    {
 
     }
 
@@ -48,7 +49,8 @@ class RelationManager
     public function makeRelation($type = 'one', $table, $ourCol, $tarCol)
     {
         MigrationManager::$migrationRelations[$type][$this->table] = [
-            $table => [$ourCol, $tarCol]];
+            $table => [$ourCol, $tarCol],
+        ];
 
         return $this;
     }

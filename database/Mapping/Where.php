@@ -15,22 +15,25 @@ class Where
     public $field;
 
     /**
-     * @var string
+     * @var mixed
      */
     public $query;
 
     /**
      * @var string
      */
-    public $backet = '=';
+    public $operator = '=';
 
     /**
      * @var string
      */
     public $type = 'AND';
 
-    /**
-     * @var bool
-     */
-    public $clean = true;
+    public function __construct($field, $operator, $query, $type)
+    {
+        $this->field = $field;
+        $this->operator = $operator;
+        $this->query = $query;
+        $this->type = $type;
+    }
 }

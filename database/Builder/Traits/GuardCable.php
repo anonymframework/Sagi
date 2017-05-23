@@ -36,7 +36,7 @@ trait GuardCable
             return false;
         }
 
-        if (is_array($this->guarded ) && in_array($key, $this->guarded)) {
+        if (is_array($this->guarded) && in_array($key, $this->guarded)) {
             return false;
         }
 
@@ -62,6 +62,7 @@ trait GuardCable
     public function setTotallyGuarded($totallyGuarded)
     {
         $this->totallyGuarded = $totallyGuarded;
+
         return $this;
     }
 

@@ -27,6 +27,7 @@ abstract class SeedManager
     public function setOutput($output)
     {
         $this->output = $output;
+
         return $this;
     }
 }

@@ -6,8 +6,8 @@ namespace Sagi\Database\Console;
 use Sagi\Database\MigrationManager;
 use Sagi\Database\TemplateManager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * Class MigrationCreateFormat
@@ -32,22 +32,22 @@ class MigrationAuthCommand extends Command
 
         $fileName = MigrationManager::migrationPath($file);
 
-        if (!file_exists($fileName)) {
+        if ( ! file_exists($fileName)) {
 
             if (touch($fileName)) {
                 $put = file_put_contents($fileName, TemplateManager::prepareContent('auth', []));
 
                 if ($put) {
-                    $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');
+                    $output->writeln('<info>'.$fileName.' : migration created successfully</info>');
                 } else {
-                    $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
+                    $output->writeln('<error>'.$fileName.' : migration could not created</error>');
 
                 }
             } else {
-                $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
+                $output->writeln('<error>'.$fileName.' : migration could not created</error>');
             }
         } else {
-            $output->writeln('<error>' . $fileName . ' : already exists</error>');
+            $output->writeln('<error>'.$fileName.' : already exists</error>');
 
         }
     }

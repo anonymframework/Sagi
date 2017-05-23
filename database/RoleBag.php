@@ -13,7 +13,7 @@ class RoleBag
         'superadmin' => ['admin', 'user', 'editor'],
         'admin' => ['user', 'editor'],
         'user' => ['editor'],
-        'editor' => []
+        'editor' => [],
     ];
 
     /**

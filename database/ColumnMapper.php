@@ -22,7 +22,7 @@ class ColumnMapper
      */
     public function map($table)
     {
-        $table = QueryBuilder::createNewInstance()->prepare('SHOW COLUMNS FROM ' . $table, []);
+        $table = QueryBuilder::createNewInstance()->prepare('SHOW COLUMNS FROM '.$table, []);
 
         $columns = [];
 

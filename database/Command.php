@@ -22,7 +22,7 @@ class Command
         [
             'auto_increment' => [
                 'string' => 'PRIMARY KEY AUTO_INCREMENT',
-                'belongs_to' => 'increment'
+                'belongs_to' => 'increment',
             ],
             'default' => [
                 'string' => 'DEFAULT %s',
@@ -30,12 +30,12 @@ class Command
             ],
             'null' => [
                 'string' => 'NULL',
-                'belongs_to' => 'null'
+                'belongs_to' => 'null',
             ],
 
             'notnull' => [
                 'string' => 'NOT NULL',
-                'belongs_to' => 'null'
+                'belongs_to' => 'null',
             ],
             'unique' => [
                 'string' => 'UNIQUE',
@@ -43,24 +43,24 @@ class Command
             ],
             'unsigned' => [
                 'string' => 'UNSIGNED',
-                'belongs_to' => 'signed'
+                'belongs_to' => 'signed',
             ],
             'signed' => [
                 'string' => 'SIGNED',
-                'belongs_to' => 'signed'
+                'belongs_to' => 'signed',
             ],
             'constraint' => [
                 'string' => 'CONSTRAINT %s',
-                'belongs_to' => 'substring'
+                'belongs_to' => 'substring',
             ],
             'delete_cascade' => [
                 'string' => 'ON DELETE CASCADE',
-                'belongs_to' => 'end'
+                'belongs_to' => 'end',
             ],
             'update_cascade' => [
                 'string' => 'ON UPDATE CASCADE',
-                'belongs_to' => 'end'
-            ]
+                'belongs_to' => 'end',
+            ],
         ];
 
     /**
@@ -70,7 +70,7 @@ class Command
         'default',
         'null',
         'notnull',
-        'unique'
+        'unique',
     ];
 
     /**
@@ -82,7 +82,7 @@ class Command
         'notnull',
         'signed',
         'unsigned',
-        'auto_increment'
+        'auto_increment',
     ];
 
     /**
@@ -91,7 +91,7 @@ class Command
     protected $other = [
         'constraint',
         'delete_cascade',
-        'update_cascade'
+        'update_cascade',
     ];
 
     /**
@@ -221,7 +221,7 @@ class Command
      */
     public function defaultValue($value)
     {
-        return $this->addCommand('default', ["'" . $value . "'"]);
+        return $this->addCommand('default', ["'".$value."'"]);
     }
 
     /**
@@ -263,11 +263,17 @@ class Command
     private function addCommand($type, $variables)
     {
         if ($this->isAllowed($type) === false) {
-            throw new Exceptions\SchemaException(sprintf('%s command is not allowed on a %s typed method, allows (%s) ', $type,
-                $this->selectedType, join(',', $this->{$this->selectedType})));
+            throw new Exceptions\SchemaException(
+                sprintf(
+                    '%s command is not allowed on a %s typed method, allows (%s) ',
+                    $type,
+                    $this->selectedType,
+                    join(',', $this->{$this->selectedType})
+                )
+            );
         }
 
-        if (!empty($variables)) {
+        if ( ! empty($variables)) {
             array_unshift($variables, $this->patterns[$type]['string']);
 
             $command = call_user_func_array('sprintf', $variables);
@@ -294,16 +300,22 @@ class Command
             $search = trim($search);
             $values = join(' ', $values);
 
-            $pattern = str_replace(':' . $search, $values, $pattern);
+            $pattern = str_replace(':'.$search, $values, $pattern);
         }
 
-        $pattern = join(' ', array_filter(explode(' ', $pattern), function ($value) {
-            if (!empty($value)) {
-                return $value;
-            } else {
-                return false;
-            }
-        }));
+        $pattern = join(
+            ' ',
+            array_filter(
+                explode(' ', $pattern),
+                function ($value) {
+                    if ( ! empty($value)) {
+                        return $value;
+                    } else {
+                        return false;
+                    }
+                }
+            )
+        );
 
         return $pattern;
     }

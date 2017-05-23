@@ -5,6 +5,7 @@
  */
 
 namespace Sagi\Database\Cache;
+
 use Memcached;
 
 class MemcacheDriver implements DriverInterface
@@ -33,7 +34,7 @@ class MemcacheDriver implements DriverInterface
             static::$driver = new Memcached();
 
             static::$driver->addServer($configs['host'], $configs['port']);
-        }elseif($configs instanceof Memcached){
+        } elseif ($configs instanceof Memcached) {
             static::$driver = $configs;
         }
 

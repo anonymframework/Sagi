@@ -5,8 +5,8 @@ namespace Sagi\Database\Console;
 
 use Sagi\Database\Loggable;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputInterface;
 
 class CleanLogsCommand extends Command
 {
@@ -19,7 +19,7 @@ class CleanLogsCommand extends Command
     {
         $files = glob(Loggable::$logFile.DIRECTORY_SEPARATOR.'*.log');
 
-        foreach($files as $file){
+        foreach ($files as $file) {
 
         }
 

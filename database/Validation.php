@@ -1,4 +1,5 @@
 <?php
+
 namespace Sagi\Database;
 
 trait Validation
@@ -49,7 +50,7 @@ trait Validation
         'same_digit' => '$0 alanına girilen karekter uzunluğu $1 alanıyla eşit olmalıdır',
         'match_db' => '$0 veri tabanında bulunamadı',
         'match_db_with' => '$0 veri tabanında bulunamadı',
-        'not_match_db' => '$0 Kaydı Zaten Mevcut'
+        'not_match_db' => '$0 Kaydı Zaten Mevcut',
     ];
 
     /**
@@ -70,7 +71,7 @@ trait Validation
         $this->handleFilters($filters, $datas);
         $this->handleRules($rules);
 
-        return !$this->failed();
+        return ! $this->failed();
     }
 
     /**
@@ -83,7 +84,7 @@ trait Validation
             $subFilters = explode("|", $subFilters);
 
             foreach ($subFilters as $subFilter) {
-                $filterFunc = 'handleFilter' . ucfirst($subFilter);
+                $filterFunc = 'handleFilter'.ucfirst($subFilter);
 
                 if (isset($this->datas[$index])) {
                     $filtred = call_user_func_array(array($this, $filterFunc), [$datas[$index]]);
@@ -142,14 +143,39 @@ trait Validation
         $input = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>]*+[>\b]?#iu', '$1>', $input);
 
 
-        $input = preg_replace('#([a-z]*)[\x00-\x20]*=[\x00-\x20]*([`\'"]*)[\x00-\x20]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2nojavascript...', $input);
-        $input = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2novbscript...', $input);
-        $input = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $input);
+        $input = preg_replace(
+            '#([a-z]*)[\x00-\x20]*=[\x00-\x20]*([`\'"]*)[\x00-\x20]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu',
+            '$1=$2nojavascript...',
+            $input
+        );
+        $input = preg_replace(
+            '#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu',
+            '$1=$2novbscript...',
+            $input
+        );
+        $input = preg_replace(
+            '#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u',
+            '$1=$2nomozbinding...',
+            $input
+        );
 
 
-        $input = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i', '$1>', $input);
-        $input = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?behaviour[\x00-\x20]*\([^>]*+>#i', '$1>', $input);
-        $input = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:*[^>]*+>#iu', '$1>', $input);
+        $input = preg_replace(
+            '#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i',
+            '$1>',
+            $input
+        );
+        $input = preg_replace(
+            '#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?behaviour[\x00-\x20]*\([^>]*+>#i',
+            '$1>',
+            $input
+        );
+        $input = preg_replace(
+            '#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:*[^>]*+>#iu',
+            '$1>',
+            $input
+        );
+
         return $input;
     }
 
@@ -162,9 +188,14 @@ trait Validation
     private function stripTags($input)
     {
 
-        $input = preg_replace('#</*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|i(?:frame|layer)|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|title|xml)[^>]*+>#i', '', $input);
+        $input = preg_replace(
+            '#</*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|i(?:frame|layer)|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|title|xml)[^>]*+>#i',
+            '',
+            $input
+        );
 
         $input = preg_replace('#</*\w+:\w[^>]*+>#i', '', $input);
+
         return $input;
     }
 
@@ -184,6 +215,7 @@ trait Validation
         $decoded = $this->stripTags($decoded);
         $decoded = $this->stripEncodedEntities($decoded);
         $output = base64_encode($decoded);
+
         return $output;
     }
 
@@ -217,17 +249,20 @@ trait Validation
                     $args = [];
                 }
 
-                $prepared = array_map(function ($value) {
-                    return ucfirst($value);
-                }, explode("_", $name));
+                $prepared = array_map(
+                    function ($value) {
+                        return ucfirst($value);
+                    },
+                    explode("_", $name)
+                );
 
-                $func = "handleRule" . join('', $prepared);
+                $func = "handleRule".join('', $prepared);
 
                 $return = call_user_func_array(array($this, $func), [$index, $args]);
 
 
-                if ($name === 'required' && !$return) {
-                    $this->errors[$name . '.' . $index] = $this->prepareErrorMessage($index, $this->messages[$name], $args);
+                if ($name === 'required' && ! $return) {
+                    $this->errors[$name.'.'.$index] = $this->prepareErrorMessage($index, $this->messages[$name], $args);
                     break;
                 }
 
@@ -244,8 +279,8 @@ trait Validation
     protected function handleRuleResult($return, $rule, $index, $args)
     {
 
-        if (!$return) {
-            $full = $rule . '.' . $index;
+        if ( ! $return) {
+            $full = $rule.'.'.$index;
 
             $message = isset($this->messages[$full]) ? $this->messages[$full] : $this->messages[$rule];
 
@@ -264,7 +299,7 @@ trait Validation
 
         $args = array_merge([$field], $args);
         foreach ($args as $index => $arg) {
-            $message = str_replace('$' . $index, $arg, $message);
+            $message = str_replace('$'.$index, $arg, $message);
         }
 
         return $message;
@@ -276,7 +311,7 @@ trait Validation
      */
     protected function handleRuleRequired($index)
     {
-        return (!empty($this->datas[$index]));
+        return ( ! empty($this->datas[$index]));
     }
 
     /**
@@ -323,7 +358,7 @@ trait Validation
             $column = $index;
         }
 
-        if (!isset($this->errors['match_db.' . $other])) {
+        if ( ! isset($this->errors['match_db.'.$other])) {
             return QueryBuilder::createNewInstance($table)->where($column, $this->datas[$index])->exists();
         } else {
             return true;
@@ -350,7 +385,7 @@ trait Validation
 
         $builder = QueryBuilder::createNewInstance($table)->where($column, $this->datas[$index]);
 
-        return !$builder->exists();
+        return ! $builder->exists();
     }
 
     /**
@@ -531,6 +566,7 @@ trait Validation
     public function setRules($rules)
     {
         $this->rules = $rules;
+
         return $this;
     }
 
@@ -549,6 +585,7 @@ trait Validation
     public function setFilters($filters)
     {
         $this->filters = $filters;
+
         return $this;
     }
 
@@ -579,7 +616,7 @@ trait Validation
      */
     public function failed()
     {
-        return !empty($this->errors);
+        return ! empty($this->errors);
     }
 
     /**
@@ -605,6 +642,7 @@ trait Validation
     public function setDatas($datas)
     {
         $this->datas = $datas;
+
         return $this;
     }
 }

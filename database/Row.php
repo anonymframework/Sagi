@@ -32,7 +32,7 @@ class Row
         'primary_key' => 'PRIMARY KEY(%s)',
         'foreign_key' => 'FOREIGN KEY(`%s`) REFERENCES `%s`(`%s`)',
         'index' => 'INDEX `%s` (`%s`) ',
-        'fulltext' => 'FULLTEXT %s (%s)'
+        'fulltext' => 'FULLTEXT %s (%s)',
     ];
 
     /**
@@ -41,7 +41,7 @@ class Row
     protected $subPatterns = [
         'string' => ':command :default :null',
         'integer' => ':command :signed :null :unique :increment',
-        'other' => ':substring :command :end'
+        'other' => ':substring :command :end',
     ];
 
     /**
@@ -64,9 +64,9 @@ class Row
     public function setTable($table)
     {
         $this->table = $table;
+
         return $this;
     }
-
 
 
     public function index($name, $col)
@@ -226,8 +226,11 @@ class Row
      */
     public function pk($name, $limit = 255)
     {
-        return $this->addCommand('int', $this->madeArray($name, $limit),
-            'integer')->unsigned()->notNull()->autoIncrement();
+        return $this->addCommand(
+            'int',
+            $this->madeArray($name, $limit),
+            'integer'
+        )->unsigned()->notNull()->autoIncrement();
     }
 
     /**
@@ -288,9 +291,12 @@ class Row
     public function primaryKey($keys)
     {
         if (is_string($keys)) {
-            $keys = array_map(function ($value){
-                return "`$value`";
-            }, explode(',', $keys));
+            $keys = array_map(
+                function ($value) {
+                    return "`$value`";
+                },
+                explode(',', $keys)
+            );
         }
 
         $keys = join(',', $keys);
@@ -315,7 +321,8 @@ class Row
      * @param $columns
      * @return Command
      */
-    public function fulltext($index, $columns){
+    public function fulltext($index, $columns)
+    {
         if (is_array($columns)) {
             $columns = join(',', $columns);
         }
@@ -355,10 +362,12 @@ class Row
     public function makeRelation($type = 'one', $table, $ourCol, $tarCol)
     {
         MigrationManager::$migrationRelations[$type][$this->table] = [
-            $table => [$ourCol, $tarCol]];
+            $table => [$ourCol, $tarCol],
+        ];
 
         return $this;
     }
+
     /**
      * get all args
      *
@@ -381,7 +390,7 @@ class Row
     {
         $childPattern = $this->subPatterns[$childPatternType];
 
-        if (!empty($variables)) {
+        if ( ! empty($variables)) {
             array_unshift($variables, $this->patterns[$type]);
 
             $command = call_user_func_array('sprintf', $variables);
@@ -404,7 +413,7 @@ class Row
         if (is_array(static::$sqlCommands)) {
             foreach (static::$sqlCommands as $command) {
                 if ($command instanceof Command) {
-                    $query .= $command->prepareCommand() . ",";
+                    $query .= $command->prepareCommand().",";
                 }
             }
         }

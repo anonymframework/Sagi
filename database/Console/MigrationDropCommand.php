@@ -2,10 +2,10 @@
 
 namespace Sagi\Database\Console;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Sagi\Database\MigrationManager;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputInterface;
 
 class MigrationDropCommand extends Command
 {
@@ -24,7 +24,7 @@ class MigrationDropCommand extends Command
         $files = $migration->down();
 
         foreach ($files as $file) {
-            $output->writeln("<info>" . $file . " dropped successfully.</info>");
+            $output->writeln("<info>".$file." dropped successfully.</info>");
         }
     }
 }

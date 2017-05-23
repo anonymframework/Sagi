@@ -30,18 +30,19 @@ trait EventCable
      * @param string $event
      * @param array $arguments
      */
-   public function callEvent($event, $arguments = [])
-   {
-       if ($this->getEventManager()->hasListiner($event)) {
-           $this->getEventManager()->fire($event, $arguments);
-       }
-   }
+    public function callEvent($event, $arguments = [])
+    {
+        if ($this->getEventManager()->hasListiner($event)) {
+            $this->getEventManager()->fire($event, $arguments);
+        }
+    }
+
     /**
      * @return EventDispatcher
      */
     public function getEventManager()
     {
-        if (!$this->eventManager instanceof EventDispatcher) {
+        if ( ! $this->eventManager instanceof EventDispatcher) {
             $this->eventManager = new EventDispatcher();
         }
 

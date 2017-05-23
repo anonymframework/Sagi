@@ -17,7 +17,7 @@ class MysqlGrammer implements GrammerInterface
      */
     private $get = [
         'group' => 'SELECT :select FROM :from :join :where :group :having :order :limit',
-        'without_group' => 'SELECT :select FROM :from :join :group :having :where :order :limit'
+        'without_group' => 'SELECT :select FROM :from :join :group :having :where :order :limit',
     ];
 
     /**
@@ -29,7 +29,8 @@ class MysqlGrammer implements GrammerInterface
      * @param $group
      * @return $this
      */
-    public function setGroup($group){
+    public function setGroup($group)
+    {
         $this->group = $group;
 
         return $this;
@@ -38,16 +39,16 @@ class MysqlGrammer implements GrammerInterface
     /**
      * @return string
      */
-    public function returnGetQuery()
+    public function getReadQuery()
     {
-         return $this->group === true ? $this->get['group'] : $this->get['without_group'];
+        return $this->group === true ? $this->get['group'] : $this->get['without_group'];
     }
 
 
     /**
      * @return string
      */
-    public function returnInsertQuery()
+    public function getInsertQuery()
     {
         return 'INSERT INTO :from :insert';
     }
@@ -55,7 +56,7 @@ class MysqlGrammer implements GrammerInterface
     /**
      * @return string
      */
-    public function returnUpdateQuery()
+    public function getUpdateQuery()
     {
         return 'UPDATE :from SET :update :where';
     }
@@ -63,7 +64,7 @@ class MysqlGrammer implements GrammerInterface
     /**
      * @return string
      */
-    public function returnDeleteQuery()
+    public function getDeleteQuery()
     {
         return 'DELETE FROM :from :where';
     }

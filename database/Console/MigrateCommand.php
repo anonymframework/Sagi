@@ -9,9 +9,9 @@
 namespace Sagi\Database\Console;
 
 use Sagi\Database\MigrationManager;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * Class MigrateCommand
@@ -35,9 +35,9 @@ class MigrateCommand extends Command
         $files = $migration->migrate();
 
         foreach ($files as $file) {
-            if($file['status'] == 1){
-                $output->writeln("<info>" . $file['name'] . " migrated.</info>");
-            }elseif($file['status'] == 2){
+            if ($file['status'] == 1) {
+                $output->writeln("<info>".$file['name']." migrated.</info>");
+            } elseif ($file['status'] == 2) {
                 $output->writeln('<error>'.$file['name'].' already exists </error>');
             }
         }

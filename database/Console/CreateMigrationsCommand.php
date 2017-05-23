@@ -10,9 +10,9 @@ use Sagi\Database\Mapping\Column;
 use Sagi\Database\MigrationManager;
 use Sagi\Database\TableMapper;
 use Sagi\Database\TemplateManager;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputInterface;
 
 class CreateMigrationsCommand extends Command
 {
@@ -31,12 +31,11 @@ class CreateMigrationsCommand extends Command
 
         foreach ($mapped as $table) {
 
-            if(in_array($table->name, MigrationManager::$systemMigrations))
-            {
+            if (in_array($table->name, MigrationManager::$systemMigrations)) {
                 continue;
             }
 
-            $create = '$this->createTable("' . $table->name . '", function(Table $table){' . "\n\r";
+            $create = '$this->createTable("'.$table->name.'", function(Table $table){'."\n\r";
 
             foreach ($table->columns as $column) {
 
@@ -50,10 +49,10 @@ class CreateMigrationsCommand extends Command
                     $type = "pk";
                 }
 
-                $create .= "\t\t" . '$table->' . $type . '("' . $column->name . '"';
+                $create .= "\t\t".'$table->'.$type.'("'.$column->name.'"';
 
                 if ($column->length) {
-                    $create .= ',' . $column->length;
+                    $create .= ','.$column->length;
                 }
 
                 $create .= ')';
@@ -62,7 +61,7 @@ class CreateMigrationsCommand extends Command
                     if ($column->default === 'CURRENT_TIMESTAMP') {
                         $create .= '->defaultExpression("CURRENT_TIMESTAMP")';
                     } else {
-                        $create .= '->defaultValue("' . $column->default . '")';
+                        $create .= '->defaultValue("'.$column->default.'")';
                     }
                 } else {
                     if ($column->nullable === true) {
@@ -79,32 +78,35 @@ class CreateMigrationsCommand extends Command
 
             $create .= '});';
 
-            $drop = '$this->dropTable("' . $table->name . '");' . "\n";
+            $drop = '$this->dropTable("'.$table->name.'");'."\n";
 
-            $manager = TemplateManager::prepareContent('migration', [
-                'name' => MigrationManager::prepareClassName('create_' . $table->name . '_table'),
-                'up' => $create,
-                'down' => $drop
-            ]);
+            $manager = TemplateManager::prepareContent(
+                'migration',
+                [
+                    'name' => MigrationManager::prepareClassName('create_'.$table->name.'_table'),
+                    'up' => $create,
+                    'down' => $drop,
+                ]
+            );
 
             $fileName = MigrationManager::migrationPath($table->name);
 
-            if (!file_exists($fileName)) {
+            if ( ! file_exists($fileName)) {
 
                 if (touch($fileName)) {
                     $put = file_put_contents($fileName, $manager);
 
                     if ($put) {
-                        $output->writeln('<info>' . $fileName . ' : migration created successfully</info>');
+                        $output->writeln('<info>'.$fileName.' : migration created successfully</info>');
                     } else {
-                        $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
+                        $output->writeln('<error>'.$fileName.' : migration could not created</error>');
 
                     }
                 } else {
-                    $output->writeln('<error>' . $fileName . ' : migration could not created</error>');
+                    $output->writeln('<error>'.$fileName.' : migration could not created</error>');
                 }
             } else {
-                $output->writeln('<error>' . $fileName . ' : already exists</error>');
+                $output->writeln('<error>'.$fileName.' : already exists</error>');
 
             }
         }

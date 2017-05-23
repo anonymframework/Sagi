@@ -36,7 +36,7 @@ class Match
      * @param $values
      * @param string $mode
      */
-    public function __construct($columns, $values,$mode = 'BOOLEAN MODE', $type = 'AND')
+    public function __construct($columns, $values, $mode = 'BOOLEAN MODE', $type = 'AND')
     {
         $this->columns = $columns;
         $this->values = $values;

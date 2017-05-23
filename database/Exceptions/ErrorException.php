@@ -7,4 +7,6 @@
 namespace Sagi\Database\Exceptions;
 
 
-class ErrorException extends \Exception{}
+class ErrorException extends \Exception
+{
+}

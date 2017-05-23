@@ -23,7 +23,7 @@ class Raw
      */
     public function __construct($query)
     {
-         $this->setQuery($query);
+        $this->setQuery($query);
     }
 
     /**
@@ -41,6 +41,7 @@ class Raw
     public function setQuery($query)
     {
         $this->query = $query;
+
         return $this;
     }
 

@@ -9,11 +9,14 @@
 namespace Sagi\Database\Builder;
 
 
+use Sagi\Database\Builder\Grammers\GrammerInterface;
+
 abstract class Builder
 {
+
 
     /**
      * @return mixed
      */
-   abstract public function build();
+    abstract public function build();
 }

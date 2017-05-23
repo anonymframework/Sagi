@@ -1,8 +1,8 @@
 <?php
+
 namespace Sagi\Database;
 
-use Exception;
-use Sagi\Database\Builder\Grammers\GrammerInterface;
+use PDO;
 use Sagi\Database\Exceptions\WhereException;
 use Sagi\Database\Mapping\Entity;
 use Sagi\Database\Mapping\Group;
@@ -10,16 +10,12 @@ use Sagi\Database\Mapping\Join;
 use Sagi\Database\Mapping\Match;
 use Sagi\Database\Mapping\SubWhere;
 use Sagi\Database\Mapping\Where;
-use PDO;
 
 /**
  * Class QueryBuilder
  */
-class QueryBuilder extends Builder
+class QueryBuilder
 {
-
-    const SUBQUERY = 'sub';
-
     /**
      * @var string
      */
@@ -28,45 +24,30 @@ class QueryBuilder extends Builder
     /**
      * @var array
      */
-    protected $counters = [];
-
-    /**
-     * @var array
-     */
     protected $error;
+
     /**
      * @var string
      */
     private $lastQueryString;
 
     /**
-     * @var PDO
+     * @var Connector
      */
-    protected $pdo;
+    protected $connector;
 
     /**
-     * @var GrammerInterface
+     * @var Builder
      */
-    private $grammer;
-
-    public function __construct()
-    {
-        $this->grammer = $this->prepareDefaultGrammer();
-    }
+    private $builder;
 
     /**
-     * @return GrammerInterface
+     *  table name
+     *
+     * @var string|callable
+     *
      */
-    private function prepareDefaultGrammer()
-    {
-        $configs = ConfigManager::returnDefaultConnection();
-
-        $class = mb_convert_case($configs['driver'], MB_CASE_TITLE);
-
-        $namespace = __NAMESPACE__ . '\Builder\Grammers\\' . $class . 'Grammer';
-
-        return new $namespace;
-    }
+    protected $table;
 
     /**
      * @return array
@@ -92,212 +73,48 @@ class QueryBuilder extends Builder
      */
     public function prepareConnection()
     {
-        if (is_null($this->pdo)) {
-
-            $connection = !empty($this->database) ? $this->database : null;
-
-            $this->pdo = Connector::getConnection($connection);
+        if (null === $this->connector) {
+            $this->connector = new Connector();
         }
+        $connection = ! empty($this->database) ? $this->database : null;
 
-        return $this->pdo;
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function prepareDelete()
-    {
-        $pattern = $this->grammer->returnDeleteQuery();
-
-        $handled = $this->handlePattern($pattern, array(
-            ':from' => $this->getTable(),
-            ':where' => $this->prepareWhereQuery()
-        ));
-
-        return $handled;
-    }
-
-    /**
-     * @param Entity $sets
-     * @return mixed
-     */
-    protected function prepareUpdate(Entity $sets)
-    {
-        $pattern = $this->grammer->returnUpdateQuery();
-
-
-        $setted = $this->databaseSetBuilder($sets);
-        $this->setArgs(array_merge($this->getArgs(), $setted['args']));
-
-        $handled = $this->handlePattern($pattern, [
-            ':from' => $this->getTable(),
-            ':update' => $setted['content'],
-            ':where' => $this->prepareWhereQuery()
-        ]);
-
-        return $handled;
-    }
-
-    /**
-     * @param Entity $entity
-     * @return PDOStatement
-     */
-    protected function prepareCreate($entity)
-    {
-        $pattern = $this->grammer->returnInsertQuery();
-
-        $setted = $this->prepareInsertQuery($entity);
-
-        $this->setArgs(array_merge($this->getArgs(), $setted['args']));
-
-        $handled = $this->handlePattern($pattern, [
-            ':from' => $this->getTable(),
-            ':insert' => $setted['content'],
-        ]);
-
-
-        return $handled;
-    }
-
-    protected function prepareInsertQuery(Entity $entity)
-    {
-
-        $s = '(';
-
-        $count = count($entity->datas);
-
-        if ($entity->multipile === false) {
-            $keys = array_keys($entity->datas);
-        } else {
-            $keys = array_keys($entity->datas[0]);
-        }
-
-        foreach ($keys as $key => $value) {
-            $s .= $value . ",";
-        }
-
-        $s = rtrim($s, ",");
-
-        $s .= ") VALUES  ";
-
-        $args = [];
-
-
-        if ($entity->multipile === false) {
-            $s .= $this->handleInsertValue($count);
-            $args = array_values($entity->datas);
-        } else {
-            foreach ($entity->datas as $data) {
-                $values = array_values($data);
-
-                $s .= $this->handleInsertValue(count($values)) . ",";
-                $args = array_merge($args, $values);
-            }
-
-            $s = rtrim($s, ",");
-        }
-
-
-        return ['args' => $args, 'content' => $s];
-    }
-
-    /**
-     * @param string $count
-     * @return string
-     */
-    private function handleInsertValue($count)
-    {
-        $s = '(';
-
-        $s .= implode(',',
-            array_fill(0, $count, '?')
-        );
-
-        $s = rtrim($s, ',');
-
-        $s .= ')';
-
-        return $s;
+        return $this->connector->getConnection($connection);
     }
 
 
     /**
-     * @param $name
-     * @return $this
-     */
-    public static function table($name)
-    {
-        return static::createNewInstance($name);
-    }
-
-    /**
-     * @return string
-     */
-    public function prepareGetQuery()
-    {
-        if ($this->getGroupBy() instanceof Group) {
-            $this->grammer->setGroup(true);
-        }
-
-        $pattern = $this->grammer->returnGetQuery();
-
-        $handled = $this->handlePattern($pattern, [
-            ':select' => $this->prepareSelectQuery($this->getSelect()),
-            ':from' => $this->getTable(),
-            ':join' => $this->prepareJoinQuery($this->getJoin(), $this->getTable()),
-            ':group' => $this->compileGroupQuery(),
-            ':having' => $this->prepareHavingQuery(),
-            ':where' => $this->prepareWhereQuery(),
-            ':order' => $this->compileOrderQuery(),
-            ':limit' => $this->compileLimitQuery()
-        ]);
-
-        return $handled;
-    }
-
-    /**
-     * @param $pattern
-     * @param $args
-     * @return mixeds
-     */
-    private function handlePattern($pattern, $args)
-    {
-        foreach ($args as $key => $arg) {
-            $pattern = str_replace($key, $arg, $pattern);
-        }
-
-        $exploded = array_filter(explode(' ', $pattern), function ($value) {
-            return !empty($value);
-        });
-
-        return implode(' ', $exploded);
-    }
-
-
-    /**
-     * @param array $select
+     * @param mixed $select
      * @return QueryBuilder
      */
-    public function select($select = [])
+    public function select($select)
     {
         if (is_string($select)) {
-            $select = explode(",", $select);
+            $select = explode(',', $select);
         }
-        $select = array_map(function ($value) {
-            if (is_string($value)) {
-                $value = trim($value);
-            }
 
-            return $value;
-        }, $select);
+        if (is_callable($select)) {
+            $select = [$select];
+        }
 
+        $select = array_map(
+            function ($value) {
+                if (is_string($value)) {
+                    $value = trim($value);
+                }
 
-        return $this->setSelect($select);
+                return $value;
+            },
+            $select
+        );
+
+        $this->getBuilder()->setSelect($select);
+
+        return $this;
     }
 
     /**
      *
-     * @param string $table
+     * @param string|callable $table
      * @return Builder
      */
     public function from($table)
@@ -318,16 +135,16 @@ class QueryBuilder extends Builder
     }
 
     /**
-     * @param $limit
+     * @param int|string|array $limit
      * @return $this
      */
     public function limit($limit)
     {
-        if (is_string($limit) || is_numeric($limit)) {
-            $this->setLimit([$limit]);
-        } else {
-            $this->setLimit($limit);
+        if (is_string($limit) || is_int($limit)) {
+            $limit = [$limit];
         }
+
+        $this->getBuilder()->setLimit($limit);
 
         return $this;
     }
@@ -341,7 +158,7 @@ class QueryBuilder extends Builder
     {
         $multipile = false;
 
-        if (!is_array($group) && is_string($group)) {
+        if ( ! is_array($group) && is_string($group)) {
             $group = explode(',', $group);
         }
 
@@ -349,7 +166,7 @@ class QueryBuilder extends Builder
             $multipile = true;
         }
 
-        $this->setGroupBy(
+        $this->getBuilder()->setGroupBy(
             new Group($group, $multipile)
         );
 
@@ -359,6 +176,7 @@ class QueryBuilder extends Builder
     /**
      * @param $column
      * @param $datas
+     * @param bool $not
      * @return QueryBuilder
      */
     public function like($column, $datas, $not = false)
@@ -375,11 +193,11 @@ class QueryBuilder extends Builder
         $like = ' LIKE ';
 
         if ($not) {
-            $like = ' NOT' . $like;
+            $like = ' NOT'.$like;
         }
 
 
-        return $this->where([$column, $like, $type]);
+        return $this->where($column, '', $like, $type);
     }
 
     /**
@@ -422,8 +240,9 @@ class QueryBuilder extends Builder
         $like = ' LIKE ';
 
         if ($not) {
-            $like = ' NOT' . $like;
+            $like = ' NOT'.$like;
         }
+
 
         return $this->orWhere([$column, $like, $type]);
     }
@@ -431,19 +250,19 @@ class QueryBuilder extends Builder
 
     /**
      * @param string $column
-     * @param array|callable|string $datas
+     * @param array|callable|string $values
      * @param bool $not
-     * @return Model
+     * @return $this
      */
-    public function in($column, $datas, $not = false)
+    public function in($column, $values, $not = false)
     {
         $in = ' IN ';
 
         if ($not) {
-            $in = ' NOT' . $in;
+            $in = ' NOT'.$in;
         }
 
-        return $this->where([$column, $in, $datas], null, null, 'AND', false);
+        return $this->where($column, $in, $values, 'AND');
     }
 
 
@@ -478,7 +297,7 @@ class QueryBuilder extends Builder
         $in = ' IN ';
 
         if ($not) {
-            $in = ' NOT' . $in;
+            $in = ' NOT'.$in;
         }
 
         return $this->orWhere([$column, $in, $datas], null, null, 'OR', false);
@@ -486,12 +305,18 @@ class QueryBuilder extends Builder
 
 
     /**
-     * @param $join
-     * @return Model
+     * @param string $table
+     * @param string $localKey
+     * @param string $backet
+     * @param string $foreignKey
+     * @param string $type
+     * @return $this
      */
     public function join($table, $localKey, $backet, $foreignKey, $type = 'INNER JOIN')
     {
-        $this->addJoin(new Join($type, $table, $foreignKey, $localKey, $backet));
+        $this->getBuilder()->addJoin(
+            new Join($type, $table, $foreignKey, $localKey, $backet)
+        );
 
         return $this;
     }
@@ -528,23 +353,24 @@ class QueryBuilder extends Builder
     }
 
     /**
-     * @param $columns
-     * @param $values
+     * @param string $columns
+     * @param mixed $values
      * @param string $mode
      * @return $this
      */
     public function match($columns, $values, $mode = 'BOOLEAN MODE', $type = 'AND')
     {
-        $match = new Match($columns, $values, $mode, $type);
 
-        $this->where[] = $match;
+        $this->getBuilder()->addWhere(
+            new Match($columns, $values, $mode, $type)
+        );
 
         return $this;
     }
 
     /**
-     * @param $columns
-     * @param $values
+     * @param mixed $columns
+     * @param mixed $values
      * @param $mode
      * @return QueryBuilder
      */
@@ -553,6 +379,25 @@ class QueryBuilder extends Builder
         return $this->match($columns, $values, $mode, 'OR');
     }
 
+    /**
+     * @return string|callable
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @param string|callable $table
+     * @return $this
+     */
+    public function setTable($table)
+    {
+        $this->table = $table;
+        $this->getBuilder()->setTable($table);
+
+        return $this;
+    }
 
     /**
      * @param Raw|callable $where
@@ -563,7 +408,7 @@ class QueryBuilder extends Builder
     {
         $subWhere = new SubWhere($where, $type);
 
-        $this->where[] = $subWhere;
+        $this->getBuilder()->addWhere($subWhere);
 
         return $this;
     }
@@ -579,33 +424,41 @@ class QueryBuilder extends Builder
 
     /**
      * @param string $field
-     * @param string $backet
+     * @param string $operator
      * @param string $value
      * @param string $type
      * @return $this
      */
-    public function where($field, $backet, $value, $type = 'AND')
+    public function where($field, $operator, $value, $type = 'AND')
     {
-        $where = $this->prepareWhereInstance(
-            compact('field', 'backet', 'value', 'type')
+        $where = new Where(
+            $field, $operator, $value, $type
         );
 
-        $mark = $this->prepareWhereMark($backet, $type, $field);
-        $this->where[$mark] = $where;
+
+        $this->getBuilder()->addWhere(
+            $where,
+            $this->prepareWhereMark(
+                $operator,
+                $type,
+                $field
+            )
+        );
 
         return $this;
     }
 
     /**
-     * @param $field
-     * @param $backet
-     * @param $value
-     * @return QueryBuilder
+     * @param string $field
+     * @param string $operator
+     * @param mixed $value
+     * @return $this
      */
-    public function orWhere($field, $backet, $value)
+    public function orWhere($field, $operator, $value)
     {
-        return $this->where($field, $backet, $value, 'OR');
+        return $this->where($field, $operator, $value, 'OR');
     }
+
 
     /**
      * @param $mark
@@ -616,59 +469,19 @@ class QueryBuilder extends Builder
      */
     private function prepareWhereMark($mark, $type, $field)
     {
-        if (isset($this->marks[$mark])) {
-            $mark = $this->marks[$mark];
-            $name = $field . '.' . $type . '.' . $mark;
+        $operators = Builder::getOperators();
 
-            return $name;
-        } else {
-            throw new WhereException(sprintf('%s could not found, you can use one of these(%s)', $mark, $this->join(',', $this->marks)));
+        if ( ! isset($operators[$mark])) {
+            throw new WhereException(
+                sprintf(
+                    '%s could not found, you can use one of these(%s)',
+                    $mark,
+                    $this->join(',', $this->marks)
+                )
+            );
         }
-    }
 
-    /**
-     * @param $datas
-     * @return Where
-     */
-    private function prepareWhereInstance($datas)
-    {
-        $where = new Where();
-
-        $where->field = $datas['field'];
-        $where->backet = $datas['backet'];
-        $where->query = $datas['value'];
-
-        $where->type = $datas['type'];
-
-        return $where;
-    }
-
-    /**
-     * Set verisi oluşturur
-     *
-     * @param mixed $set
-     * @return array
-     */
-    private function databaseSetBuilder(Entity $set)
-    {
-        $s = '';
-        $arr = [];
-        foreach ($set->datas as $key => $value) {
-
-            if (!isset($this->counters[$key])) {
-                $s .= "$key = ?,";
-                $arr[] = $value;
-            } else {
-                $value = $this->counters[$value];
-
-                $s = "$key = $key + $value";
-            }
-
-        }
-        return [
-            'content' => rtrim($s, ','),
-            'args' => $arr,
-        ];
+        return $field.'.'.$type.'.'.$operators[$mark];
     }
 
     /**
@@ -693,7 +506,7 @@ class QueryBuilder extends Builder
      */
     public function prepare($query, $args, $execute = false)
     {
-        if (!$this->pdo instanceof PDO) {
+        if ( ! $this->pdo instanceof PDO) {
             $this->prepareConnection();
         }
 
@@ -713,7 +526,7 @@ class QueryBuilder extends Builder
      * @param array $args
      * @return \PDOStatement
      */
-    public function query($query,array $args = [])
+    public function query($query, array $args = [])
     {
         return $this->prepare($query, $args);
     }
@@ -741,7 +554,7 @@ class QueryBuilder extends Builder
     public function get()
     {
         return $this->returnPreparedResults(
-            $this->prepareGetQuery()
+            $this->getBuilder()->handleGetQuery()
         );
     }
 
@@ -751,7 +564,8 @@ class QueryBuilder extends Builder
     public function delete()
     {
         return $this->returnPreparedResults(
-            $this->prepareDelete(), true
+            $this->getBuilder()->handleDelete(),
+            true
         );
 
     }
@@ -768,8 +582,9 @@ class QueryBuilder extends Builder
 
 
         return $this->returnPreparedResults(
-            $this->prepareUpdate($datas),
-            true);
+            $this->getBuilder()->handleUpdate($datas),
+            true
+        );
     }
 
 
@@ -784,7 +599,7 @@ class QueryBuilder extends Builder
         }
 
         $create = $this->returnPreparedResults(
-            $this->prepareCreate($data),
+            $this->getBuilder()->handleCreate($data),
             true
         );
 
@@ -872,6 +687,7 @@ class QueryBuilder extends Builder
     public function setPdo($pdo)
     {
         $this->pdo = $pdo;
+
         return $this;
     }
 
@@ -890,6 +706,58 @@ class QueryBuilder extends Builder
     public function setLastQueryString($lastQueryString)
     {
         $this->lastQueryString = $lastQueryString;
+
         return $this;
     }
+
+    /**
+     * @return Builder
+     */
+    public function getBuilder()
+    {
+        if (null === $this->builder) {
+            $this->builder = new Builder($this->getTable());
+        }
+
+        return $this->builder;
+    }
+
+    /**
+     * @param Builder $builder
+     * @return QueryBuilder
+     */
+    public function setBuilder($builder)
+    {
+        $this->builder = $builder;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getClassName()
+    {
+        return get_called_class();
+    }
+
+    /**
+     * @param string $as
+     * @return $this
+     */
+    public function setAs($as)
+    {
+        $this->getBuilder()->setAs($as);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAs()
+    {
+        return $this->getBuilder()->getAs();
+    }
 }
+

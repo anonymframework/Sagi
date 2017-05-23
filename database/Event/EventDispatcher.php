@@ -10,13 +10,10 @@
 
 namespace Sagi\Database\Event;
 
-use Sagi\Database\Exceptions\EventNameException;
-use Sagi\Database\Event\EventListenerException;
-
-use Sagi\Database\Event\Event as EventDispatch;
-use Sagi\Database\Event\EventCollector;
-use Sagi\Database\Event\EventListener;
 use Closure;
+use Sagi\Database\Event\Event as EventDispatch;
+use Sagi\Database\Event\EventListener;
+use Sagi\Database\Exceptions\EventNameException;
 
 /**
  *
@@ -63,8 +60,10 @@ class EventDispatcher
 
         foreach ($listeners as $listener) {
 
-            $response[] = $listener instanceof Closure ? $this->resolveClosureListener($listener,
-                $parameters) : $this->resolveObjectListener(
+            $response[] = $listener instanceof Closure ? $this->resolveClosureListener(
+                $listener,
+                $parameters
+            ) : $this->resolveObjectListener(
                 $listener,
                 $event
             );
@@ -170,7 +169,7 @@ class EventDispatcher
      */
     public function getListeners($eventName = '')
     {
-        if (!is_string($eventName)) {
+        if ( ! is_string($eventName)) {
             throw new EventNameException('Event adı geçerli bir string değeri olmalıdır');
         }
 

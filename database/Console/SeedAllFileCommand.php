@@ -19,7 +19,7 @@ class SeedAllFileCommand extends Command
     {
         $seeder = new Seeder($output);
 
-        $glob = glob($seeder->getSeedPath() . '/*.php');
+        $glob = glob($seeder->getSeedPath().'/*.php');
 
 
         foreach ($glob as $file) {

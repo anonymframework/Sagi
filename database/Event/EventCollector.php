@@ -55,12 +55,12 @@ class EventCollector
      */
     public static function addListener($name, $listener)
     {
-        if (!isset(static::$listeners[$name])) {
+        if ( ! isset(static::$listeners[$name])) {
             static::$listeners[$name] = [];
         }
-        if(!is_array($listener)){
+        if ( ! is_array($listener)) {
             static::$listeners[$name][] = $listener;
-        }else{
+        } else {
             static::$listeners[$name] = array_merge(static::$listeners[$name], $listener);
         }
     }

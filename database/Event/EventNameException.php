@@ -9,23 +9,11 @@
 
 
 namespace Sagi\Database\Event;
+
 use Exception;
 
 /**
  * Class EventNameException
  * @package Sagi\Database\Event
  */
-class EventNameException extends Exception
-{
-
-
-    /**
-     * İstisnayı oluşturur
-     *
-     * @param string $message
-     */
-    public function __construct($message = '')
-    {
-        $this->message = $message;
-    }
-}
+class EventNameException extends Exception{}

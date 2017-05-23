@@ -1,4 +1,5 @@
 <?php
+
 namespace Sagi\Database\Exceptions;
 
 
