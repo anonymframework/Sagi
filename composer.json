@@ -17,7 +17,10 @@
     "league/pipeline": "dev-master"
   },
   "require-dev": {
-     "predis/predis" : "1.1"
+     "predis/predis" : "1.1",
+    "phpunit/phpunit": "^6.1",
+    "phpunit/php-invoker": "1.1.x-dev",
+    "phpunit/dbunit": "^3.0@dev"
   },
   "minimum-stability": "dev",
   "autoload": {

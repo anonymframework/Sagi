@@ -3,10 +3,8 @@
 namespace Sagi\Database;
 
 use PDO;
-use PDOException;
 use Sagi\Database\Exceptions\ConnectionException;
-use Sagi\Database\Exceptions\ErrorException;
-use Sagi\Database\Interfaces\ConnectionInterface;
+use Sagi\Database\Exceptions\DriverNotFoundException;
 use Sagi\Database\Interfaces\ConnectorInterface;
 
 class Connector
@@ -21,7 +19,9 @@ class Connector
     private static $callbacks = [];
 
     /**
-     * @param string|null $connection
+     * @param null $connection
+     * @return mixed|null
+     * @throws ConnectionException
      */
     public function madeConnection($connection = null)
     {
@@ -29,7 +29,7 @@ class Connector
         $driver = $configs['driver'];
         $connection = $this->callDriver($driver, $configs);
 
-        if ( ! $connection instanceof ConnectorInterface) {
+        if (!$connection instanceof ConnectorInterface) {
             throw new ConnectionException(
                 sprintf(
                     '%s driver must return an instance of PDO',
@@ -43,6 +43,7 @@ class Connector
 
         return $connection;
     }
+
     /**
      * @param $connection
      * @return array
@@ -52,7 +53,7 @@ class Connector
         if ($connection === null) {
             $configs = ConfigManager::get('connections.default', 'localhost');
         } else {
-            $configs = ConfigManager::get('connections.'.$connection, []);
+            $configs = ConfigManager::get('connections.' . $connection, []);
         }
 
 
@@ -75,7 +76,7 @@ class Connector
      * @param $driver
      * @param array $configs
      * @return mixed
-     * @throws ErrorException
+     * @throws DriverNotFoundException
      */
     private function callDriver($driver, array $configs)
     {
@@ -88,7 +89,7 @@ class Connector
 
         return $callback($configs);
 
-        throw new ErrorException(sprintf('%s driver not found', $driver));
+        throw new DriverNotFoundException(sprintf('%s driver not found', $driver));
     }
 
     /**
