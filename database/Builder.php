@@ -220,35 +220,6 @@ class Builder
     }
 
     /**
-     * Set verisi oluşturur
-     *
-     * @param mixed $set
-     * @return array
-     */
-    private function databaseSetBuilder(Entity $set)
-    {
-        $s = '';
-        $arr = [];
-        foreach ($set->datas as $key => $value) {
-
-            if ( ! isset($this->counters[$key])) {
-                $s .= "$key = ?,";
-                $arr[] = $value;
-            } else {
-                $value = $this->counters[$value];
-
-                $s = "$key = $key + $value";
-            }
-
-        }
-
-        return [
-            'content' => rtrim($s, ','),
-            'args' => $arr,
-        ];
-    }
-
-    /**
      * @return string
      */
     protected function compileLimitQuery()
@@ -602,21 +573,6 @@ class Builder
         return ['args' => $args, 'content' => $s];
     }
 
-    /**
-     * @param string $count
-     * @return string
-     */
-    private function handleInsertValue($count)
-    {
-        $values = implode(
-            ',',
-            array_fill(0, $count, '?')
-        );
-
-        $values = rtrim($values, ',');
-
-        return '('.$values.')';
-    }
 
 
     /**

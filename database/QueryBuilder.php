@@ -3,6 +3,7 @@
 namespace Sagi\Database;
 
 use PDO;
+use Sagi\Database\Executor\Interfaces\DriverInterface;
 use Sagi\Database\Exceptions\WhereException;
 use Sagi\Database\Mapping\Entity;
 use Sagi\Database\Mapping\Group;
@@ -506,7 +507,7 @@ class QueryBuilder
      */
     public function prepare($query, $args, $execute = false)
     {
-        if ( ! $this->pdo instanceof PDO) {
+        if ( ! $this->connection instanceof DriverInterface) {
             $this->prepareConnection();
         }
 

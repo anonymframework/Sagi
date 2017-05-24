@@ -11,6 +11,7 @@ namespace Sagi\Database\Builder;
 
 use Sagi\Database\Builder\Grammers\GrammerInterface;
 use Sagi\Database\Mapping\Entity;
+use Sagi\Database\Repositories\BuilderReturnRepository;
 use Sagi\Database\Repositories\EntityRepository;
 use Sagi\Database\Repositories\ParameterRepository;
 use Sagi\Database\Repositories\PatternRepository;
@@ -59,7 +60,10 @@ class Create extends Builder
 
         $pattern = new Pattern($patternRepository, $parameterRepository);
 
-        return [$pattern->build(), $args];
+        return new BuilderReturnRepository(
+            $pattern->build(),
+            $args
+        );
     }
 
     /**

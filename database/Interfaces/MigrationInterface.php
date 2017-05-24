@@ -9,7 +9,13 @@ namespace Sagi\Database\Interfaces;
 interface MigrationInterface
 {
 
+    /**
+     * @return mixed
+     */
     public function up();
 
+    /**
+     * @return mixed
+     */
     public function down();
 }
