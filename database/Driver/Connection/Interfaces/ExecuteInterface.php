@@ -1,12 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: My
- * Date: 05/23/2017
- * Time: 20:22
- */
-
-namespace Sagi\Database\Executor\Interfaces;
+namespace Sagi\Database\Driver\Connection\Interfaces;
 
 use Sagi\Database\Repositories\ParameterRepository;
 

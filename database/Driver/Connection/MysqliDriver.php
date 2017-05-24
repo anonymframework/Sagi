@@ -1,17 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: My
- * Date: 05/23/2017
- * Time: 20:50
- */
-
-namespace Sagi\Database\Connection\Drivers;
+namespace Sagi\Database\Driver\Connection;
 
 
-use Sagi\Database\Executor\Interfaces\DriverInterface;
-use Sagi\Database\Executor\Interfaces\ExecuteInterface;
-use Sagi\Database\Executor\Interfaces\PrepareInterface;
+use Sagi\Database\Driver\Connection\Interfaces\DriverInterface;
+use Sagi\Database\Driver\Connection\Interfaces\ExecuteInterface;
+use Sagi\Database\Driver\Connection\Interfaces\PrepareInterface;
 use Sagi\Database\Repositories\ParameterRepository;
 use Sagi\Database\Interfaces\ConnectionInterface;
 
@@ -55,5 +48,23 @@ class MysqliDriver extends Driver implements DriverInterface, ExecuteInterface, 
         $prepare = $this->getConnection()->prepare($query);
 
         return $prepare;
+    }
+
+    /**
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
+     */
+    public function __call($name, array $arguments)
+    {
+        if (!is_callable([$this->getConnection(), $name])) {
+            throw new \BadMethodCallException(sprintf(
+                '%s class does not exists in mysqli', $name
+            ));
+        }
+
+        return call_user_func_array(
+            [$this->getConnection(), $name], $arguments
+        );
     }
 }

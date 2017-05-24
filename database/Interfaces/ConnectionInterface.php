@@ -1,7 +1,7 @@
 <?php
 namespace Sagi\Database\Interfaces;
 
-use Sagi\Database\Executor\Interfaces\DriverInterface;
+use Sagi\Database\Driver\Connection\Interfaces\DriverInterface;
 
 /**
  * Interface ConnectionInterface
@@ -10,12 +10,7 @@ use Sagi\Database\Executor\Interfaces\DriverInterface;
 interface ConnectionInterface
 {
 
-    /**
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
-     */
-    public function __call($name, array $arguments);
+
 
 
     /**

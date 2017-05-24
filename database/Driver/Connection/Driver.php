@@ -1,5 +1,5 @@
 <?php
-namespace Sagi\Database\Connection\Drivers;
+namespace Sagi\Database\Driver\Connection;
 
 
 use Sagi\Database\Interfaces\ConnectionInterface;
@@ -13,7 +13,7 @@ class Driver
     private $connection;
 
     /**
-     * @return ConnectionInterface
+     * @return mixed
      */
     public function getConnection()
     {
@@ -21,10 +21,10 @@ class Driver
     }
 
     /**
-     * @param ConnectionInterface $connection
+     * @param mixed $connection
      * @return Driver
      */
-    public function setConnection(ConnectionInterface $connection)
+    public function setConnection($connection)
     {
         $this->connection = $connection;
 

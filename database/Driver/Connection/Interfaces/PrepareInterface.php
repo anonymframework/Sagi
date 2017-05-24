@@ -1,6 +1,6 @@
 <?php
 
-namespace Sagi\Database\Executor\Interfaces;
+namespace Sagi\Database\Driver\Connection\Interfaces;
 
 /**
  * Interface PrepareInterface
