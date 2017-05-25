@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: My
- * Date: 04/27/2017
- * Time: 17:33
- */
 
 namespace Sagi\Database;
-
 
 use League\Pipeline\PipelineBuilder;
 use Sagi\Database\Builder\WhereBuilder;
@@ -17,7 +10,7 @@ use Sagi\Database\Driver\Expectation\ExpectInstanceOf;
 use Sagi\Database\Exceptions\ExtensionNotAsExpectedException;
 use Sagi\Database\Exceptions\ExtensionNotFoundException;
 use Sagi\Database\Extension\Extension;
-use Sagi\Database\Grammer\Sql\SqlReaderGrammerInterface;
+use Sagi\Database\Driver\Grammer\Sql\SqlReaderGrammerInterface;
 use Sagi\Database\Mapping\Join;
 use Sagi\Database\Mapping\SubWhere;
 use Sagi\Database\Mapping\Where;

@@ -1,5 +1,5 @@
 <?php
-namespace Sagi\Database\Grammer\Sql;
+namespace Sagi\Database\Driver\Grammer\Sql;
 
 use Sagi\Database\Builder;
 use Sagi\Database\Mapping\Entity;

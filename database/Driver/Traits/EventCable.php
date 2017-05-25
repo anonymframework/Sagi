@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: My
- * Date: 05/08/2017
- * Time: 01:54
- */
 
-namespace Sagi\Database\Builder\Traits;
+namespace Sagi\Database\Driver\Traits;
 
 
 use Sagi\Database\Event\EventDispatcher;

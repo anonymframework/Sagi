@@ -483,36 +483,44 @@ class QueryBuilder
     }
 
     /**
-     * @param $query
-     * @param $args
-     * @param bool $execute
+     * @param string $query
      * @return bool|\PDOStatement
      */
-    public function prepare($query, $args, $execute = false)
+    public function prepare($query)
     {
         if ( ! $this->connection instanceof DriverInterface) {
             $this->prepareConnection();
         }
 
-        $prepared = $this->pdo->prepare($query);
-        $exed = $prepared->execute($args);
-
-        if ($exed === false) {
-            $this->error = $prepared->errorInfo();
-        }
-
-        return $execute ? $exed : $prepared;
+        return $this
+            ->getBuilder()
+            ->getDriver()
+            ->prepare($query);
     }
 
+    /**
+     * @param mixed $prepare
+     * @param array $args
+     * @return mixed
+     */
+    public function execute($prepare, $args)
+    {
+        return $this
+            ->getBuilder()
+            ->getDriver()
+            ->execute($prepare, $args);
+    }
 
     /**
-     * @param $query
-     * @param array $args
+     * @param string $query
      * @return \PDOStatement
      */
-    public function query($query, array $args = [])
+    public function query($query)
     {
-        return $this->prepare($query, $args);
+        return $this
+            ->getBuilder()
+            ->getDriver()
+            ->query($query);
     }
 
 
@@ -550,7 +558,7 @@ class QueryBuilder
      */
     public function delete()
     {
-        return $this->returnPreparedResults(
+        return $this->handleResults(
             $this
                 ->getBuilder()
                 ->getGrammer()
@@ -625,7 +633,8 @@ class QueryBuilder
      * @param bool $returnOnlyExecute
      * @return array
      */
-    private function handleResults(array  $result, $returnOnlyExecute = false){
+    private function handleResults(array $result, $returnOnlyExecute = false)
+    {
         list($query, $args) = $result;
 
         $this->getBuilder()->setArgs($args);
@@ -634,7 +643,7 @@ class QueryBuilder
 
         list($prepareResult, $executeResult) = $this->execute($prepare, $args);
 
-        if(true === $returnOnlyExecute){
+        if (true === $returnOnlyExecute) {
             return $executeResult;
         }
 

@@ -32,5 +32,14 @@ class BuilderExtension
     {
         return $this->manager->driver('connector')->name($name);
     }
+
+    /**
+     * @param string $name
+     * @return \Sagi\Database\Driver\Driver
+     */
+    public function create($name)
+    {
+        return $this->manager->driver('migration')->name($name);
+    }
 }
 

@@ -38,6 +38,7 @@ class Connector
 
         $driver = $this->driverManager->resolve('connector', $driver);
 
+        return $driver->connect($driver, $configs);
     }
 
     /**

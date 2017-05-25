@@ -1,6 +1,6 @@
 <?php
 
-namespace Sagi\Database\Helpers;
+namespace Sagi\Database\Validation;
 
 use Sagi\Database\Validation as ValidationBase;
 

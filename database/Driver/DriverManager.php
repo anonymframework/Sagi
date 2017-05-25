@@ -63,6 +63,13 @@ class DriverManager
         return $this;
     }
 
+    /**
+     * @param string $to the name of module
+     * @param string $name the name of driver
+     * @param ParameterRepository|null $parameterRepository parameters will given the instance
+     * @return mixed
+     * @throws DriverNotFoundException
+     */
     public function resolve($to, $name, ParameterRepository $parameterRepository = null)
     {
 
@@ -77,21 +84,23 @@ class DriverManager
         }
 
         $driver = static::$drivers[$to][$name];
-
         $this->checkExpectation($to, $driver);
 
+        if (is_callable($driver)) {
+            return $driver(
+                $parameterRepository->getParameters()
+            );
+        }elseif (is_string($driver)) {
+            $driver =  new $driver(
+                $parameterRepository->getParameters()
+            );
+        }
 
-        if (is_object($driver)) {
+
+        if(is_object($driver)){
             return $driver;
         }
 
-        if (is_string($driver)) {
-            return new $driver($parameterRepository->getParameters());
-        }
-
-        if (is_callable($driver)) {
-            return $driver($parameterRepository->getParameters());
-        }
     }
 
     /**
@@ -116,7 +125,7 @@ class DriverManager
             if ( ! $expect->expect($driver)) {
                 throw new DriverIsNotExpectedException(
                     sprintf(
-                        '%s driver is not expected',
+                        '%s driver is not expected, please give a proper one',
                         $to
                     )
                 );

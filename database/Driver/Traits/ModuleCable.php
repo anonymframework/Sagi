@@ -6,7 +6,7 @@
  * Time: 13:27
  */
 
-namespace Sagi\Database\Builder\Traits;
+namespace Sagi\Database\Driver\Traits;
 
 
 use Sagi\Database\Model;

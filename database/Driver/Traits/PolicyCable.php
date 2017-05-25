@@ -6,7 +6,7 @@
  * Time: 01:51
  */
 
-namespace Sagi\Database\Builder\Traits;
+namespace Sagi\Database\Driver\Traits;
 
 use Sagi\Database\ConfigManager;
 use Sagi\Database\Exceptions\PolicyException;

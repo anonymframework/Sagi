@@ -6,7 +6,7 @@
  * Time: 01:37
  */
 
-namespace Sagi\Database\Builder\Traits;
+namespace Sagi\Database\Driver\Traits;
 
 
 trait GuardCable

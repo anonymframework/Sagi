@@ -1,16 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: My
- * Date: 05/22/2017
- * Time: 03:28
- */
 
 namespace Sagi\Database\Forge;
 
 
+use Sagi\Database\Builder;
 use Sagi\Database\Connector;
+use Sagi\Database\Driver\Expectation\ExpectInstanceOf;
 use Sagi\Database\Exceptions\QueryException;
+use Sagi\Database\Repositories\ParameterRepository;
 
 class Table
 {
@@ -26,9 +23,12 @@ class Table
      * @var array
      */
     private static $patterns = [
-        'create_exists' => 'CREATE TABLE IF NOT EXISTS `%s`(',
-        'create' => 'CREATE TABLE `%s`(',
-        'drop' => 'DROP TABLE `%s`;',
+        'create_exists' => /** @lang text */
+            'CREATE TABLE IF NOT EXISTS `%s`(',
+        'create' => /** @lang text */
+            'CREATE TABLE `%s`(',
+        'drop' => /** @lang text */
+            'DROP TABLE `%s`;',
         'end' => ');',
     ];
 
@@ -37,36 +37,71 @@ class Table
      */
     protected $commands;
 
+    /**
+     * @var Builder
+     */
+    private $builder;
+
+
+    public function __construct(Builder $builder)
+    {
+        $this->builder = $builder;
+
+        $this
+            ->builder
+            ->getDriverManager()
+            ->expect(
+                'migration',
+                new ExpectInstanceOf(
+                    '\Sagi\Database\Forge\DriverInterface'
+                )
+            );
+        
+    }
+
     public function create($table, callable $callback, $database = null)
     {
         $this->addCommand('create', $table);
+
         $callback(
             new Column($table)
         );
+
         $this->addCommand('end');
-        $command = $this->renderCommand();
+
+        $this->runCommand(
+            $this->renderCommand(),
+            $database
+        );
 
 
-        $this->runCommand($command,$database);
     }
 
+
     /**
-     * @param string $command
-     * @param string $command
-     * @return int
+     * @param $command
+     * @param $database
+     * @throws QueryException
      */
     private function runCommand($command, $database)
     {
-        $connection = $this->getConnector()->getConnection($database);
 
-        $run = $connection->exec($command);
+        $this->builder->connect($database);
+
+        $run = $this->builder
+            ->getDriver()
+            ->exec($command);
 
         if (false === $run) {
             throw new QueryException(
                 sprintf(
                     '%s has failed, error: %s',
                     $command,
-                    json_encode($connection->errorInfo())
+                    json_encode(
+                        $this->builder
+                            ->getDriver()
+                            ->errorInfo()
+                    )
                 )
             );
         }
@@ -75,10 +110,25 @@ class Table
 
     /**
      * @return string
+     * @throws \Sagi\Database\Exceptions\DriverNotFoundException
      */
     private function renderCommand()
     {
-        return implode('', $this->commands);
+
+        $driver = $this
+            ->builder
+            ->getDriverManager()
+            ->resolve(
+                'migration',
+                'create',
+                new ParameterRepository(
+                    $this->commands
+                )
+            );
+
+
+
+
     }
 
     /**
@@ -99,29 +149,4 @@ class Table
 
         return $command;
     }
-
-    /**
-     * @return Connector
-     */
-    public function getConnector()
-    {
-        if (null === $this->connector) {
-            $this->connector = new Connector();
-        }
-
-        return $this->connector;
-    }
-
-    /**
-     * @param mixed $connector
-     * @return Table
-     */
-    public function setConnector($connector)
-    {
-        $this->connector = $connector;
-
-        return $this;
-    }
-
-
 }
