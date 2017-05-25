@@ -1,8 +1,7 @@
 <?php
+
 namespace Sagi\Database\Driver;
 
-
-use Sagi\Database\Driver\Expectation\ExpectationInterface;
 
 class Driver
 {
@@ -37,16 +36,6 @@ class Driver
     }
 
     /**
-     * @param string $to
-     * @return Driver
-     */
-    public function setTo($to)
-    {
-        $this->to = $to;
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getName()
@@ -58,9 +47,10 @@ class Driver
      * @param string $name
      * @return Driver
      */
-    public function setName($name)
+    public function name($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -76,9 +66,10 @@ class Driver
      * @param callable|object $callback
      * @return Driver
      */
-    public function setCallback($callback)
+    public function callback($callback)
     {
         $this->callback = $callback;
+
         return $this;
     }
 }

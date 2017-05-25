@@ -2,60 +2,35 @@
 
 namespace Sagi\Database\Extension;
 
-use Sagi\Database\Connector;
-use Sagi\Database\Driver\Expectation\ExpectationInterface;
+use Sagi\Database\Driver\DriverManager;
 
 /**
  * Class BuilderExtension
  * @package Sagi\Database\Extension
  */
-class BuilderExtension implements ExtensionInterface
+class BuilderExtension
 {
     /**
-     * @var mixed
+     * @var DriverManager
      */
-    private $connector;
+    private $manager;
 
     /**
-     * @var ExpectationInterface
+     * BuilderExtension constructor.
+     * @param DriverManager $manager
      */
-    private $expectation;
-
-    /**
-     * @return mixed
-     */
-    public function getConnector()
+    public function __construct(DriverManager $manager)
     {
-        return $this->connector;
+        $this->manager = $manager;
     }
 
     /**
-     * @param mixed $connector
-     * @return BuilderExtension
+     * @param string $name
+     * @return \Sagi\Database\Driver\Driver
      */
-    public function setConnector($connector)
+    public function connector($name)
     {
-        $this->connector = $connector;
-
-        return $this;
-    }
-
-    /**
-     * @return ExpectationInterface
-     */
-    public function getExpectation()
-    {
-        return $this->expectation;
-    }
-
-    /**
-     * @param ExpectationInterface $expectation
-     * @return BuilderExtension
-     */
-    public function setExpectation($expectation)
-    {
-        $this->expectation = $expectation;
-
-        return $this;
+        return $this->manager->driver('connector')->name($name);
     }
 }
+

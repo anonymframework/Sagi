@@ -9,10 +9,14 @@
 namespace Sagi\Database;
 
 
+use League\Pipeline\PipelineBuilder;
 use Sagi\Database\Builder\WhereBuilder;
 use Sagi\Database\Driver\Connection\Interfaces\DriverInterface;
 use Sagi\Database\Driver\DriverManager;
 use Sagi\Database\Driver\Expectation\ExpectInstanceOf;
+use Sagi\Database\Exceptions\ExtensionNotAsExpectedException;
+use Sagi\Database\Exceptions\ExtensionNotFoundException;
+use Sagi\Database\Extension\Extension;
 use Sagi\Database\Grammer\Sql\SqlReaderGrammerInterface;
 use Sagi\Database\Mapping\Join;
 use Sagi\Database\Mapping\SubWhere;
@@ -128,8 +132,63 @@ class Builder
             );
     }
 
-    public function installExtensions(){
+    public function installExtensions($extensions)
+    {
 
+        $builder = new PipelineBuilder();
+
+        foreach ($extensions as $extension) {
+
+            $this->checkExtensionExists($extension);
+            $extension = new $extension;
+            $this->determineExtensionIsAsExpected($extension);
+            $builder->add(
+                [
+                    $extension,
+                    'install',
+                ]
+            );
+
+        }
+
+        return $builder
+            ->build()
+            ->process(
+                $this->getDriverManager()
+            );
+
+    }
+
+    /**
+     * @param object $extension
+     * @throws ExtensionNotAsExpectedException
+     */
+    private function determineExtensionIsAsExpected($extension)
+    {
+        if ( ! $extension instanceof Extension) {
+            throw new ExtensionNotAsExpectedException(
+                sprintf(
+                    '%s extension is not as expected',
+                    get_class($extension)
+                )
+            );
+        }
+    }
+
+    /**
+     * @param string $extension
+     * @throws ExtensionNotFoundException
+     */
+    private function checkExtensionExists($extension)
+    {
+        if ( ! class_exists($extension, true)) {
+            throw new ExtensionNotFoundException(
+                sprintf(
+                    '%s extension is not found',
+                    $extension
+                )
+            );
+        }
     }
 
     /**
@@ -154,7 +213,6 @@ class Builder
 
         return $this;
     }
-
 
     /**
      * @param string|null $db
