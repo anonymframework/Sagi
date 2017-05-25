@@ -11,14 +11,6 @@ use Sagi\Database\Interfaces\ConnectionInterface;
 class MysqliDriver extends Driver implements DriverInterface, ExecuteInterface, PrepareInterface
 {
 
-    /**
-     * MysqliDriver constructor.
-     * @param ConnectionInterface $connection
-     */
-    public function __construct(ConnectionInterface $connection)
-    {
-        $this->setConnection($connection);
-    }
 
     /**
      * @param $prepare
@@ -45,26 +37,10 @@ class MysqliDriver extends Driver implements DriverInterface, ExecuteInterface, 
      */
     public function prepare($query)
     {
-        $prepare = $this->getConnection()->prepare($query);
+        $prepare = $this->connection->prepare($query);
 
         return $prepare;
     }
 
-    /**
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
-     */
-    public function __call($name, array $arguments)
-    {
-        if (!is_callable([$this->getConnection(), $name])) {
-            throw new \BadMethodCallException(sprintf(
-                '%s class does not exists in mysqli', $name
-            ));
-        }
 
-        return call_user_func_array(
-            [$this->getConnection(), $name], $arguments
-        );
-    }
 }

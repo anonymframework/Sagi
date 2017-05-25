@@ -33,17 +33,6 @@ class Pattern extends Builder
      */
     public function build()
     {
-        foreach ($args as $key => $arg) {
-            $pattern = str_replace($key, $arg, $pattern);
-        }
 
-        $exploded = array_filter(
-            explode(' ', $pattern),
-            function ($value) {
-                return ! empty($value);
-            }
-        );
-
-        return implode(' ', $exploded);
     }
 }

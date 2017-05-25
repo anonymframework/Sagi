@@ -9,7 +9,9 @@ interface ConnectorInterface
 {
 
     /**
+     *
+     * @param string|null $db
      * @return ConnectionInterface
      */
-    public function connect();
+    public function connect($db = null);
 }

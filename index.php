@@ -1,12 +1,20 @@
 <?php
 
 include __DIR__.'/vendor/autoload.php';
-include  __DIR__.'/database/Helpers/functions.php';
+use Sagi\Database\Driver\Connection\Sql\MysqlConnector;
+$builder = new \Sagi\Database\Builder();
+
+$builder->getDriverManager()
+    ->add(
+        $builder
+            ->getDriverManager()
+        ->driver('connector')
+        ->setName('mysql')
+        ->setCallback(
+            new MysqlConnector()
+        )
+    );
 
 
-$table = new \Sagi\Database\Forge\Table();
+$connector = $builder->getDriverManager()->resolve('connector', 'mysql');
 
-$table->create('test', function(\Sagi\Database\Forge\Column $column)
-{
-
-});

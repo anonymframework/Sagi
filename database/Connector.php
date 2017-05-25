@@ -3,6 +3,7 @@
 namespace Sagi\Database;
 
 use PDO;
+use Sagi\Database\Driver\DriverManager;
 use Sagi\Database\Exceptions\ConnectionException;
 use Sagi\Database\Exceptions\DriverNotFoundException;
 use Sagi\Database\Interfaces\ConnectorInterface;
@@ -15,8 +16,29 @@ class Connector
      */
     protected $connection;
 
+    /**
+     * @var DriverManager
+     */
+    protected $driverManager;
 
-    private static $callbacks = [];
+    /**
+     * Connector constructor.
+     */
+    public function __construct(DriverManager $driverManager)
+    {
+        $this->driverManager = $driverManager;
+    }
+
+    /**
+     * @param string $connection
+     */
+    public function connect($connection){
+        $configs = $this->findConnectionConfig($connection);
+        $driver = $configs['driver'];
+
+        $driver = $this->driverManager->resolve('connector', $driver);
+
+    }
 
     /**
      * @param null $connection

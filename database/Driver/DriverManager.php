@@ -36,6 +36,18 @@ class DriverManager
     }
 
     /**
+     * @param string $to
+     * @param mixed $expect
+     * @return $this
+     */
+    public function expect($to, $expect)
+    {
+        static::$expects[$to][] = $expect;
+
+        return $this;
+    }
+
+    /**
      * @param Driver $driver
      * @return $this
      */
@@ -45,28 +57,28 @@ class DriverManager
         $to = $driver->getTo();
         $name = $driver->getName();
         $callback = $driver->getCallback();
-        $expect = $driver->getExpect();
 
         static::$drivers[$to][$name] = $callback;
-        static::$expects[$to][$name] = $expect;
 
         return $this;
     }
 
-    public function resolve($to, $name, ParameterRepository $parameterRepository)
+    public function resolve($to, $name, ParameterRepository $parameterRepository = null)
     {
 
-        if (!isset(static::$drivers[$to][$name])) {
-            throw new DriverNotFoundException(sprintf(
-                '%s.%s could not found',
-                $to,
-                $name
-            ));
+        if ( ! isset(static::$drivers[$to][$name])) {
+            throw new DriverNotFoundException(
+                sprintf(
+                    '%s.%s could not found',
+                    $to,
+                    $name
+                )
+            );
         }
 
         $driver = static::$drivers[$to][$name];
 
-        $this->checkExpectation($to, $name, $driver);
+        $this->checkExpectation($to, $driver);
 
 
         if (is_object($driver)) {
@@ -84,32 +96,30 @@ class DriverManager
 
     /**
      * @param string $to
-     * @param string $name
      * @param string $driver
      * @return bool
      * @throws DriverIsNotExpectedException
      */
-    private function checkExpectation($to, $name, $driver)
+    private function checkExpectation($to, $driver)
     {
-        if (!isset(static::$expects[$to][$name])) {
+        if ( ! isset(static::$expects[$to])) {
             return true;
         }
 
-        $expects = static::$expects[$to][$name];
-
-        if (!is_array($expects)) {
-            $expects = [$expects];
-        }
+        $expects = static::$expects[$to];
 
         foreach ($expects as $expect) {
             /**
              * @var ExpectationInterface $expect
              */
 
-            if (!$expect->expect($driver)) {
-                throw new DriverIsNotExpectedException(sprintf(
-                    '%s.%s driver is not expected', $to, $name
-                ));
+            if ( ! $expect->expect($driver)) {
+                throw new DriverIsNotExpectedException(
+                    sprintf(
+                        '%s driver is not expected',
+                        $to
+                    )
+                );
             }
         }
     }

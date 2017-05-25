@@ -22,10 +22,6 @@ class Driver
      */
     private $callback;
 
-    /**
-     * @var ExpectationInterface
-     */
-    private $expect;
 
     public function __construct($to = '')
     {
@@ -83,24 +79,6 @@ class Driver
     public function setCallback($callback)
     {
         $this->callback = $callback;
-        return $this;
-    }
-
-    /**
-     * @return ExpectationInterface
-     */
-    public function getExpect()
-    {
-        return $this->expect;
-    }
-
-    /**
-     * @param ExpectationInterface $expect
-     * @return Driver
-     */
-    public function setExpect(ExpectationInterface $expect)
-    {
-        $this->expect = $expect;
         return $this;
     }
 }

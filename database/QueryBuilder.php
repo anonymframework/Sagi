@@ -3,7 +3,6 @@
 namespace Sagi\Database;
 
 use PDO;
-use Sagi\Database\Executor\Interfaces\DriverInterface;
 use Sagi\Database\Exceptions\WhereException;
 use Sagi\Database\Mapping\Entity;
 use Sagi\Database\Mapping\Group;
@@ -31,11 +30,6 @@ class QueryBuilder
      * @var string
      */
     private $lastQueryString;
-
-    /**
-     * @var Connector
-     */
-    protected $connector;
 
     /**
      * @var Builder
@@ -74,12 +68,15 @@ class QueryBuilder
      */
     public function prepareConnection()
     {
-        if (null === $this->connector) {
-            $this->connector = new Connector();
-        }
         $connection = ! empty($this->database) ? $this->database : null;
 
-        return $this->connector->getConnection($connection);
+        if (false === $this->getBuilder()->isConnected()) {
+            $this->getBuilder()->connect($connection);
+        }
+
+        return $this
+            ->getBuilder()
+            ->getDriver();
     }
 
 
@@ -487,20 +484,6 @@ class QueryBuilder
 
     /**
      * @param $query
-     * @param bool $ex
-     * @return \PDOStatement|bool
-     */
-    private function returnPreparedResults($query, $ex = false)
-    {
-        $prepared = $this->prepare($query, $this->getArgs(), $ex);
-
-        $this->setArgs([])->setLastQueryString($query);
-
-        return $prepared;
-    }
-
-    /**
-     * @param $query
      * @param $args
      * @param bool $execute
      * @return bool|\PDOStatement
@@ -554,8 +537,11 @@ class QueryBuilder
      */
     public function get()
     {
-        return $this->returnPreparedResults(
-            $this->getBuilder()->handleGetQuery()
+        return $this->handleResults(
+            $this
+                ->getBuilder()
+                ->getGrammer()
+                ->read($this->getBuilder())
         );
     }
 
@@ -565,7 +551,15 @@ class QueryBuilder
     public function delete()
     {
         return $this->returnPreparedResults(
-            $this->getBuilder()->handleDelete(),
+            $this
+                ->getBuilder()
+                ->getGrammer()
+                ->delete(
+                    $this->getTable(),
+                    $this
+                        ->getBuilder()
+                        ->getWhere()
+                ),
             true
         );
 
@@ -582,8 +576,18 @@ class QueryBuilder
         }
 
 
-        return $this->returnPreparedResults(
-            $this->getBuilder()->handleUpdate($datas),
+        return $this->handleResults(
+            $this
+                ->getBuilder()
+                ->getGrammer()
+                ->update(
+                    $datas,
+                    $this
+                        ->getTable(),
+                    $this
+                        ->getBuilder()
+                        ->getWhere()
+                ),
             true
         );
     }
@@ -599,16 +603,43 @@ class QueryBuilder
             $data = new Entity($data);
         }
 
-        $create = $this->returnPreparedResults(
-            $this->getBuilder()->handleCreate($data),
+        $create = $this->handleResults(
+            $this
+                ->getBuilder()
+                ->getGrammer()
+                ->create(
+                    $data,
+                    $this
+                        ->getTable()
+                ),
             true
         );
 
-        $this->setArgs([]);
+        $this->getBuilder()->setArgs([]);
 
         return $create;
     }
 
+    /**
+     * @param array $result
+     * @param bool $returnOnlyExecute
+     * @return array
+     */
+    private function handleResults(array  $result, $returnOnlyExecute = false){
+        list($query, $args) = $result;
+
+        $this->getBuilder()->setArgs($args);
+
+        $prepare = $this->prepare($query);
+
+        list($prepareResult, $executeResult) = $this->execute($prepare, $args);
+
+        if(true === $returnOnlyExecute){
+            return $executeResult;
+        }
+
+        return array($prepareResult, $executeResult);
+    }
 
     /**
      * @return int

@@ -11,23 +11,11 @@ class PdoDriver extends Driver implements DriverInterface, ExecuteInterface, Pre
 
 
     /**
-     * PdoDriver constructor.
-     * @param ConnectorInterface $connection
-     */
-    public function __construct($connection)
-    {
-
-
-        $this->setConnection($connection);
-    }
-
-
-    /**
      * @return mixed
      */
     public function prepare($query)
     {
-        return $this->getConnection()->prepare($query);
+        return $this->connection->prepare($query);
     }
 
 
@@ -43,21 +31,4 @@ class PdoDriver extends Driver implements DriverInterface, ExecuteInterface, Pre
         return array($prepare, $exed);
     }
 
-    /**
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
-     */
-    public function __call($name, array $arguments)
-    {
-        if (!is_callable([$this->getConnection(), $name])) {
-            throw new \BadMethodCallException(sprintf(
-                '%s class does not exists in pdo', $name
-            ));
-        }
-
-        return call_user_func_array(
-            [$this->getConnection(), $name], $arguments
-        );
-    }
 }
