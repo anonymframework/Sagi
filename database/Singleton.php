@@ -14,6 +14,11 @@ class Singleton
      */
     protected static $instance;
 
+    // prevents new Singleton
+    protected function __construct()
+    {
+    }
+
     /**
      * @param $class
      * @param array $parameters
@@ -29,4 +34,11 @@ class Singleton
 
         return static::$instance[$class];
     }
+
+    /**
+     *  prevents cloning singleton instance
+     */
+    private function __clone(){}
+
+
 }

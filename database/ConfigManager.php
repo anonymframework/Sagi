@@ -9,51 +9,8 @@ class ConfigManager
     /**
      * @var array
      */
-    public static $configs;
+    private $configs;
 
-    /**
-     * @var string
-     */
-    public static $configFile;
-
-    /**
-     * @return array
-     */
-    public static function returnDefaultConnection()
-    {
-        $connection = self::get('connections.default', []);
-
-
-        return $connection;
-    }
-
-
-    public static function loadConfigs()
-    {
-        $rootDir = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR;
-
-        static::$configFile = $rootDir."config.php";
-
-        if (file_exists(static::$configFile)) {
-            static::$configs = include static::$configFile;
-
-            static::set('root_dir', $rootDir);
-        } else {
-            throw new Exceptions\ConfigException(static::$configFile.'is not exists');
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public static function getConfigs()
-    {
-        if ( ! static::$configs) {
-            static::loadConfigs();
-        }
-
-        return self::$configs;
-    }
 
     /**
      * Fetch a flattened array of a nested array element.
@@ -62,9 +19,8 @@ class ConfigManager
      * @return array
      *
      */
-    public static function get($key, $default = null)
+    public  function get($key, $default = null)
     {
-        $array = static::getConfigs();
 
         if (isset($array[$key])) {
             return $array[$key];
@@ -81,9 +37,8 @@ class ConfigManager
         return $array;
     }
 
-    public static function set($key, $value)
+    public  function set($key, $value)
     {
-        $array = &static::$configs;
 
         $keys = explode('.', $key);
 
@@ -105,11 +60,4 @@ class ConfigManager
         return $array;
     }
 
-    /**
-     * @param array $configs
-     */
-    public static function setConfigs($configs)
-    {
-        self::$configs = $configs;
-    }
 }

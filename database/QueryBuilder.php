@@ -7,6 +7,7 @@ use Sagi\Database\Exceptions\WhereException;
 use Sagi\Database\Mapping\Entity;
 use Sagi\Database\Mapping\Group;
 use Sagi\Database\Mapping\Join;
+use Sagi\Database\Mapping\Limit;
 use Sagi\Database\Mapping\Match;
 use Sagi\Database\Mapping\SubWhere;
 use Sagi\Database\Mapping\Where;
@@ -138,9 +139,16 @@ class QueryBuilder
      */
     public function limit($limit)
     {
-        if (is_string($limit) || is_int($limit)) {
-            $limit = [$limit];
+        if (is_array($limit)) {
+            list($startFrom, $offset) = $limit;
+        }else{
+            $startFrom = 0;
+            $offset = 10;
         }
+
+        $limit = new Limit(
+            $startFrom, $offset
+        );
 
         $this->getBuilder()->setLimit($limit);
 

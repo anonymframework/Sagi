@@ -4,9 +4,9 @@ namespace Sagi\Database\Driver\Grammer\Sql;
 
 
 use Sagi\Database\Builder;
-use Sagi\Database\Builder\SubQuery;
 use Sagi\Database\Mapping\Entity;
 use Sagi\Database\Mapping\Group;
+use Sagi\Database\Mapping\Limit;
 use Sagi\Database\Mapping\Match;
 use Sagi\Database\Mapping\SubWhere;
 use Sagi\Database\Mapping\Where;
@@ -64,7 +64,6 @@ class Ansi implements SqlReaderGrammerInterface
         $args = [];
 
 
-
         foreach ($where as $item) {
             $returned = $this->determineWhereType($item, $args);
 
@@ -101,7 +100,7 @@ class Ansi implements SqlReaderGrammerInterface
         if (is_array($returned)) {
             list($returned, $returnedArgs) = $returned;
 
-            if ( !is_array($returnedArgs)) {
+            if ( ! is_array($returnedArgs)) {
                 $returnedArgs = [$returnedArgs];
             }
         }
@@ -521,21 +520,18 @@ class Ansi implements SqlReaderGrammerInterface
     /**
      * @return string
      */
-    protected function handleLimitQuery()
+    protected function handleLimitQuery(Limit $limit)
     {
-        $limit = $this->limit;
-
-        if (empty($limit)) {
-            return "";
+        if (null === $limit) {
+            return '';
         }
 
-        if (isset($limit[1])) {
-            $s = sprintf('LIMIT %d OFFSET %d', $limit[1], $limit[0]);
-        } else {
-            $s = sprintf('LIMIT %d', $limit[0]);
-        }
-
-        return $s;
+        return
+            sprintf(
+                'LIMIT %d OFFSET %d',
+                $limit->offset,
+                $limit->startFrom
+            );
     }
 
     /**

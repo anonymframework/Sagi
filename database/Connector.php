@@ -10,6 +10,11 @@ use Sagi\Database\Interfaces\ConnectorInterface;
 
 class Connector
 {
+
+    /**
+     * @var string
+     */
+    protected $db;
     /**
      * @var PDO
      *
@@ -23,17 +28,23 @@ class Connector
 
     /**
      * Connector constructor.
+     * @param DriverManager $driverManager
+     * @param null $db
      */
-    public function __construct(DriverManager $driverManager)
+    public function __construct(DriverManager $driverManager, $db = null)
     {
         $this->driverManager = $driverManager;
+        $this->db = $db;
     }
 
     /**
      * @param string $connection
      */
-    public function connect($connection){
-        $configs = $this->findConnectionConfig($connection);
+    public function connect(){
+        $configs = $this->findConnectionConfig(
+            $this->db
+        );
+
         $driver = $configs['driver'];
 
         $driver = $this->driverManager->resolve('connector', $driver);
@@ -42,30 +53,67 @@ class Connector
     }
 
     /**
-     * @param null $connection
-     * @return mixed|null
-     * @throws ConnectionException
+     * @param string $db
+     * @return mixed
      */
-    public function madeConnection($connection = null)
+    private function findDriver()
     {
-        $configs = $this->findConnectionConfig($connection);
+        $configs = $this->findConnectionConfig(
+            $this->db
+        );
         $driver = $configs['driver'];
-        $connection = $this->callDriver($driver, $configs);
 
-        if (!$connection instanceof ConnectorInterface) {
-            throw new ConnectionException(
-                sprintf(
-                    '%s driver must return an instance of PDO',
-                    $driver
-                )
-            );
-        }
-
-
-        $this->connection = $connection->connect();
-
-        return $connection;
+        return $driver;
     }
+
+    public function grammer()
+    {
+
+    }
+
+
+    /**
+     * @return mixed
+     * @throws \Sagi\Database\Exceptions\DriverNotFoundException
+     */
+    public function create()
+    {
+        $driver = $this->findDriver(
+            $this->db
+        );
+
+        return $this->driverManager
+            ->resolve('create', $driver);
+    }
+
+    /**
+     * @return mixed
+     * @throws \Sagi\Database\Exceptions\DriverNotFoundException
+     */
+    public function blueprint()
+    {
+        $driver = $this->findDriver(
+            $this->db
+        );
+
+        return $this->driverManager
+            ->resolve('blueprint', $driver);
+    }
+
+    /**
+     * @return mixed
+     * @throws \Sagi\Database\Exceptions\DriverNotFoundException
+     */
+    public function modify()
+    {
+        $driver = $this->findDriver(
+            $this->db
+        );
+
+        return $this->driverManager
+            ->resolve('modify', $driver);
+    }
+
 
     /**
      * @param $connection
@@ -81,51 +129,5 @@ class Connector
 
 
         return $configs;
-    }
-
-    /**
-     * @param string $driver
-     * @param callable $callback
-     * @return Connector
-     */
-    public function driver($driver, $callback)
-    {
-        static::$callbacks[$driver] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * @param $driver
-     * @param array $configs
-     * @return mixed
-     * @throws DriverNotFoundException
-     */
-    private function callDriver($driver, array $configs)
-    {
-        $callback = static::$callbacks[$driver];
-
-
-        if (is_string($callback)) {
-            return static::$callback($configs);
-        }
-
-        return $callback($configs);
-
-        throw new DriverNotFoundException(sprintf('%s driver not found', $driver));
-    }
-
-    /**
-     *
-     * @param string $database
-     * @return PDO
-     */
-    public function getConnection($database = null)
-    {
-        if (null === $this->connection) {
-            return $this->madeConnection($database);
-        }
-
-        return $this->connection;
     }
 }

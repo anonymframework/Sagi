@@ -3,15 +3,15 @@
 namespace Sagi\Database;
 
 use League\Pipeline\PipelineBuilder;
-use Sagi\Database\Builder\WhereBuilder;
 use Sagi\Database\Driver\Connection\Interfaces\DriverInterface;
 use Sagi\Database\Driver\DriverManager;
 use Sagi\Database\Driver\Expectation\ExpectInstanceOf;
 use Sagi\Database\Exceptions\ExtensionNotAsExpectedException;
 use Sagi\Database\Exceptions\ExtensionNotFoundException;
-use Sagi\Database\Extension\Extension;
 use Sagi\Database\Driver\Grammer\Sql\SqlReaderGrammerInterface;
+use Sagi\Database\Extension\Interfaces\ExtensionInterface;
 use Sagi\Database\Mapping\Join;
+use Sagi\Database\Mapping\Limit;
 use Sagi\Database\Mapping\SubWhere;
 use Sagi\Database\Mapping\Where;
 use Sagi\Database\Interfaces\ConnectorInterface;
@@ -158,7 +158,7 @@ class Builder
      */
     private function determineExtensionIsAsExpected($extension)
     {
-        if ( ! $extension instanceof Extension) {
+        if ( ! $extension instanceof ExtensionInterface) {
             throw new ExtensionNotAsExpectedException(
                 sprintf(
                     '%s extension is not as expected',
@@ -244,23 +244,16 @@ class Builder
     }
 
     /**
+     * @param string $driver
      * @return SqlReaderGrammerInterface
      */
-    public function getGrammer()
+    public function getGrammer($driver = 'standart')
     {
-        return $this->grammer;
+        return $this
+            ->getConnector()
+            ->$driver();
     }
 
-    /**
-     * @param SqlReaderGrammerInterface $grammer
-     * @return Builder
-     */
-    public function setGrammer($grammer)
-    {
-        $this->grammer = $grammer;
-
-        return $this;
-    }
 
     /**
      * @return string
@@ -326,10 +319,10 @@ class Builder
     }
 
     /**
-     * @param array $limit
+     * @param Limit $limit
      * @return Builder
      */
-    public function setLimit($limit)
+    public function setLimit(Limit $limit)
     {
         $this->limit = $limit;
 

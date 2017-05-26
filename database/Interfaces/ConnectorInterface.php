@@ -1,6 +1,9 @@
 <?php
 namespace Sagi\Database\Interfaces;
 
+use Sagi\Database\Driver\Grammer\Sql\SqlStandartGrammerInterface;
+use Sagi\Database\Forge\DriverInterface;
+
 /**
  * Interface ConnectorInterface
  * @package Sagi\Database\Interfaces
@@ -10,8 +13,8 @@ interface ConnectorInterface
 
     /**
      *
-     * @param string|null $db
      * @return ConnectionInterface
      */
-    public function connect($db = null);
+    public function connect();
+
 }

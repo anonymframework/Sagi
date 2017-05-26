@@ -9,7 +9,7 @@ use Sagi\Database\Driver\Expectation\ExpectInstanceOf;
 use Sagi\Database\Exceptions\QueryException;
 use Sagi\Database\Repositories\ParameterRepository;
 
-class Table
+class Schema
 {
 
     /**
@@ -43,6 +43,12 @@ class Table
     private $builder;
 
 
+    /**
+     * @var array
+     */
+    private static $triggers;
+
+
     public function __construct(Builder $builder)
     {
         $this->builder = $builder;
@@ -56,7 +62,16 @@ class Table
                     '\Sagi\Database\Forge\DriverInterface'
                 )
             );
-        
+
+
+    }
+
+    /**
+     * @param Trigger $trigger the instance of trigger
+     */
+    public static function addTrigger(Trigger $trigger)
+    {
+        static::$triggers[] = $trigger;
     }
 
     public function create($table, callable $callback, $database = null)
@@ -107,46 +122,21 @@ class Table
         }
     }
 
-
     /**
-     * @return string
-     * @throws \Sagi\Database\Exceptions\DriverNotFoundException
-     */
-    private function renderCommand()
-    {
-
-        $driver = $this
-            ->builder
-            ->getDriverManager()
-            ->resolve(
-                'migration',
-                'create',
-                new ParameterRepository(
-                    $this->commands
-                )
-            );
-
-
-
-
-    }
-
-    /**
-     * @param string $pattern
-     * @param array|null $variables
+     * @param string $pattern the name of pattern
+     * @param array|null $variables variables will be used in command
      * @return string
      */
-    protected function addCommand($pattern, $variables = null)
+    protected function addCommand($pattern,array $variables = null)
     {
-        if ( ! is_array($variables)) {
-            $variables = [$variables];
-        }
 
-        array_unshift($variables, static::$patterns[$pattern]);
+        $this->commands[] = [
+            $pattern,
+            new ParameterRepository(
+                $variables
+            ),
+        ];
 
-        $command = call_user_func_array('sprintf', $variables);
-        $this->commands[] = $command;
-
-        return $command;
+        return $this;
     }
 }

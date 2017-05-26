@@ -253,16 +253,21 @@ trait Validation
                     function ($value) {
                         return ucfirst($value);
                     },
-                    explode("_", $name)
+                    explode('_', $name)
                 );
 
-                $func = "handleRule".join('', $prepared);
+                $func = 'handleRule'.implode('', $prepared);
 
-                $return = call_user_func_array(array($this, $func), [$index, $args]);
+                $return = $this->$func($index, $args);
 
 
                 if ($name === 'required' && ! $return) {
-                    $this->errors[$name.'.'.$index] = $this->prepareErrorMessage($index, $this->messages[$name], $args);
+                    $this->errors[$name.'.'.$index] =
+                        $this->prepareErrorMessage(
+                            $index,
+                            $this->messages[$name],
+                            $args
+                        );
                     break;
                 }
 
@@ -282,9 +287,15 @@ trait Validation
         if ( ! $return) {
             $full = $rule.'.'.$index;
 
-            $message = isset($this->messages[$full]) ? $this->messages[$full] : $this->messages[$rule];
+            $message = isset($this->messages[$full]) ?
+                $this->messages[$full] :
+                $this->messages[$rule];
 
-            $this->errors[$full] = $this->prepareErrorMessage($index, $message, $args);
+            $this->errors[$full] = $this->prepareErrorMessage(
+                $index,
+                $message,
+                $args
+            );
         }
     }
 
