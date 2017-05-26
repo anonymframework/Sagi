@@ -24,7 +24,7 @@ class Seeder
      */
     public function __construct(OutputInterface $output)
     {
-        $this->seedPath = ConfigManager::get('root_path').$this->seedPath;
+        $this->seedPath = Config::get('root_path').$this->seedPath;
         $this->output = $output;
     }
 

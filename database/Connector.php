@@ -122,9 +122,9 @@ class Connector
     private function findConnectionConfig($connection)
     {
         if ($connection === null) {
-            $configs = ConfigManager::get('connections.default', 'localhost');
+            $configs = Config::get('connections.default', 'localhost');
         } else {
-            $configs = ConfigManager::get('connections.' . $connection, []);
+            $configs = Config::get('connections.' . $connection, []);
         }
 
 

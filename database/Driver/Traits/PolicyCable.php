@@ -8,7 +8,7 @@
 
 namespace Sagi\Database\Driver\Traits;
 
-use Sagi\Database\ConfigManager;
+use Sagi\Database\Config;
 use Sagi\Database\Exceptions\PolicyException;
 use Sagi\Database\Interfaces\PolicyInterface;
 
@@ -39,7 +39,7 @@ trait PolicyCable
     public function getPolicy()
     {
         if ( ! $this->policy instanceof PolicyInterface) {
-            if ($policy = ConfigManager::get('policies.'.get_called_class())) {
+            if ($policy = Config::get('policies.'.get_called_class())) {
                 if ( ! is_string($policy) || ! class_exists($policy)) {
                     throw new PolicyException('Policy does not exists');
                 }
@@ -61,7 +61,7 @@ trait PolicyCable
                 $policyKey = sprintf('policies.messages.%s_%s', $model->getTable(), $method);
                 $default = sprintf('You cannot use %s method', $method);
                 throw new PolicyException(
-                    ConfigManager::get($policyKey, $default)
+                    Config::get($policyKey, $default)
                 );
             }
         };

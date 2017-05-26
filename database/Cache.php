@@ -22,7 +22,7 @@ trait Cache
 
     public function bootCache()
     {
-        $configs = ConfigManager::get('cache');
+        $configs = Config::get('cache');
 
         $selectedDriver = isset($configs['driver']) ? $configs['driver'] : 'memcache';
 
@@ -38,13 +38,13 @@ trait Cache
         $driver = new $driverName;
 
 
-        $defaultConfig = ConfigManager::get('cache.'.$selectedDriver.'.default', false);
+        $defaultConfig = Config::get('cache.'.$selectedDriver.'.default', false);
 
         if ($defaultConfig) {
-            $selectedConfigs = ConfigManager::get('cache.'.$selectedDriver.$defaultConfig, []);
+            $selectedConfigs = Config::get('cache.'.$selectedDriver.$defaultConfig, []);
 
             if ( ! empty($selectedConfigs)) {
-                $driver->boot(ConfigManager::get('cache.'.$selectedDriver.$driverName, []));
+                $driver->boot(Config::get('cache.'.$selectedDriver.$driverName, []));
 
                 static::$driver = $driver;
             }

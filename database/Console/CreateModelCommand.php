@@ -2,7 +2,7 @@
 
 namespace Sagi\Database\Console;
 
-use Sagi\Database\ConfigManager;
+use Sagi\Database\Config;
 use Sagi\Database\MigrationManager;
 use Sagi\Database\Model;
 use Sagi\Database\QueryBuilder;
@@ -50,7 +50,7 @@ class CreateModelCommand extends Command
             'model',
             [
                 'table' => $name,
-                'relations' => ConfigManager::get(
+                'relations' => Config::get(
                     'prepare_relations',
                     true
                 ) === true ? $this->prepareRelations($name).$this->prepareRelationsMany($name) : '',

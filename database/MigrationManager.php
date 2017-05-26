@@ -79,7 +79,7 @@ class MigrationManager extends Schema
             $migrations[$file] = $prepared;
         }
 
-        $firstMigrations = ConfigManager::get('migrations', []);
+        $firstMigrations = Config::get('migrations', []);
 
         foreach ($firstMigrations as $firstMigration) {
             $search = array_search($firstMigration, $migrations);
