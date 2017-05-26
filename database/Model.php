@@ -9,7 +9,6 @@ use PDO;
 use Sagi\Database\Driver\Traits\EventCable;
 use Sagi\Database\Driver\Traits\GuardCable;
 use Sagi\Database\Driver\Traits\ModuleCable;
-use Sagi\Database\Driver\Traits\PolicyCable;
 use Sagi\Database\Exceptions\AttributeNotFoundException;
 use Sagi\Database\Exceptions\NotFoundException;
 use Sagi\Database\Exceptions\ProtectedAttributeException;
@@ -31,7 +30,7 @@ class Model extends QueryBuilder implements Iterator, Countable, ArrayAccess
     const DELETED_AT = 'deleted_at';
 
 
-    use ModuleCable, GuardCable, EventCable, PolicyCable;
+    use ModuleCable, GuardCable, EventCable;
     /**
      * @var array
      */
