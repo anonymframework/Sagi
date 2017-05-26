@@ -15,15 +15,12 @@
     "symfony/process": "~2.4",
     "nesbot/carbon": "~1.21",
     "league/pipeline": "dev-master",
-    "cable/cable-facade": "1.0.3"
+    "cable/cable-facades": "1.0.3"
   },
   "require-dev": {
      "predis/predis" : "1.1",
-    "phpunit/phpunit": "^6.1",
-    "phpunit/php-invoker": "1.1.x-dev",
-    "phpunit/dbunit": "^3.0@dev"
+    "phpunit/phpunit": "^6.1"
   },
-  "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
       "Sagi\\Database\\": "database/",

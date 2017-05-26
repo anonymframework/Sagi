@@ -8,7 +8,7 @@
 
 namespace Sagi\Database\Driver\Traits;
 
-use Sagi\Database\Config;
+use Sagi\Database\Facade\Config;
 use Sagi\Database\Exceptions\PolicyException;
 use Sagi\Database\Interfaces\PolicyInterface;
 

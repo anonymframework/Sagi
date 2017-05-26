@@ -2,7 +2,7 @@
 
 namespace Sagi\Database\Console;
 
-use Sagi\Database\Config;
+use Sagi\Database\Facade\Config;
 use Sagi\Database\MigrationManager;
 use Sagi\Database\Model;
 use Sagi\Database\QueryBuilder;
